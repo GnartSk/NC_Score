@@ -29,7 +29,10 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      'import/newline-after-import': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      'require-await': 'off',
+      '@typescript-eslint/require-await': 'off',
     },
-  },
+  }
 );
