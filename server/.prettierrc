@@ -2,6 +2,7 @@
   "arrowParens": "always",
   "bracketSpacing": true,
   "embeddedLanguageFormatting": "auto",
+  "endOfLine": "crlf",
   "htmlWhitespaceSensitivity": "css",
   "insertPragma": false,
   "jsxBracketSameLine": false,
@@ -12,6 +13,8 @@
   "requirePragma": false,
   "semi": true,
   "singleQuote": true,
+  "tabWidth": 2,
+  "useTabs": false,
 
   "trailingComma": "es5",
   "vueIndentScriptAndStyle": false
