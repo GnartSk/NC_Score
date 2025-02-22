@@ -33,6 +33,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-argument': 'warn',
       'require-await': 'off',
       '@typescript-eslint/require-await': 'off',
+      "linebreak-style": ["error", "window"],
     },
   }
 );

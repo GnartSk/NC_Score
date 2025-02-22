@@ -1,0 +1,18 @@
+meta {
+  name: Create a user
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/user
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  gmail: hoangle293vu@gmail.com
+  username: kophaivu
+  password: 29032004
+  fullName: Vu
+}
