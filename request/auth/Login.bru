@@ -5,7 +5,12 @@ meta {
 }
 
 post {
-  url: 
-  body: none
+  url: {{baseUrl}}/api/auth/login
+  body: formUrlEncoded
   auth: none
+}
+
+body:form-urlencoded {
+  gmail: hoangle293vu@gmail.com
+  password: 29032004
 }
