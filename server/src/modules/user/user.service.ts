@@ -6,6 +6,7 @@ import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { hashPasswordHelper } from '@/helpers/util';
 import aqp from 'api-query-params';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class UserService {
@@ -51,7 +52,7 @@ export class UserService {
 
     const totalItems = (await this.userModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / pageSize);
-    const skip = (+current - 1) * (+pageSize);
+    const skip = (+current - 1) * +pageSize;
 
     const results = await this.userModel
       .find(filter)
@@ -65,11 +66,19 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findByGmail(gmail: string) {
+    return await this.userModel.findOne({ gmail });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(updateUserDto: UpdateUserDto) {
+    return await this.userModel.updateOne({ _id: updateUserDto._id }, { ...updateUserDto });
+  }
+
+  async remove(_id: string) {
+    if (mongoose.isValidObjectId(_id)) {
+      return this.userModel.deleteOne({ _id });
+    } else {
+      throw new BadRequestException('Invalid MongoDB _id');
+    }
   }
 }

@@ -1,0 +1,20 @@
+meta {
+  name: Update user
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/user
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  _id: 67b9d1d6d4ef5106bba81cc6
+  ~username: update
+  ~fullName: 
+  ~avatar: 
+  ~birth: 
+  ~gender: 
+}

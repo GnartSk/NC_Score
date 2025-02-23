@@ -14,6 +14,7 @@ import { ScoreModule } from './modules/score/score.module';
 import { SubjectModule } from './modules/subject/subject.module';
 import { SubjectRelateModule } from './modules/subject_relate/subject_relate.module';
 import { UserModule } from './modules/user/user.module';
+import { AuthModule } from '@/auth/auth.module';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -42,6 +43,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [ConfigService],
     }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

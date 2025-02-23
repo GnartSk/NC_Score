@@ -1,5 +1,5 @@
 import { Prop } from '@nestjs/mongoose';
-import { IsEmpty, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty({message: "gmail is required"})
