@@ -7,12 +7,15 @@ import { Model } from 'mongoose';
 import { hashPasswordHelper } from '@/helpers/util';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<User>
+    private userModel: Model<User>,
   ) {}
 
   isEmailExist = async (gmail: string) => {
@@ -80,5 +83,28 @@ export class UserService {
     } else {
       throw new BadRequestException('Invalid MongoDB _id');
     }
+  }
+
+  async handleRegister(registerDto: CreateAuthDto) {
+    const { gmail, username, password } = registerDto;
+
+    const isExist = await this.isEmailExist(gmail);
+    if (isExist) {
+      throw new BadRequestException('Gmail has been used.');
+    }
+
+    const hashPassword = await hashPasswordHelper(password);
+    const user = await this.userModel.create({
+      gmail,
+      username,
+      password: hashPassword,
+      isActive: false,
+      codeId: uuidv4(),
+      codeExpired: dayjs().add(1, 'minutes'),
+    });
+
+    return {
+      _id: user._id,
+    };
   }
 }

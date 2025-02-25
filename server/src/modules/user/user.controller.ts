@@ -5,35 +5,34 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+	constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    console.log('>> Check createUserDto', createUserDto);
-    return this.userService.create(createUserDto);
-  }
+	@Post()
+	create(@Body() createUserDto: CreateUserDto) {
+		return this.userService.create(createUserDto);
+	}
 
-  @Get()
-  async findAll(
-    @Query() query: string,
-    @Query('current') current: string,
-    @Query('pageSize') pageSize: string
-  ) {
-    return this.userService.findAll(query, +current, +pageSize);
-  }
+	@Get()
+	async findAll(
+		@Query() query: string,
+		@Query('current') current: string,
+		@Query('pageSize') pageSize: string,
+	) {
+		return this.userService.findAll(query, +current, +pageSize);
+	}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
+	@Get(':id')
+	findOne(@Param('id') id: string) {
+		return this.userService.findOne(+id);
+	}
 
-  @Patch()
-  update(@Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(updateUserDto);
-  }
+	@Patch()
+	update(@Body() updateUserDto: UpdateUserDto) {
+		return this.userService.update(updateUserDto);
+	}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
-  }
+	@Delete(':id')
+	remove(@Param('id') id: string) {
+		return this.userService.remove(id);
+	}
 }

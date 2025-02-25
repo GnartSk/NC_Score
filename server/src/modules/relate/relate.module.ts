@@ -3,7 +3,7 @@ import { RelateService } from './relate.service';
 import { RelateController } from './relate.controller';
 
 @Module({
-  controllers: [RelateController],
-  providers: [RelateService],
+	controllers: [RelateController],
+	providers: [RelateService],
 })
 export class RelateModule {}

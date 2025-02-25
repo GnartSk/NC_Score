@@ -5,30 +5,30 @@ import { UpdateSubjectRelateDto } from './dto/update-subject_relate.dto';
 
 @Controller('subject-relate')
 export class SubjectRelateController {
-  constructor(private readonly subjectRelateService: SubjectRelateService) {}
+	constructor(private readonly subjectRelateService: SubjectRelateService) {}
 
-  @Post()
-  create(@Body() createSubjectRelateDto: CreateSubjectRelateDto) {
-    return this.subjectRelateService.create(createSubjectRelateDto);
-  }
+	@Post()
+	create(@Body() createSubjectRelateDto: CreateSubjectRelateDto) {
+		return this.subjectRelateService.create(createSubjectRelateDto);
+	}
 
-  @Get()
-  findAll() {
-    return this.subjectRelateService.findAll();
-  }
+	@Get()
+	findAll() {
+		return this.subjectRelateService.findAll();
+	}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.subjectRelateService.findOne(+id);
-  }
+	@Get(':id')
+	findOne(@Param('id') id: string) {
+		return this.subjectRelateService.findOne(+id);
+	}
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubjectRelateDto: UpdateSubjectRelateDto) {
-    return this.subjectRelateService.update(+id, updateSubjectRelateDto);
-  }
+	@Patch(':id')
+	update(@Param('id') id: string, @Body() updateSubjectRelateDto: UpdateSubjectRelateDto) {
+		return this.subjectRelateService.update(+id, updateSubjectRelateDto);
+	}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.subjectRelateService.remove(+id);
-  }
+	@Delete(':id')
+	remove(@Param('id') id: string) {
+		return this.subjectRelateService.remove(+id);
+	}
 }

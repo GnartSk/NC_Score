@@ -25,6 +25,9 @@ export class User {
   codeId: string; //Validation code send via email
 
   @Prop()
+  codeExpired: string;
+
+  @Prop()
   birth: string;
 
   @Prop()

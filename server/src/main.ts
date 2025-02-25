@@ -4,23 +4,23 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule);
 
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT');
+	const configService = app.get(ConfigService);
+	const port = configService.get<number>('PORT');
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-    })
-  );
+	app.useGlobalPipes(
+		new ValidationPipe({
+			whitelist: true,
+		}),
+	);
 
-  app.setGlobalPrefix('api', { exclude: [''] });
+	app.setGlobalPrefix('api', { exclude: [''] });
 
-  if (port === undefined) {
-    throw new Error('PORT configuration is not set');
-  }
+	if (port === undefined) {
+		throw new Error('PORT configuration is not set');
+	}
 
-  await app.listen(port);
+	await app.listen(port);
 }
 bootstrap();
