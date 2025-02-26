@@ -33,7 +33,11 @@ export class AuthController {
         to: '22521511@gm.uit.edu.vn', // list of receivers
         subject: 'From NC Score with luv ✔', // Subject line
         text: 'welcome', // plaintext body
-        html: '<b>Chao buoi toi ahihi</b>', // HTML body content
+        template: "register",
+        context: {
+          name: "Vu trai dep",
+          activationCode: 123456789
+        }
       })
       .then(() => {})
       .catch(() => {});

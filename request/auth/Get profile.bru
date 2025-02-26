@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/auth/login
+  url: {{baseUrl}}/api/auth/profile
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhvYW5nbGUyOTN2dUBnbWFpbC5jb20iLCJzdWIiOiI2N2JkMjNkZjliZTBkMWI1NTk1NmQ2NzUiLCJpYXQiOjE3NDA0ODcwNDIsImV4cCI6MTc0MDQ5Nzg0Mn0.wnZCWuEIRG_GEqeHDS1Fs4QZvBfoO8SswIjwSpA92_w
 }

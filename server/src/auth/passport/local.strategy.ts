@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 
 @Injectable()
@@ -13,6 +13,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 		const user = await this.authService.validateUser(gmail, password);
 		if (!user) {
 			throw new UnauthorizedException('Invalid gmail/password');
+		}
+
+		if (user.isActive == false) {
+			throw new BadRequestException("Account not activated")
 		}
 		return user;
 	}

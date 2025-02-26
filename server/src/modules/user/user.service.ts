@@ -10,12 +10,14 @@ import mongoose from 'mongoose';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<User>,
+    private readonly mailerService: MailerService,
   ) {}
 
   isEmailExist = async (gmail: string) => {
@@ -94,13 +96,24 @@ export class UserService {
     }
 
     const hashPassword = await hashPasswordHelper(password);
+    const codeId = uuidv4()
     const user = await this.userModel.create({
       gmail,
       username,
       password: hashPassword,
       isActive: false,
-      codeId: uuidv4(),
-      codeExpired: dayjs().add(1, 'minutes'),
+      codeId: codeId,
+      codeExpired: dayjs().add(10, 'minutes'),
+    });
+
+    this.mailerService.sendMail({
+      to: user.gmail, // list of receivers
+      subject: 'Activate your NC Score account', // Subject line
+      template: 'register',
+      context: {
+        name: user?.fullName ?? user.gmail,
+        activationCode: codeId,
+      },
     });
 
     return {
