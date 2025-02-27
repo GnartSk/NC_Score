@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { Public } from '@/decorator/customize';
@@ -25,6 +25,13 @@ export class AuthController {
     return this.authService.handleRegister(registerDto);
   }
 
+  @Post('verify-code')
+  @Public()
+  verifyCode(@Query() query: any) {
+    console.log("Query: ", query)
+    return this.authService.verifyCode(query.codeId);
+  }
+
   @Get('mail')
   @Public()
   testMail() {
@@ -33,11 +40,11 @@ export class AuthController {
         to: '22521511@gm.uit.edu.vn', // list of receivers
         subject: 'From NC Score with luv ✔', // Subject line
         text: 'welcome', // plaintext body
-        template: "register",
+        template: 'register',
         context: {
-          name: "Vu trai dep",
-          activationCode: 123456789
-        }
+          name: 'Vu trai dep',
+          activationCode: 123456789,
+        },
       })
       .then(() => {})
       .catch(() => {});

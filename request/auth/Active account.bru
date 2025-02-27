@@ -1,0 +1,15 @@
+meta {
+  name: Active account
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/auth/verify-code?codeId=915b8e2b-058c-4afc-852a-bca24647341d
+  body: none
+  auth: none
+}
+
+params:query {
+  codeId: 915b8e2b-058c-4afc-852a-bca24647341d
+}

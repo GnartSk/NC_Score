@@ -88,7 +88,7 @@ export class UserService {
   }
 
   async handleRegister(registerDto: CreateAuthDto) {
-    const { gmail, username, password } = registerDto;
+    const { gmail, username, password, fullName } = registerDto;
 
     const isExist = await this.isEmailExist(gmail);
     if (isExist) {
@@ -96,14 +96,15 @@ export class UserService {
     }
 
     const hashPassword = await hashPasswordHelper(password);
-    const codeId = uuidv4()
+    const codeId = uuidv4();
     const user = await this.userModel.create({
       gmail,
       username,
+      fullName,
       password: hashPassword,
       isActive: false,
       codeId: codeId,
-      codeExpired: dayjs().add(10, 'minutes'),
+      codeExpired: dayjs().add(100, 'minutes'),
     });
 
     this.mailerService.sendMail({
@@ -119,5 +120,28 @@ export class UserService {
     return {
       _id: user._id,
     };
+  }
+
+  async handleActiveAccount(codeId: string) {
+    if (!codeId) {
+      throw new BadRequestException('Invalid activation code.');
+    }
+
+    const user = await this.userModel.findOne({ codeId: codeId });
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired activation code.');
+    }
+
+    if (dayjs().isAfter(user.codeExpired)) {
+      throw new BadRequestException('Activation code has expired.');
+    }
+
+    user.isActive = true;
+    user.codeId = null;
+    user.codeExpired = null;
+    await user.save();
+
+    return true;
   }
 }

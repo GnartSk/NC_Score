@@ -21,11 +21,11 @@ export class User {
   @Prop({ default: 'USER' })
   role: string;
 
-  @Prop()
-  codeId: string; //Validation code send via email
+  @Prop({ type: String, default: null })
+  codeId: string | null; //Validation code send via email
 
-  @Prop()
-  codeExpired: string;
+  @Prop({ type: Date, default: null })
+  codeExpired: Date | null;
 
   @Prop()
   birth: string;

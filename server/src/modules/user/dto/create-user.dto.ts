@@ -14,6 +14,12 @@ export class CreateUserDto {
 	@IsNotEmpty({ message: 'password is required' })
 	password: string;
 
+	@IsNotEmpty({ message: 'studentId is required' })
+	studentId: string;
+
+	@IsNotEmpty({ message: 'idAcademicYear is required' })
+	idAcademicYear: string;
+
 	@Prop()
 	avatar: string;
 
