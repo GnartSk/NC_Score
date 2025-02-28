@@ -17,8 +17,11 @@ export class CreateAuthDto {
   @IsNotEmpty({ message: 'studentId is required' })
   studentId: string;
 
-  @IsNotEmpty({ message: 'idAcademicYear is required' })
-  idAcademicYear: string;
+  @IsNotEmpty({ message: 'academicYear is required' })
+  academicYear: string;
+
+  @IsNotEmpty({ message: 'specialized is required' })
+  specialized: string; // 'Mạng máy tính & Truyền thông dữ liệu' 'An toàn thông tin'
 
   @Prop()
   avatar: string;
@@ -28,4 +31,7 @@ export class CreateAuthDto {
 
   @Prop()
   gender: string;
+
+  @Prop()
+  role: string;
 }

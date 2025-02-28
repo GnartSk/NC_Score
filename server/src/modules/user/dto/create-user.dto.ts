@@ -17,8 +17,11 @@ export class CreateUserDto {
 	@IsNotEmpty({ message: 'studentId is required' })
 	studentId: string;
 
-	@IsNotEmpty({ message: 'idAcademicYear is required' })
-	idAcademicYear: string;
+	@IsNotEmpty({ message: 'academicYear is required' })
+	academicYear: string;
+
+	@IsNotEmpty({message: 'specialized is required'})
+    specialized: string;
 
 	@Prop()
 	avatar: string;
@@ -28,4 +31,7 @@ export class CreateUserDto {
 
 	@Prop()
 	gender: string;
+
+	@Prop()
+	role: string;
 }

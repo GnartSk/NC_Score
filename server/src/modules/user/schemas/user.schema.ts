@@ -18,7 +18,7 @@ export class User {
   @Prop()
   avatar: string;
 
-  @Prop({ default: 'USER' })
+  @Prop({ default: 'USER' })  //ADMIN, USER
   role: string;
 
   @Prop({ type: String, default: null })
@@ -40,6 +40,9 @@ export class User {
   isActive: boolean;
 
   @Prop()
-  idAcademicYear: number;
+  academicYear: number;
+
+  @Prop()
+  specialized: string;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

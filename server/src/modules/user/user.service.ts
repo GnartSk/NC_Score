@@ -46,7 +46,7 @@ export class UserService {
     });
 
     return {
-      _id: user._id,
+      user,
     };
   }
 
@@ -88,7 +88,7 @@ export class UserService {
   }
 
   async handleRegister(registerDto: CreateAuthDto) {
-    const { gmail, username, password, fullName } = registerDto;
+    const { gmail, username, password, fullName, studentId, academicYear, role, specialized } = registerDto;
 
     const isExist = await this.isEmailExist(gmail);
     if (isExist) {
@@ -105,6 +105,10 @@ export class UserService {
       isActive: false,
       codeId: codeId,
       codeExpired: dayjs().add(100, 'minutes'),
+      studentId,
+      academicYear,
+      role,
+      specialized,
     });
 
     this.mailerService.sendMail({
@@ -118,7 +122,7 @@ export class UserService {
     });
 
     return {
-      _id: user._id,
+      user,
     };
   }
 
