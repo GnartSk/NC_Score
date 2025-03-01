@@ -6,16 +6,28 @@ meta {
 
 post {
   url: {{baseUrl}}/api/subject
-  body: formUrlEncoded
+  body: json
   auth: bearer
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjIyNTIxNjkxQGdtLnVpdC5lZHUudm4iLCJzdWIiOiI2N2MwNzBjZDFmZDU0YWJlMzYzMGI0MWUiLCJpYXQiOjE3NDA3NTA0MzMsImV4cCI6MTc0MDc2MTIzM30.YfwZG0Nv4pNwFgukuWbxXbooW3_JuW8vBlr8qShsioo
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjIyNTIxNjkxQGdtLnVpdC5lZHUudm4iLCJzdWIiOiI2N2MzMGVmMGI3Y2M1MzA3OGRiMjJlYjAiLCJpYXQiOjE3NDA4Mzc1MTMsImV4cCI6MTgyNzIzNzUxM30.BkbsdquXMl8J8jszebeVwr8WHk2nonqZu9nNpg1FoDw
+}
+
+body:json {
+  {
+    "subjectCode": "1",
+    "subjectName": "1",
+    "credit": 4,
+    "blockOfKnowledge": "1",
+    "specialized": "Mạng máy tính & Truyền thông dữ liệu",
+    "relatedToIndustry": ["web", "devops"]
+  }
+  
 }
 
 body:form-urlencoded {
-  subjectCode: 1
+  subjectCode: 3
   subjectName: 1
   credit: 1
   blockOfKnowledge: 1

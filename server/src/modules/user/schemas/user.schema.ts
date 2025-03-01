@@ -18,7 +18,7 @@ export class User {
   @Prop()
   avatar: string;
 
-  @Prop({ default: 'USER' })  //ADMIN, USER
+  @Prop() //ADMIN, USER
   role: string;
 
   @Prop({ type: String, default: null })
