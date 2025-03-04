@@ -1,0 +1,22 @@
+meta {
+  name: Register
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/auth/register
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  gmail: 22521691@gm.uit.edu.vn
+  username: kophaivu
+  fullName: Vu
+  password: 29032004
+  studentId: 22521691
+  academicYear: 2022
+  specialized: Mạng máy tính & Truyền thông dữ liệu
+  role: ADMIN
+}
