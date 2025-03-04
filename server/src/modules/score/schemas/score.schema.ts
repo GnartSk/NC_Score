@@ -32,13 +32,13 @@ export class Score {
   })
   TK: number;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   status: string; //"ONSTUDY", "NOTSTUDY", "FINISH"
 
-  @Prop()
-  idStudentId: string;
+  @Prop({ type: String, required: true })
+  idStudent: string;
 
-  @Prop()
-  idSubject: string;
+  @Prop({ type: String, required: true })
+  subjectCode: string;
 }
 export const ScoreSchema = SchemaFactory.createForClass(Score);

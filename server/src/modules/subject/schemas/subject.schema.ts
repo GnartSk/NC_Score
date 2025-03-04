@@ -16,7 +16,7 @@ export class Subject {
   @Prop()
   specialized: string;
 
-  @Prop({ type: [String], default: {} }) // Object chứa nhiều chuỗi
+  @Prop({ type: [String], default: [] }) // Object chứa nhiều chuỗi
   relatedToIndustry: string[];
 }
 export const SubjectSchema = SchemaFactory.createForClass(Subject);
