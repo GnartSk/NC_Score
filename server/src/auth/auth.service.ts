@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { MailerService } from '@nestjs-modules/mailer';
+import { CreateUserDto } from '@/modules/user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -85,5 +86,13 @@ export class AuthService {
     }
 
     throw new NotFoundException('Gmail not found...');
+  }
+
+  async validateGoogleUser(googleUser: CreateUserDto) {
+    const user = await this.userService.findByGmail(googleUser.gmail)
+
+    if (user) return user;
+
+    return await this.userModel.create(googleUser)
   }
 }
