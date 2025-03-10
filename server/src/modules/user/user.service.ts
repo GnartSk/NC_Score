@@ -1,16 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { hashPasswordHelper } from '@/helpers/util';
-import aqp from 'api-query-params';
 import mongoose from 'mongoose';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class UserService {
@@ -50,33 +50,39 @@ export class UserService {
     };
   }
 
-  async findAll(query: string, current: number, pageSize: number) {
-    const { filter, sort } = aqp(query);
-    if (!current) current = 1;
-    if (!pageSize) pageSize = 10;
+  async findAll(paginationDto: PaginationDto) {
+    const { page = 1, limit = 10 } = paginationDto;
+    const skip = (page - 1) * limit;
 
-    const totalItems = (await this.userModel.find(filter)).length;
-    const totalPages = Math.ceil(totalItems / pageSize);
-    const skip = (+current - 1) * +pageSize;
+    const users = await this.userModel.find().skip(skip).limit(limit);
+    const total = await this.userModel.countDocuments();
 
-    const results = await this.userModel
-      .find(filter)
-      .limit(pageSize)
-      .skip(skip)
-      .sort(sort as any);
-    return results;
+    return {
+      users,
+      totalRecords: total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(_id: string) {
+    return await this.userModel.findOne({ _id });
   }
 
   async findByGmail(gmail: string) {
     return await this.userModel.findOne({ gmail });
   }
 
-  async update(updateUserDto: UpdateUserDto) {
-    return await this.userModel.updateOne({ _id: updateUserDto._id }, { ...updateUserDto });
+  async update(userId: string, updateUserDto: UpdateUserDto) {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    Object.assign(user, updateUserDto);
+
+    await user.save();
+    return user;
   }
 
   async remove(_id: string) {
@@ -88,7 +94,12 @@ export class UserService {
   }
 
   async handleRegister(registerDto: CreateAuthDto) {
-    const { gmail, username, password, fullName, studentId, academicYear, role, specialized } = registerDto;
+    const { gmail, username, password, fullName, studentId, academicYear, role } = registerDto;
+
+    const gmailRegex = /^[0-9]{2}52[0-9]{4}@gm\.uit\.edu\.vn$/;
+    if (!gmailRegex.test(gmail)) {
+      throw new UnauthorizedException('Invalid gmail format');
+    }
 
     const isExist = await this.isEmailExist(gmail);
     if (isExist) {
@@ -108,7 +119,6 @@ export class UserService {
       studentId,
       academicYear,
       role,
-      specialized,
     });
 
     this.mailerService.sendMail({

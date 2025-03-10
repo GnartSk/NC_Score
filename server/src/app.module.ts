@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
@@ -13,7 +12,13 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { UserModule } from '@/modules/user/user.module';
 import { AuthModule } from '@/auth/auth.module';
 import { SubjectModule } from '@/modules/subject/subject.module';
+<<<<<<< HEAD
 import * as path from 'path';
+=======
+import { ScoreModule } from './modules/score/score.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+>>>>>>> 521de89fcf3fe2cd1bfde1798347a74b2fcdebcd
 
 @Module({
   imports: [
@@ -58,6 +63,23 @@ import * as path from 'path';
       }),
       inject: [ConfigService],
     }),
+    ClientsModule.registerAsync([
+      {
+        name: 'RABBITMQ_SERVICE',
+        imports: [ConfigModule],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get<string>('RABBITMQ_URL') as string],
+            queue: 'main_queue',
+            queueOptions: { durable: false },
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
+    ScoreModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [

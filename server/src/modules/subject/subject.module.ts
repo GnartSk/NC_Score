@@ -13,5 +13,6 @@ import { Subject, SubjectSchema } from './schemas/subject.schema';
   imports: [MongooseModule.forFeature([{ name: Subject.name, schema: SubjectSchema }]), UserModule],
   controllers: [SubjectController, AuthController],
   providers: [SubjectService, AuthService, JwtStrategy, LocalStrategy],
+  exports: [SubjectService,MongooseModule],
 })
 export class SubjectModule {}

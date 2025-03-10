@@ -1,5 +1,5 @@
 import { Prop } from '@nestjs/mongoose';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateAuthDto {
   @IsNotEmpty({ message: 'gmail is required' })
@@ -20,18 +20,18 @@ export class CreateAuthDto {
   @IsNotEmpty({ message: 'academicYear is required' })
   academicYear: string;
 
-  @IsNotEmpty({ message: 'specialized is required' })
+  @IsOptional()
   specialized: string; // 'Mạng máy tính & Truyền thông dữ liệu' 'An toàn thông tin'
 
-  @Prop()
+  @IsOptional()
   avatar: string;
 
-  @Prop()
+  @IsOptional()
   birth: string;
 
-  @Prop()
+  @IsOptional()
   gender: string;
 
-  @Prop()
-  role: string;
+  @IsNotEmpty({ message: 'role is required' })
+  role: string;   //  "ADMIN", "USER"
 }

@@ -8,12 +8,15 @@ export class Subject {
   subjectName: string;
 
   @Prop() // tín chỉ
-  credit: string;
+  credit: number;
 
   @Prop()
   blockOfKnowledge: string;
 
   @Prop()
   specialized: string;
+
+  @Prop({ type: [String], default: [] }) // Object chứa nhiều chuỗi
+  relatedToIndustry: string[];
 }
 export const SubjectSchema = SchemaFactory.createForClass(Subject);

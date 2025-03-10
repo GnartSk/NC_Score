@@ -1,37 +1,36 @@
-import { Prop } from '@nestjs/mongoose';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
-	@IsNotEmpty({ message: 'gmail is required' })
-	gmail: string;
+  @IsNotEmpty({ message: 'gmail is required' })
+  gmail: string;
 
-	@IsNotEmpty({ message: 'username is required' })
-	username: string;
+  @IsNotEmpty({ message: 'username is required' })
+  username: string;
 
-	@IsNotEmpty({ message: 'fullName is required' })
-	fullName: string;
+  @IsNotEmpty({ message: 'fullName is required' })
+  fullName: string;
 
-	@IsNotEmpty({ message: 'password is required' })
-	password: string;
+  @IsNotEmpty({ message: 'password is required' })
+  password: string;
 
-	@IsNotEmpty({ message: 'studentId is required' })
-	studentId: string;
+  @IsNotEmpty({ message: 'studentId is required' })
+  studentId: string;
 
-	@IsNotEmpty({ message: 'academicYear is required' })
-	academicYear: string;
+  @IsNotEmpty({ message: 'academicYear is required' })
+  academicYear: string;
 
-	@IsNotEmpty({message: 'specialized is required'})
-    specialized: string;
+  @IsOptional()
+  specialized: string;
 
-	@Prop()
-	avatar: string;
+  @IsOptional()
+  avatar: string;
 
-	@Prop()
-	birth: string;
+  @IsOptional()
+  birth: string;
 
-	@Prop()
-	gender: string;
+  @IsOptional()
+  gender: string;
 
-	@Prop()
-	role: string;
+  @IsNotEmpty({ message: 'role is required' })
+  role: string; //  "ADMIN", "USER"
 }
