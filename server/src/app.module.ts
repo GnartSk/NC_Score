@@ -13,6 +13,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { UserModule } from '@/modules/user/user.module';
 import { AuthModule } from '@/auth/auth.module';
 import { SubjectModule } from '@/modules/subject/subject.module';
+import * as path from 'path';
 
 @Module({
   imports: [

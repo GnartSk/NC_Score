@@ -119,6 +119,13 @@ export class UserService {
         name: user?.fullName ?? user.gmail,
         activationCode: codeId,
       },
+      attachments: [
+        {
+          filename: 'LogoUIT.png',
+          path: process.cwd() + '/src/mail/assets/LogoUIT.png', 
+          cid: 'logo',
+        },
+      ],
     });
 
     return {
