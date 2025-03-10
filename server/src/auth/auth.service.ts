@@ -82,17 +82,24 @@ export class AuthService {
         },
       });
 
-      return "Email sended";
+      return 'Email sended';
     }
 
     throw new NotFoundException('Gmail not found...');
   }
 
   async validateGoogleUser(googleUser: CreateUserDto) {
-    const user = await this.userService.findByGmail(googleUser.gmail)
+    const user = await this.userService.findByGmail(googleUser.gmail);
 
-    if (user) return user;
+    if (user) {
+      const payload = { username: user.gmail, sub: user._id };
 
-    return await this.userModel.create(googleUser)
+      return {
+        user: user,
+        access_token: this.jwtService.sign(payload),
+      };
+    }
+
+    return await this.userModel.create(googleUser);
   }
 }
