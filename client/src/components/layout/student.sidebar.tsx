@@ -1,113 +1,83 @@
-// 'use client'
-// import Layout from "antd/es/layout";
-// import Menu from "antd/es/menu";
-// import {
-//     AppstoreOutlined,
-//     MailOutlined,
-//     SettingOutlined,
-//     TeamOutlined,
+'use client'
+import Layout from "antd/es/layout";
+import Menu from "antd/es/menu";
+import {
+    AppstoreOutlined,
+    GlobalOutlined,
+    MailOutlined,
+    PartitionOutlined,
+    ProfileOutlined,
+    TeamOutlined,
 
-// } from '@ant-design/icons';
-// import React, { useContext } from 'react';
-// import { AdminContext } from "@/library/admin.context";
-// import type { MenuProps } from 'antd';
-// import Link from 'next/link'
+} from '@ant-design/icons';
+import React, { useContext } from 'react';
+import { StudentContext } from "@/library/student.context";
+import type { MenuProps } from 'antd';
+import Link from 'next/link'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGraduationCap } from "@fortawesome/free-solid-svg-icons/faGraduationCap";
 
-// type MenuItem = Required<MenuProps>['items'][number];
-// const StudentSideBar = () => {
-//     const { Sider } = Layout;
-//     const { collapseMenu } = useContext(AdminContext)!;
+type MenuItem = Required<MenuProps>['items'][number];
+const StudentSideBar = () => {
+    const { Sider } = Layout;
+    const { collapseMenu } = useContext(StudentContext)!;
 
-//     const items: MenuItem[] = [
+    const items: MenuItem[] = [
 
-//         {
-//             key: 'grp',
-//             label: 'NC Score',
-//             type: 'group',
-//             children: [
-//                 {
-//                     key: "dashboard",
-//                     label: <Link href={"/dashboard"}>Dashboard</Link>,
-//                     icon: <AppstoreOutlined />,
-//                 },
-//                 {
-//                     key: "users",
-//                     label: <Link href={"/dashboard/user"}>Manage Users</Link>,
-//                     icon: <TeamOutlined />,
-//                 },
-//                 {
-//                     key: 'sub1',
-//                     label: 'Navigation One',
-//                     icon: <MailOutlined />,
-//                     children: [
-//                         {
-//                             key: 'g1',
-//                             label: 'Item 1',
-//                             type: 'group',
-//                             children: [
-//                                 { key: '1', label: 'Option 1' },
-//                                 { key: '2', label: 'Option 2' },
-//                             ],
-//                         },
-//                         {
-//                             key: 'g2',
-//                             label: 'Item 2',
-//                             type: 'group',
-//                             children: [
-//                                 { key: '3', label: 'Option 3' },
-//                                 { key: '4', label: 'Option 4' },
-//                             ],
-//                         },
-//                     ],
-//                 },
-//                 {
-//                     key: 'sub2',
-//                     label: 'Navigation Two',
-//                     icon: <AppstoreOutlined />,
-//                     children: [
-//                         { key: '5', label: 'Option 5' },
-//                         { key: '6', label: 'Option 6' },
-//                         {
-//                             key: 'sub3',
-//                             label: 'Submenu',
-//                             children: [
-//                                 { key: '7', label: 'Option 7' },
-//                                 { key: '8', label: 'Option 8' },
-//                             ],
-//                         },
-//                     ],
-//                 },
-//                 {
-//                     type: 'divider',
-//                 },
-//                 {
-//                     key: 'sub4',
-//                     label: 'Navigation Three',
-//                     icon: <SettingOutlined />,
-//                     children: [
-//                         { key: '9', label: 'Option 9' },
-//                         { key: '10', label: 'Option 10' },
-//                         { key: '11', label: 'Option 11' },
-//                         { key: '12', label: 'Option 12' },
-//                     ],
-//                 },
-//             ],
-//         },
-//     ];
+        {
+            key: 'grp',
+            label: 'NC Score',
+            type: 'group',
+            children: [
+                {
+                    key: "current-score",
+                    label: <Link href={"/dashboard"}>Điểm hiện tại</Link>,
+                    icon: <AppstoreOutlined />,
+                },
+                {
+                    key: "users",
+                    label: <Link href={"/dashboard/user"}>Thử điểm</Link>,
+                    icon: <ProfileOutlined />,
+                },
+                {
+                    key: 'roadmap',
+                    label: 'Lộ trình',
+                    icon: <PartitionOutlined />,
+                    children: [
+                      { key: 'subject-suggestions', label: 'Đề xuất môn học' },
+                      { key: 'schedule', label: 'Xếp TKB' },
+                    ],
+                },
+                {
+                    key: 'ctdt',
+                    label: 'CTĐT',
+                    icon: <FontAwesomeIcon icon={faGraduationCap} />,
+                },
+                {
+                    type: 'divider',
+                },
+                {
+                    key: 'forum',
+                    label: 'Diễn đàn',
+                    icon: <GlobalOutlined />,
+                },
+            ],
+        },
+    ];
 
-//     return (
-//         <Sider
-//             collapsed={collapseMenu}
-//         >
+    return (
+        <Sider
+            collapsed={collapseMenu}
+        >
 
-//             <Menu
-//                 mode="inline"
-//                 defaultSelectedKeys={['dashboard']}
-//                 items={items}
-//                 style={{ height: '100vh' }}
-//             />
-//         </Sider>
-//     )
-// }
+            <Menu
+                mode="inline"
+                defaultSelectedKeys={['dashboard']}
+                items={items}
+                style={{ height: '100vh' }}
+            />
+        </Sider>
+    )
+}
 
-// export default StudentSideBar;
+export default StudentSideBar;
