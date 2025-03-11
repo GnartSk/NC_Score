@@ -20,7 +20,7 @@ export class CreateAuthDto {
   @IsNotEmpty({ message: 'academicYear is required' })
   academicYear: string;
 
-  @IsNotEmpty({ message: 'specialized is required' })
+  @IsOptional()
   specialized: string; // 'Mạng máy tính & Truyền thông dữ liệu' 'An toàn thông tin'
 
   @IsOptional()

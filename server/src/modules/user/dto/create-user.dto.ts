@@ -1,4 +1,3 @@
-import { Prop } from '@nestjs/mongoose';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
@@ -20,7 +19,7 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'academicYear is required' })
   academicYear: string;
 
-  @IsNotEmpty({ message: 'specialized is required' })
+  @IsOptional()
   specialized: string;
 
   @IsOptional()

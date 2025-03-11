@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -94,7 +94,12 @@ export class UserService {
   }
 
   async handleRegister(registerDto: CreateAuthDto) {
-    const { gmail, username, password, fullName, studentId, academicYear, role, specialized } = registerDto;
+    const { gmail, username, password, fullName, studentId, academicYear, role } = registerDto;
+
+    const gmailRegex = /^[0-9]{2}52[0-9]{4}@gm\.uit\.edu\.vn$/;
+    if (!gmailRegex.test(gmail)) {
+      throw new UnauthorizedException('Invalid gmail format');
+    }
 
     const isExist = await this.isEmailExist(gmail);
     if (isExist) {
@@ -114,7 +119,6 @@ export class UserService {
       studentId,
       academicYear,
       role,
-      specialized,
     });
 
     this.mailerService.sendMail({
@@ -125,6 +129,13 @@ export class UserService {
         name: user?.fullName ?? user.gmail,
         activationCode: codeId,
       },
+      attachments: [
+        {
+          filename: 'LogoUIT.png',
+          path: process.cwd() + '/src/mail/assets/LogoUIT.png', 
+          cid: 'logo',
+        },
+      ],
     });
 
     return {

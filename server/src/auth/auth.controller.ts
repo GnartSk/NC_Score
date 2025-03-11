@@ -1,18 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, Put, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+  Query,
+  Put,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { Public } from '@/decorator/customize';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ChangePasswrodDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly mailerService: MailerService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   @Public()
@@ -44,22 +55,19 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPasswordDto.gmail);
   }
 
-  @Get('mail')
+  @Get('google/login')
   @Public()
-  testMail() {
-    this.mailerService
-      .sendMail({
-        to: '22521511@gm.uit.edu.vn', // list of receivers
-        subject: 'From NC Score with luv ✔', // Subject line
-        text: 'welcome', // plaintext body
-        template: 'register',
-        context: {
-          name: 'Vu trai dep',
-          activationCode: 123456789,
-        },
-      })
-      .then(() => {})
-      .catch(() => {});
-    return 'ok';
+  @UseGuards(GoogleAuthGuard)
+  googleLogin() {}
+
+  @Get('google/callback')
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  async googleCallback(@Req() req, @Res() res) {
+    if (!req.user) {
+      return res.redrirect(`http://localhost:3000/login`);
+    }
+    const response = await this.authService.login(req.user._id);
+    res.redrirect(`http://localhost:3000?token=${response.access_token}`);
   }
 }
