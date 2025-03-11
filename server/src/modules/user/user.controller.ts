@@ -49,6 +49,10 @@ export class UserController {
       imageUrl = uploadResult.secure_url; // Lấy link ảnh sau khi upload thành công
     }
 
+    if (imageUrl) {
+      updateUserDto.avatar = imageUrl;
+    }
+
     return this.userService.update(req.user._id, updateUserDto);
   }
 
