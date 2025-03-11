@@ -12,6 +12,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { UserModule } from '@/modules/user/user.module';
 import { AuthModule } from '@/auth/auth.module';
 import { SubjectModule } from '@/modules/subject/subject.module';
+
 import { ScoreModule } from './modules/score/score.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
