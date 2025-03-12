@@ -1,5 +1,5 @@
 'use client'
-import { StudentContext } from '@/library/student.context';
+import { StudentContext } from '@/lib/student.context';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Layout } from 'antd';
 import { useContext } from 'react';
