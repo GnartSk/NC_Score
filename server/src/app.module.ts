@@ -16,7 +16,7 @@ import { SubjectModule } from '@/modules/subject/subject.module';
 import { ScoreModule } from './modules/score/score.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { PdfReaderModule } from './modules/pdf_reader/pdf_reader.module';
+import { ReaderModule } from './modules/reader/reader.module';
 
 @Module({
   imports: [
@@ -78,7 +78,7 @@ import { PdfReaderModule } from './modules/pdf_reader/pdf_reader.module';
     ]),
     ScoreModule,
     CloudinaryModule,
-    PdfReaderModule,
+    ReaderModule,
   ],
   controllers: [AppController],
   providers: [

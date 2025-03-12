@@ -29,7 +29,7 @@ export class SubjectService {
 
     if (user.role != 'ADMIN') throw new UnauthorizedException('Only admin can perform this action');
 
-    const { subjectCode, subjectName, credit, blockOfKnowledge, specialized, relatedToIndustry } = createSubjectDto;
+    const { subjectCode, subjectName, credit, blockOfKnowledge, specialized, relatedToIndustry, semester } = createSubjectDto;
 
     const isExit = await this.isSubjectCodeExits(subjectCode);
     if (isExit) throw new BadRequestException('subjectCode has been used.');
@@ -41,6 +41,7 @@ export class SubjectService {
       blockOfKnowledge,
       specialized,
       relatedToIndustry,
+      semester,
     });
 
     return subject;
