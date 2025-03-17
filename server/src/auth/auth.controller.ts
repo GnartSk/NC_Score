@@ -65,9 +65,9 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   async googleCallback(@Req() req, @Res() res) {
     if (!req.user) {
-      return res.redrirect(`http://localhost:3000/login`);
+      return res.redirect('http://localhost:3000/auth/login');
     }
-    const response = await this.authService.login(req.user._id);
-    res.redrirect(`http://localhost:3000?token=${response.access_token}`);
+    console.log('http://localhost:3000/dashboard?token=${req.user.access_token}');
+    res.redirect('http://localhost:3000/dashboard?token=${req.user.access_token}');
   }
 }
