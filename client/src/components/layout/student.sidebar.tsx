@@ -11,7 +11,7 @@ import {
 
 } from '@ant-design/icons';
 import React, { useContext } from 'react';
-import { StudentContext } from "@/library/student.context";
+import { StudentContext } from "@/lib/student.context";
 import type { MenuProps } from 'antd';
 import Link from 'next/link'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
