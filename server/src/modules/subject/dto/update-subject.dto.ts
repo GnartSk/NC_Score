@@ -39,7 +39,4 @@ export class UpdateSubjectDto extends PartialType(CreateSubjectDto) {
   @IsArray()
   @IsString({ each: true }) // Mỗi phần tử trong mảng phải là chuỗi
   relatedToIndustry: string[];
-
-  @IsOptional()
-  semester: number; // 'I', 'II', 'III',..., 'VIII'
 }

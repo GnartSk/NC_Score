@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import pdf from 'pdf-parse';
 
 @Injectable()
 export class ReaderService {
@@ -45,4 +46,67 @@ export class ReaderService {
     }
     return result;
   }
+
+  private processBufferedSubject(buffer: string[], result: any, currentSemester: string) {
+    const mergedLine = buffer.join(' ').replace(/\s+/g, ' '); // Ghép dòng bị tách
+    const subjectPattern = /^(\d+)?([A-Z]{2,3}\d{3})\s+(.+?)\s+(\d+)((?:\s+\d+(?:\.\d+)?)+)?$/;
+    const match = mergedLine.match(subjectPattern);
+
+    if (match) {
+      const [, , subjectCode, subjectName, credit, scores] = match;
+      const subject: any = { subjectCode, subjectName, credit };
+
+      // Tách điểm số
+      if (scores) {
+        const scoreValues = scores.trim().split(/\s+/);
+        const labels = ['QT', 'GK', 'TH', 'CK', 'TK'];
+        scoreValues.forEach((score, index) => (subject[labels[index]] = score));
+      }
+
+      result.parsedData[currentSemester].push(subject);
+    }
+  }
+
+  private parseText(text: string): any {
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line);
+    const result: any = { parsedData: {} };
+    let currentSemester = '';
+    let buffer: string[] = [];
+
+    // Regex nhận diện tiêu đề học kỳ
+    const semesterPattern = /Học kỳ \d+ - Năm học \d{4}-\d{4}/;
+    // Regex nhận diện môn học (Mã HP + Tên môn + Tín chỉ + Điểm số)
+    const subjectPattern = /^(\d+)?([A-Z]{2,3}\d{3})\s+(.+?)\s+(\d+)((?:\s+\d+(?:\.\d+)?)+)?$/;
+
+    lines.forEach((line) => {
+      if (semesterPattern.test(line)) {
+        if (buffer.length > 0) this.processBufferedSubject(buffer, result, currentSemester);
+        currentSemester = line;
+        result.parsedData[currentSemester] = [];
+        buffer = [];
+      } else if (subjectPattern.test(line)) {
+        if (buffer.length > 0) this.processBufferedSubject(buffer, result, currentSemester);
+        buffer = [line]; // Bắt đầu môn học mới
+      } else if (buffer.length > 0) {
+        buffer.push(line); // Ghép dòng bị xuống dòng
+      }
+    });
+
+    if (buffer.length > 0) this.processBufferedSubject(buffer, result, currentSemester);
+
+    console.log('Parsed Data:', JSON.stringify(result, null, 2));
+    return result;
+  }
+
+  async uploadPdf(file: Express.Multer.File) {
+    const dataBuffer = file.buffer;
+    const pdfData = await pdf(dataBuffer);
+    const extractedText = pdfData.text;
+
+    console.log('Raw text from PDF:', extractedText);
+
+    return this.parseText(extractedText);   }
 }

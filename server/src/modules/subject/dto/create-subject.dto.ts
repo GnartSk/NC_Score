@@ -38,7 +38,4 @@ export class CreateSubjectDto {
   @IsArray()
   @IsString({ each: true }) // Mỗi phần tử trong mảng phải là chuỗi
   relatedToIndustry: string[];
-
-  @IsNotEmpty({ message: 'semester is required' })
-  semester: number; // 'I', 'II', 'III',..., 'VIII'
 }

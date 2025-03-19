@@ -25,6 +25,12 @@ export class UpdateScoreDto extends PartialType(CreateScoreDto) {
   status: string; //"ONSTUDY", "NOTSTUDY", "FINISH"
 
   @IsOptional()
+  @IsEnum(['Học lại', 'Miễn', 'Học phần chính'], {
+    message: 'status must be a in the value: Học lại, Miễn, Học phần chính',
+  })
+  type: string; //"Học lại", "Miễn", "Học phần chính"
+
+  @IsOptional()
   @Matches(/^[A-Z]{2}\d{3}$/, {
     message: 'subjectCode must have first 2 uppercase letters and last 3 numbers (eg: NT101)',
   })
@@ -35,4 +41,7 @@ export class UpdateScoreDto extends PartialType(CreateScoreDto) {
 
   @IsNotEmpty({ message: 'credit is required' }) // tín chỉ
   credit: number;
+
+  @IsOptional()
+  semester: string; // 'I', 'II', 'III',..., 'VIII'
 }
