@@ -6,7 +6,6 @@ import { useContext } from 'react';
 import { DownOutlined, SmileOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
-import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react"
 
 const StudentHeader = (props: any) => {
