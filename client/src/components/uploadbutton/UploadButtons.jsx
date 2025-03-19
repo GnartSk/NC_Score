@@ -1,14 +1,15 @@
-const UploadButtons = () => {
+const UploadButtons = ({ label, icon }) => {
   return (
-    <div className="flex space-x-4">
-      <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">
-        Tải lên thời khóa biểu
-      </button>
-      <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg">
-        Tải lên bảng điểm
-      </button>
+    <div className="flex flex-col items-center p-4 bg-white rounded-xl shadow-md border border-gray-200 w-90">
+      <div className="w-full bg-blue-100 rounded-lg p-6 flex flex-col items-center">
+        <div className="bg-yellow-400 p-3 rounded-lg mb-2">
+          {icon}
+        </div>
+        <p className="text-blue-600 font-semibold text-center">{label}</p>
+      </div>
     </div>
   );
 };
+
 
 export default UploadButtons;

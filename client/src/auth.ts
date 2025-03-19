@@ -1,38 +1,58 @@
-import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
- 
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    Google,
     Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
+      name: "Credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text", placeholder: "your-email@example.com" },
+        password: { label: "Password", type: "password" }
       },
-      authorize: async (credentials) => {
-        console.log(">>>> check credentials: ", credentials)
-        let user = null
- 
-        // logic to salt and hash password
-        // call backend
-        user = {
-          _id: "123",
-          username: "Sukem",
-          email: "22521511@gm.uit.edu.vn",
-          isVerify: "123",
-          type: "123",
-          role:"123",
-        };
-        if (!user) {
-          // No user found, so this is their first attempt to login
-          // Optionally, this is also the place you could do a user registration
-          throw new Error("Invalid credentials.")
+      async authorize(credentials) {
+        try {
+          const res = await fetch("http://localhost:8081/api/auth/google/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: credentials?.email,
+              password: credentials?.password
+            })
+          });
+
+          if (!res.ok) {
+            throw new Error("Invalid credentials");
+          }
+
+          const user = await res.json();
+          if (user) return user;
+          return null;
+        } catch (error) {
+          console.error("Login error:", error);
+          return null;
         }
- 
-        // return user object with their profile data
-        return user
-      },
-    }),
+      }
+    })
   ],
-})
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+    session.user.email = token.email || ""; 
+    session.user.name = token.name; 
+      return session;
+    }
+  },
+  pages: {
+    signIn: "/auth/login"
+  },
+  secret: process.env.AUTH_SECRET
+});
