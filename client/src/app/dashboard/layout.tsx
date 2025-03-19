@@ -3,7 +3,7 @@ import StudentContent from '@/components/layout/student.content';
 import StudentFooter from '@/components/layout/student.footer';
 import StudentHeader from '@/components/layout/student.header';
 import StudentSideBar from '@/components/layout/student.sidebar';
-import { StudentContextProvider } from '@/library/student.context';
+import { StudentContextProvider } from '@/lib/student.context';
 
 const StudentLayout = async ({
     children,
