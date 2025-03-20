@@ -5,7 +5,7 @@ import CalendarWidget from "@/components/calendar/CalendarWidget";
 
 const DashboardPage = () => {
   return (
-    <div className="p-6 space-y-6 min-h-screen" style={{ backgroundColor: "#F0F7FF" }}>
+    <div className="p-1 space-y-6 min-h-screen" style={{ backgroundColor: "#F0F7FF" }}>
       <div className="grid grid-cols-3 gap-4 items-start">
         <div className="col-span-2 flex flex-col space-y-4">
           <div className="flex items-center bg-gradient-to-r from-blue-400 to-blue-200 p-6 rounded-lg shadow-md">
