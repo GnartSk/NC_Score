@@ -39,7 +39,7 @@ const StudentHeader = (props: any) => {
                 style={{
                     padding: 0,
                     display: "flex",
-                    background: "#f5f5f5",
+                    background: "#ffffff",
                     justifyContent: "space-between",
                     alignItems: "center"
                 }} >
