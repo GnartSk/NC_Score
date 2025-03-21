@@ -11,16 +11,14 @@ const handler = NextAuth({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text", placeholder: "your-email@example.com" },
-        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         try {
-          const res = await fetch("http://localhost:8081/api/auth/google/login", {
+          const res = await fetch("http://localhost:3000/dashboard?token=${req.user.access_token}", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email: credentials?.email,
-              password: credentials?.password
             })
           });
 
@@ -41,7 +39,6 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
         token.email = user.email;
         token.name = user.name;
       }
