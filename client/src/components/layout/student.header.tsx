@@ -6,7 +6,6 @@ import { useContext } from 'react';
 import { DownOutlined, SmileOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
-import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react"
 
 const StudentHeader = (props: any) => {
@@ -39,7 +38,7 @@ const StudentHeader = (props: any) => {
                 style={{
                     padding: 0,
                     display: "flex",
-                    background: "#f5f5f5",
+                    background: "#ffffff",
                     justifyContent: "space-between",
                     alignItems: "center"
                 }} >
