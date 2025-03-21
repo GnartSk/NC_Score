@@ -22,6 +22,12 @@ export class CreateScoreDto {
   })
   status: string; //"ONSTUDY", "NOTSTUDY", "FINISH"
 
+  @IsNotEmpty({ message: 'type is required' })
+  @IsEnum(['Học lại', 'Miễn', 'Học phần chính'], {
+    message: 'status must be a in the value: Học lại, Miễn, Học phần chính',
+  })
+  type: string; //"Học lại", "Miễn", "Học phần chính"
+
   @IsNotEmpty({ message: 'subjectCode is required' })
   @Matches(/^[A-Z]{2}\d{3}$/, {
     message: 'subjectCode must have first 2 uppercase letters and last 3 numbers (eg: NT101)',
@@ -33,4 +39,7 @@ export class CreateScoreDto {
 
   @IsNotEmpty({ message: 'credit is required' }) // tín chỉ
   credit: number;
+
+  @IsNotEmpty({ message: 'semester is required' })
+  semester: string; // 'I', 'II', 'III',..., 'VIII'
 }

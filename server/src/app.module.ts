@@ -16,6 +16,7 @@ import { SubjectModule } from '@/modules/subject/subject.module';
 import { ScoreModule } from './modules/score/score.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { ReaderModule } from './modules/reader/reader.module';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     ]),
     ScoreModule,
     CloudinaryModule,
+    ReaderModule,
   ],
   controllers: [AppController],
   providers: [
