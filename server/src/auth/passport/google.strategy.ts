@@ -32,7 +32,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
       const user = await this.authService.validateGoogleUser({
         gmail: email,
-        username: username,
+        username: profile.displayName && profile.displayName.trim() !== '' ? profile.displayName : username,
         fullName: `${profile.name?.familyName} ${profile.name?.givenName}`,
         password: '',
         studentId: username,
