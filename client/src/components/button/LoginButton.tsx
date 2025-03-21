@@ -1,14 +1,17 @@
 'use client';
 
-interface LoginButtonProps {
-    toLogin: () => void;
-}
+const LoginButton: React.FC = () => {
+    const toLogin = () => {
+        window.location.href = '/auth/login';
+    };
 
-const LoginButton: React.FC<LoginButtonProps> = ({ toLogin }) => {
     return (
         <button
             onClick={toLogin}
-            type="submit"
+            onMouseEnter={() => {
+                console.log('Prefetching /login...');
+            }}
+            type="button"
             className="mr-0 flex text-black justify-center gap-2 items-center mx-auto shadow-xl text-lg bg-gray-50 backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-[#5c96ec] hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-2 overflow-hidden border-2 rounded-full group"
         >
             Login

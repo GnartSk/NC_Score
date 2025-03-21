@@ -4,10 +4,8 @@ import Menu from "antd/es/menu";
 import {
     AppstoreOutlined,
     GlobalOutlined,
-    MailOutlined,
     PartitionOutlined,
     ProfileOutlined,
-    TeamOutlined,
 
 } from '@ant-design/icons';
 import React, { useContext } from 'react';

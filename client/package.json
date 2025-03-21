@@ -22,6 +22,7 @@
         "@react-oauth/google": "0.12.1",
         "@types/react-big-calendar": "1.16.1",
         "antd": "5.23.3",
+        "cookies-next": "^5.1.0",
         "framer-motion": "^12.5.0",
         "lucide-react": "0.483.0",
         "moment": "2.30.1",

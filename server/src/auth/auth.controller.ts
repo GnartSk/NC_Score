@@ -67,7 +67,7 @@ export class AuthController {
     if (!req.user) {
       return res.redirect('http://localhost:3000/auth/login');
     }
-    console.log('http://localhost:3000/dashboard?token=${req.user.access_token}');
-    res.redirect('http://localhost:3000/dashboard?token=${req.user.access_token}');
+    console.log(`'http://localhost:3000/auth?token=${req.user.access_token}`);
+    res.redirect(`http://localhost:3000/auth?token=${req.user.access_token}`);
   }
 }
