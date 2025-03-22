@@ -19,9 +19,15 @@ export async function middleware(req: NextRequest) {
         }
 
         const data = await res.json();
+        const role = data.data.role;
         const adminRoutes = ['/dashboard/student-score', '/dashboard/subject-managerment', '/dashboard/report'];
+        const userRouter = ['/dashboard/user'];
 
-        if (adminRoutes.includes(req.nextUrl.pathname) && data.data.role !== 'ADMIN') {
+        if (adminRoutes.includes(req.nextUrl.pathname) && role !== 'ADMIN') {
+            return NextResponse.redirect(new URL('/dashboard', req.url));
+        }
+
+        if (userRouter.includes(req.nextUrl.pathname) && role !== 'USER') {
             return NextResponse.redirect(new URL('/dashboard', req.url));
         }
 
