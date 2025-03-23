@@ -35,10 +35,16 @@ export class Score {
   @Prop({ type: String, required: true })
   status: string; //"ONSTUDY", "NOTSTUDY", "FINISH"
 
+  @Prop()
+  type: string; //"Học lại", "Miễn", "Học phần chính"
+
   @Prop({ type: String, required: true })
   idStudent: string;
 
   @Prop({ type: String, required: true })
   subjectCode: string;
+
+  @Prop ()
+  semester: string;
 }
 export const ScoreSchema = SchemaFactory.createForClass(Score);

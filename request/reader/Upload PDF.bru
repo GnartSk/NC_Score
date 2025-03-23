@@ -1,15 +1,19 @@
 meta {
-  name: Get profile
+  name: Upload PDF
   type: http
   seq: 2
 }
 
-get {
-  url: {{baseUrl}}/api/user/profile
-  body: none
+post {
+  url: {{baseUrl}}/api/reader/pdf
+  body: multipartForm
   auth: bearer
 }
 
 auth:bearer {
   token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjIyNTIxNjkxQGdtLnVpdC5lZHUudm4iLCJzdWIiOiI2N2MzMGVmMGI3Y2M1MzA3OGRiMjJlYjAiLCJpYXQiOjE3NDE3NjIxMDQsImV4cCI6MTgyODE2MjEwNH0.NqR4xWX0AQBC7lKydYrtrd-5_qVSspTqsjxFMly2wZY
+}
+
+body:multipart-form {
+  file: @file(C:\Users\MSI\Downloads\Kết quả học tập.pdf)
 }

@@ -19,8 +19,8 @@ export class ScoreService {
     private subjectModel: Model<Subject>,
   ) {}
 
-  isSubjectCodeNotExits = async (subjectCode: string, subjectName: string, credit: number) => {
-    const subjectExist = await this.subjectModel.exists({ subjectCode: subjectCode });
+  isSubjectCodeNotExits = async (subjectCode: string, subjectName: string, credit: number, semester: string) => {
+    const subjectExist = await this.subjectModel.exists({ subjectCode: subjectCode, semester });
     if (subjectExist) return false;
 
     // Add new subject
@@ -28,6 +28,7 @@ export class ScoreService {
       subjectCode,
       subjectName,
       credit,
+      semester,
       blockOfKnowledge: 'Tự chọn',
       specialized: 'Tự chọn',
       relatedToIndustry: [],
@@ -39,9 +40,9 @@ export class ScoreService {
     const user = await this.userModel.findById(userId);
     if (!user) throw new NotFoundException('User not found...');
 
-    const { QT, TH, GK, CK, TK, status, subjectCode, subjectName, credit } = createScoreDto;
+    const { QT, TH, GK, CK, TK, status, subjectCode, subjectName, credit, semester } = createScoreDto;
 
-    const isNotExits = await this.isSubjectCodeNotExits(subjectCode, subjectName, credit);
+    const isNotExits = await this.isSubjectCodeNotExits(subjectCode, subjectName, credit, semester);
 
     const updateData: any = { status };
     if (QT !== undefined) updateData.QT = QT;
@@ -58,7 +59,7 @@ export class ScoreService {
 
     if (isNotExits)
       return {
-        message: 'New subject had been added',
+        message: 'New score had been added',
         score: score,
         subject: isNotExits,
       };

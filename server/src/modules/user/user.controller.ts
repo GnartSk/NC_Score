@@ -10,6 +10,7 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -35,6 +36,11 @@ export class UserController {
     return this.userService.findAll(paginationDto);
   }
 
+  @Get('profile')
+  async getProfile(@Request() req) {
+    return this.userService.findOne(req.user._id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
@@ -47,6 +53,10 @@ export class UserController {
     if (file) {
       const uploadResult = await this.cloudinaryService.uploadImage(file);
       imageUrl = uploadResult.secure_url; // Lấy link ảnh sau khi upload thành công
+    }
+
+    if (imageUrl) {
+      updateUserDto.avatar = imageUrl;
     }
 
     return this.userService.update(req.user._id, updateUserDto);
