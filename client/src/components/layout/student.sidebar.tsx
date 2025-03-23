@@ -31,12 +31,12 @@ const StudentSideBar = () => {
             children: [
                 {
                     key: "current-score",
-                    label: <Link href={"/dashboard"}>Điểm hiện tại</Link>,
+                    label: <Link href={"/dashboard/score"}>Điểm hiện tại</Link>,
                     icon: <AppstoreOutlined />,
                 },
                 {
                     key: "users",
-                    label: <Link href={"/dashboard/user"}>Thử điểm</Link>,
+                    label: <Link href={"/dashboard/calender"}>Lịch</Link>,
                     icon: <ProfileOutlined />,
                 },
                 {
