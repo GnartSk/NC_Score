@@ -16,6 +16,9 @@ export class Subject {
   @Prop()
   specialized: string;
 
+  @Prop()
+  subjectDescription: string;
+
   @Prop({ type: [String], default: [] }) // Object chứa nhiều chuỗi
   relatedToIndustry: string[];
 }

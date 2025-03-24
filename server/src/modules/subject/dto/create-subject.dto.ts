@@ -28,11 +28,14 @@ export class CreateSubjectDto {
   ])
   blockOfKnowledge: string;
 
-  @IsNotEmpty({ message: 'specialized is required' })
-  @IsEnum(['MMTT', 'ATTT', 'Tự chọn'], {
-    message: 'specialized must be a in the value: MMTT, ATTT',
+  @IsOptional({ message: 'specialized is required' })
+  @IsEnum(['MMTT', 'ATTT', 'Trường'], {
+    message: 'specialized must be a in the value: MMTT, ATTT, Trường',
   })
   specialized: string;
+
+  @IsOptional()
+  subjectDescription: string;
 
   @IsOptional()
   @IsArray()
