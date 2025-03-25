@@ -9,22 +9,23 @@ import Select from 'react-dropdown-select';
 import { FaXmark } from 'react-icons/fa6';
 import { faSquare, faSquareCheck } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Cookies from 'js-cookie';
 
 const schema = z.object({
     subjectCode: z.string().regex(/^[A-Z]{2}\d{3}$/, { message: 'VD: NT101' }),
     subjectName: z.string().min(1, 'Không được để trống'),
     credit: z.preprocess(Number, z.number().min(1, 'Tối thiểu 1 tín chỉ')),
     blockOfKnowledge: z.enum([
-        'Lý luận chính trị',
-        'Toán - Tin',
+        'Các môn lý luận chính trị',
+        'Toán – Tin học – Khoa học tự nhiên',
         'Ngoại ngữ',
         'Cơ sở ngành',
         'Chuyên ngành',
         'Tự chọn',
-        'Thực tập',
+        'Thực tập doanh nghiệp',
         'Đồ án',
-        'Khóa luận',
-        'Chuyên đề',
+        'Khóa luận tốt nghiệp',
+        'Chuyên đề tốt nghiệp',
     ]),
     specialized: z.enum(['MMTT', 'ATTT', 'Trường']).optional(),
     subjectDescription: z.string().optional(),
@@ -50,6 +51,16 @@ const fakeSubjects = [
     },
 ];
 
+// const fakeSubjects: {
+//     subjectCode: string;
+//     subjectName: string;
+//     credit: number;
+//     specialized?: string;
+//     blockOfKnowledge: string;
+//     relatedToIndustry?: string;
+//     subjectDescription?: string;
+// }[] = [];
+
 type JobType = { id: string; name: number };
 
 const job: JobType[] = [
@@ -68,14 +79,47 @@ const SubjectManagement = () => {
         reset,
         watch,
     } = useForm({ resolver: zodResolver(schema) });
+    // const [subjects, setSubjects] = useState<z.infer<typeof schema>[]>([]);
     const [subjects, setSubjects] = useState(fakeSubjects);
     const [page, setPage] = useState(0);
-    const subjectsPerPage = 5;
+    const subjectsPerPage = 10;
     const [selectedJob, setSelectedJob] = useState<JobType[]>([]);
+    const token = Cookies.get('NCToken') || '';
 
     type FormData = z.infer<typeof schema>;
 
-    const onSubmit = (data: FormData) => {
+    const onSubmit = async (data: FormData) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/subject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    subjectCode: data.subjectCode,
+                    subjectName: data.subjectName,
+                    credit: data.credit,
+                    blockOfKnowledge: data.blockOfKnowledge,
+                    specialized: data.specialized,
+                    subjectDescription: data.subjectDescription,
+                    relatedToIndustry: data.relatedToIndustry,
+                }),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                console.log('Error Response:', errorData);
+                throw new Error(errorData.message || 'Invalid credentials');
+            }
+
+            const responseData = await res.json();
+            console.log('Response: ', responseData);
+        } catch (error) {
+            console.error('Post subject error:', error);
+            return;
+        }
+
         setSubjects((prev) =>
             prev.map((item) => ({
                 ...item,
@@ -86,8 +130,36 @@ const SubjectManagement = () => {
         reset();
     };
 
+    const onDeleteSubject = async () => {
+        const deleteSubjectCode = watch('subjectCode');
+        // console.log(deleteSubjectCode);
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/subject/${deleteSubjectCode}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                console.log('Error Response:', errorData);
+                throw new Error(errorData.message || 'Invalid credentials');
+            }
+
+            const responseData = await res.json();
+            console.log('Response: ', responseData);
+        } catch (error) {
+            console.error('Delete subject error:', error);
+            return;
+        }
+
+        alert(`Xóa môn học ${deleteSubjectCode}!`);
+        reset();
+    };
+
     const handlePatchSubject = (data: FormData) => {
-        console.log(data);
         setValue('subjectCode', data.subjectCode);
         setValue('credit', data.credit);
         setValue('subjectName', data.subjectName);
@@ -230,9 +302,18 @@ const SubjectManagement = () => {
                         <input type="hidden" {...register('relatedToIndustry')} />
                     </div>
 
-                    <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">
-                        Thêm môn học
-                    </button>
+                    <div className="w-full flex justify-between">
+                        <button type="submit" className="w-[49.5%] bg-blue-500 text-white py-2 rounded">
+                            Thêm môn học
+                        </button>
+                        <button
+                            type="button"
+                            className="w-[49.5%] bg-red-500 text-white py-2 rounded"
+                            onClick={onDeleteSubject}
+                        >
+                            Xóa môn học
+                        </button>
+                    </div>
                 </form>
             </div>
             <div className="mt-6 bg-white p-6 mx-auto shadow-md rounded-lg">
@@ -259,43 +340,59 @@ const SubjectManagement = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {subjects.slice(page * subjectsPerPage, (page + 1) * subjectsPerPage).map((sub, index) => (
-                            <tr
-                                key={index}
-                                className="text-center"
-                                onClick={() =>
-                                    handlePatchSubject({
-                                        ...sub,
-                                        blockOfKnowledge: sub.blockOfKnowledge as
-                                            | 'Lý luận chính trị'
-                                            | 'Toán - Tin'
-                                            | 'Ngoại ngữ'
-                                            | 'Cơ sở ngành'
-                                            | 'Chuyên ngành'
-                                            | 'Tự chọn'
-                                            | 'Thực tập'
-                                            | 'Đồ án'
-                                            | 'Khóa luận'
-                                            | 'Chuyên đề',
-                                        specialized: sub.specialized as 'MMTT' | 'ATTT' | 'Trường' | undefined,
-                                    })
-                                }
-                            >
-                                {[
-                                    sub.subjectCode,
-                                    sub.subjectName,
-                                    sub.credit,
-                                    sub.specialized || 'N/A',
-                                    sub.blockOfKnowledge,
-                                    sub.relatedToIndustry || 'N/A',
-                                    sub.subjectDescription || 'Không có mô tả',
-                                ].map((val, i) => (
-                                    <td key={i} className={`border p-2 ${i === 6 ? 'w-[40%] text-left' : 'w-[10%]'}`}>
-                                        {val}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
+                        {subjects.length > 0
+                            ? subjects.slice(page * subjectsPerPage, (page + 1) * subjectsPerPage).map((sub, index) => (
+                                  <tr
+                                      key={index}
+                                      className="text-center"
+                                      onClick={() =>
+                                          handlePatchSubject({
+                                              ...sub,
+                                              blockOfKnowledge: sub.blockOfKnowledge as
+                                                  | 'Các môn lý luận chính trị'
+                                                  | 'Toán – Tin học – Khoa học tự nhiên'
+                                                  | 'Ngoại ngữ'
+                                                  | 'Cơ sở ngành'
+                                                  | 'Chuyên ngành'
+                                                  | 'Tự chọn'
+                                                  | 'Thực tập doanh nghiệp'
+                                                  | 'Đồ án'
+                                                  | 'Khóa luận tốt nghiệp'
+                                                  | 'Chuyên đề tốt nghiệp',
+                                              specialized: sub.specialized as 'MMTT' | 'ATTT' | 'Trường' | undefined,
+                                          })
+                                      }
+                                  >
+                                      {[
+                                          sub.subjectCode,
+                                          sub.subjectName,
+                                          sub.credit,
+                                          sub.specialized || 'N/A',
+                                          sub.blockOfKnowledge,
+                                          sub.relatedToIndustry || 'N/A',
+                                          sub.subjectDescription || 'Không có mô tả',
+                                      ].map((val, i) => (
+                                          <td
+                                              key={i}
+                                              className={`border p-2 ${i === 6 ? 'w-[40%] text-left' : 'w-[10%]'}`}
+                                          >
+                                              {val}
+                                          </td>
+                                      ))}
+                                  </tr>
+                              ))
+                            : Array.from({ length: 5 }).map((_, index) => (
+                                  <tr key={index} className="text-center animate-pulse">
+                                      {Array.from({ length: 7 }).map((_, i) => (
+                                          <td
+                                              key={i}
+                                              className={`border p-2 ${i === 6 ? 'w-[40%] text-left' : 'w-[10%]'}`}
+                                          >
+                                              <div className="h-5 w-full bg-gray-300 rounded"></div>
+                                          </td>
+                                      ))}
+                                  </tr>
+                              ))}
                     </tbody>
                 </table>
                 <div className="mt-4 flex justify-center">

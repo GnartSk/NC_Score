@@ -38,7 +38,5 @@ export class CreateSubjectDto {
   subjectDescription: string;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true }) // Mỗi phần tử trong mảng phải là chuỗi
-  relatedToIndustry: string[];
+  relatedToIndustry: string;
 }
