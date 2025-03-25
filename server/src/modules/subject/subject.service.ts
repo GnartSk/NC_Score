@@ -27,23 +27,43 @@ export class SubjectService {
 
     if (!user) throw new NotFoundException('User not found...');
 
-    if (user.role != 'ADMIN') throw new UnauthorizedException('Only admin can perform this action');
+    const { subjectCode, subjectName, credit, blockOfKnowledge, specialized, subjectDescription, relatedToIndustry } =
+      createSubjectDto;
 
-    const { subjectCode, subjectName, credit, blockOfKnowledge, specialized, relatedToIndustry } = createSubjectDto;
+    const existingSubject = await this.subjectModel.findOne({ subjectCode });
+    if (existingSubject) {
+      // Nếu môn học đã tồn tại, tiến hành cập nhật
+      await this.subjectModel.updateOne(
+        { subjectCode },
+        {
+          $set: {
+            subjectName,
+            credit,
+            blockOfKnowledge,
+            specialized,
+            subjectDescription,
+            relatedToIndustry,
+          },
+        },
+      );
+      return {
+        message: `Update ${subjectCode}: ${subjectName}`,
+        subject: await this.subjectModel.findOne({ subjectCode }),
+      };
+    } else {
+      // Nếu môn học chưa tồn tại, tiến hành thêm mới
+      const newSubject = await this.subjectModel.create({
+        subjectCode,
+        subjectName,
+        credit,
+        blockOfKnowledge,
+        specialized,
+        subjectDescription,
+        relatedToIndustry,
+      });
 
-    const isExit = await this.isSubjectCodeExits(subjectCode);
-    if (isExit) throw new BadRequestException('subjectCode has been used.');
-
-    const subject = await this.subjectModel.create({
-      subjectCode,
-      subjectName,
-      credit,
-      blockOfKnowledge,
-      specialized,
-      relatedToIndustry,
-    });
-
-    return subject;
+      return { message: `New ${subjectCode}: ${subjectName}`, subject: newSubject };
+    }
   }
 
   async findAll(paginationDto: PaginationDto) {
@@ -84,11 +104,23 @@ export class SubjectService {
     return subject;
   }
 
-  remove(_id: string) {
-    if (mongoose.isValidObjectId(_id)) {
-      return this.subjectModel.deleteOne({ _id });
-    } else {
-      throw new BadRequestException('Invalid MongoDB _id');
+  async remove(subjectCode: string) {
+    const subject = await this.subjectModel.findOne({ subjectCode });
+
+    if (!subject) {
+      throw new NotFoundException(`Subject with code "${subjectCode}" not found`);
     }
+
+    await this.subjectModel.deleteOne({ subjectCode });
+
+    return {
+      message: `Deleted subject: ${subjectCode}`,
+      deletedSubject: subject,
+    };
+    // if (mongoose.isValidObjectId(_id)) {
+    //   return this.subjectModel.deleteOne({ _id });
+    // } else {
+    //   throw new BadRequestException('Invalid MongoDB _id');
+    // }
   }
 }

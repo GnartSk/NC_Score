@@ -10,6 +10,7 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -33,6 +34,11 @@ export class UserController {
   @Get()
   async findAll(@Query() paginationDto: PaginationDto) {
     return this.userService.findAll(paginationDto);
+  }
+
+  @Get('profile')
+  async getProfile(@Request() req) {
+    return this.userService.findOne(req.user._id);
   }
 
   @Get(':id')

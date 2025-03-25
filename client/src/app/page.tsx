@@ -1,82 +1,9 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { FaYoutube, FaGithub } from 'react-icons/fa';
 import LoginButton from '@/components/button/LoginButton';
-import { useTransition } from 'react';
 
 export default function Home() {
-    const router = useRouter();
-    const [isPending, startTransition] = useTransition();
-
-    const toLogin = () => {
-        startTransition(() => {
-            router.push('/auth/login');
-        });
-    };
-
-    // return (
-    //     <div className="bg-gray-100 min-h-screen">
-    //         {/* Header */}
-    //         <header className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
-    //             <div className="flex hover:cursor-pointer transform-gpu transition-transform duration-500 ease-in-out hover:scale-105">
-    //                 <img
-    //                     className="flex items-center object-contain h-[32px] w-[32px] mr-[5px] transition-transform duration-500 ease-in-out"
-    //                     alt="VertexOps"
-    //                     src="https://upload.wikimedia.org/wikipedia/commons/3/38/Logo_UIT_updated.jpg"
-    //                 />
-    //                 <h1 className="text-2xl font-bold text-indigo-600 transition-transform duration-500 ease-in-out">
-    //                     NCScore
-    //                 </h1>
-    //             </div>
-
-    //             <nav className="hidden md:flex space-x-6">
-    //                 <a href="#features" className="text-gray-700 hover:text-indigo-600">
-    //                     Features
-    //                 </a>
-    //                 <a href="#pricing" className="text-gray-700 hover:text-indigo-600">
-    //                     Pricing
-    //                 </a>
-    //                 <a href="#contact" className="text-gray-700 hover:text-indigo-600">
-    //                     Contact
-    //                 </a>
-    //             </nav>
-    //             <button className="bg-indigo-600 text-white px-4 py-2 rounded-md">Get Started</button>
-    //         </header>
-
-    //         {/* Hero Section */}
-    //         <section className="text-center py-20 bg-indigo-50">
-    //             <h2 className="text-4xl font-bold text-gray-800">Build Your Next Project with Us</h2>
-    //             <p className="text-gray-600 mt-4 text-lg">Simple, powerful and fast solutions for your business.</p>
-    //             <button className="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-md">Start Now</button>
-    //         </section>
-
-    //         {/* Features Section */}
-    //         <section id="features" className="py-20 px-6 max-w-5xl mx-auto">
-    //             <h3 className="text-3xl font-bold text-center text-gray-800">Our Features</h3>
-    //             <div className="grid md:grid-cols-3 gap-8 mt-10">
-    //                 <div className="p-6 bg-white shadow-md rounded-lg text-center">
-    //                     <h4 className="text-xl font-semibold text-indigo-600">Feature 1</h4>
-    //                     <p className="text-gray-600 mt-2">Lorem ipsum dolor sit amet.</p>
-    //                 </div>
-    //                 <div className="p-6 bg-white shadow-md rounded-lg text-center">
-    //                     <h4 className="text-xl font-semibold text-indigo-600">Feature 2</h4>
-    //                     <p className="text-gray-600 mt-2">Lorem ipsum dolor sit amet.</p>
-    //                 </div>
-    //                 <div className="p-6 bg-white shadow-md rounded-lg text-center">
-    //                     <h4 className="text-xl font-semibold text-indigo-600">Feature 3</h4>
-    //                     <p className="text-gray-600 mt-2">Lorem ipsum dolor sit amet.</p>
-    //                 </div>
-    //             </div>
-    //         </section>
-
-    //         {/* Footer */}
-    //         <footer className="bg-gray-900 text-white text-center py-6 mt-10">
-    //             <p>&copy; 2025 MyBrand. All rights reserved.</p>
-    //         </footer>
-    //     </div>
-    // );
-
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#5c70b3] via-[#244DDA] to-white text-white">
             {/* Header */}
@@ -95,7 +22,7 @@ export default function Home() {
                         NC Score
                     </h1>
                 </div>
-                <LoginButton toLogin={toLogin} />
+                <LoginButton />
             </header>
 
             <img className="absolute h-[250px] w-[200px] top-[150px] left-12" src="/9c486b17fa4b4a15135a.jpg" />
