@@ -6,7 +6,6 @@ import { useState } from "react";
 
 
 const CalenderPage = () => {
-  const [events, setEvents] = useState<any[]>([]);
   return (
     <div className="p-1 flex gap-4 flex-col xl:flex-row" style={{ backgroundColor: "#F0F7FF" }}>
       {/* LEFT */}
@@ -14,7 +13,7 @@ const CalenderPage = () => {
         <div className="h-full bg-white p-4 rounded-md">
           <ImportICS/>
           <h1 className="text-xl font-semibold">Schedule (4A)</h1>
-          <BigCalendar importedEvents={events}/>
+          <BigCalendar />
         </div>
       </div>
       {/* RIGHT */}
