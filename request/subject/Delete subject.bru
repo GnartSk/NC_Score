@@ -1,0 +1,15 @@
+meta {
+  name: Delete subject
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/subject/NT100
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjIyNTIxNjkxQGdtLnVpdC5lZHUudm4iLCJzdWIiOiI2N2MzMGVmMGI3Y2M1MzA3OGRiMjJlYjAiLCJpYXQiOjE3NDA4Mzc1MTMsImV4cCI6MTgyNzIzNzUxM30.BkbsdquXMl8J8jszebeVwr8WHk2nonqZu9nNpg1FoDw
+}
