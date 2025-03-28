@@ -12,7 +12,7 @@ const CalenderPage = () => {
       <div className="w-full xl:w-2/3">
         <div className="h-full bg-white p-4 rounded-md">
           <ImportICS/>
-          <h1 className="text-xl font-semibold">Schedule (4A)</h1>
+          <h1 className="text-xl font-semibold">Schedule</h1>
           <BigCalendar />
         </div>
       </div>
