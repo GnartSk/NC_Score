@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -32,42 +32,78 @@ const schema = z.object({
     relatedToIndustry: z.string().optional(),
 });
 
-const fakeSubjects = [
-    {
-        subjectCode: 'CS101',
-        subjectName: 'Lập trình C++',
-        credit: 3,
-        specialized: 'MMTT',
-        subjectDescription: 'Hehe',
-        blockOfKnowledge: 'Cơ sở ngành',
-    },
-    {
-        subjectCode: 'CS102',
-        subjectName: 'Lập trình Java',
-        credit: 3,
-        specialized: 'ATTT',
-        blockOfKnowledge: 'Chuyên ngành',
-        relatedToIndustry: 'CNTT, Web dev',
-    },
-];
-
-// const fakeSubjects: {
-//     subjectCode: string;
-//     subjectName: string;
-//     credit: number;
-//     specialized?: string;
-//     blockOfKnowledge: string;
-//     relatedToIndustry?: string;
-//     subjectDescription?: string;
-// }[] = [];
+// const fakeSubjects = [
+//     {
+//         subjectCode: 'CS101',
+//         subjectName: 'Lập trình C++',
+//         credit: 3,
+//         specialized: 'MMTT',
+//         subjectDescription: 'Hehe',
+//         blockOfKnowledge: 'Cơ sở ngành',
+//     },
+//     {
+//         subjectCode: 'CS102',
+//         subjectName: 'Lập trình Java',
+//         credit: 3,
+//         specialized: 'ATTT',
+//         blockOfKnowledge: 'Chuyên ngành',
+//         relatedToIndustry: 'CNTT, Web dev',
+//     },
+// ];
 
 type JobType = { id: string; name: number };
 
 const job: JobType[] = [
-    { id: 'Web dev', name: 1 },
-    { id: 'Mobile dev', name: 2 },
-    { id: 'zzzzzz dev', name: 3 },
-    { id: 'CNTT', name: 4 },
+    { id: 'Software Developer', name: 1 },
+    { id: 'Embedded Software Engineer', name: 2 },
+    { id: 'Systems Engineer', name: 3 },
+    { id: 'DevOps Engineer', name: 4 },
+    { id: 'Frontend Developer', name: 5 },
+    { id: 'Backend Developer', name: 6 },
+    { id: 'Fullstack Developer', name: 7 },
+    { id: 'Software Tester', name: 8 },
+    { id: 'Automation Test Engineer', name: 9 },
+    { id: 'Game Developer', name: 10 },
+    { id: 'AR/VR Engineer', name: 11 },
+    { id: 'Mobile Developer', name: 12 },
+    { id: 'AI Engineer', name: 13 },
+    { id: 'Data Scientist', name: 14 },
+    { id: 'Data Engineer', name: 15 },
+    { id: 'Data Analyst', name: 16 },
+    { id: 'Machine Learning Engineer', name: 17 },
+    { id: 'Computer Vision Engineer', name: 18 },
+    { id: 'NLP Engineer', name: 19 },
+    { id: 'Big Data Engineer', name: 20 },
+    { id: 'Cybersecurity Specialist', name: 21 },
+    { id: 'Security Engineer', name: 22 },
+    { id: 'Penetration Tester', name: 23 },
+    { id: 'Malware Analyst', name: 24 },
+    { id: 'Information Security Analyst', name: 25 },
+    { id: 'Digital Forensics Expert', name: 26 },
+    { id: 'System Administrator', name: 27 },
+    { id: 'Network Administrator', name: 28 },
+    { id: 'Network Engineer', name: 29 },
+    { id: 'Cloud Engineer', name: 30 },
+    { id: 'Storage Engineer', name: 31 },
+    { id: 'IT Support Specialist', name: 32 },
+    { id: 'IT Project Manager', name: 33 },
+    { id: 'IT Business Analyst', name: 34 },
+    { id: 'Scrum Master', name: 35 },
+    { id: 'Product Manager', name: 36 },
+    { id: 'Blockchain Developer', name: 37 },
+    { id: 'Smart Contract Engineer', name: 38 },
+    { id: 'Cryptography Engineer', name: 39 },
+    { id: 'Web3 Developer', name: 40 },
+    { id: 'Hardware Engineer', name: 41 },
+    { id: 'IoT Engineer', name: 42 },
+    { id: 'Telecommunications Engineer', name: 43 },
+    { id: 'UI/UX Designer', name: 44 },
+    { id: 'User Experience Designer', name: 45 },
+    { id: 'Graphic Designer', name: 46 },
+    { id: '3D Modeler', name: 47 },
+    { id: 'IT Lecturer', name: 48 },
+    { id: 'IT Researcher', name: 49 },
+    { id: 'IT Consultant', name: 50 },
 ];
 
 const SubjectManagement = () => {
@@ -79,14 +115,62 @@ const SubjectManagement = () => {
         reset,
         watch,
     } = useForm({ resolver: zodResolver(schema) });
-    // const [subjects, setSubjects] = useState<z.infer<typeof schema>[]>([]);
-    const [subjects, setSubjects] = useState(fakeSubjects);
+
+    const [subjects, setSubjects] = useState<z.infer<typeof schema>[]>([]);
     const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
     const subjectsPerPage = 10;
     const [selectedJob, setSelectedJob] = useState<JobType[]>([]);
     const token = Cookies.get('NCToken') || '';
 
+    const [expandedRows, setExpandedRows] = useState<{ [key: number]: boolean }>({});
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const toggleExpand = (index: number) => {
+        setExpandedRows((prev) => ({
+            ...prev,
+            [index]: !prev[index],
+        }));
+    };
+
+    const filteredJobs = job.filter((item) => item.id.toLowerCase().includes(searchTerm.toLowerCase()));
+
     type FormData = z.infer<typeof schema>;
+
+    const getSubject = async () => {
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_BackendURL}/subject?page=${page + 1}&limit=${subjectsPerPage}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                },
+            );
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                console.log('Error Response:', errorData);
+                throw new Error(errorData.message || 'Invalid credentials');
+            }
+
+            const responseData = await res.json();
+            console.log('Response: ', responseData.data);
+            setTotalPages(responseData.data.totalPages);
+            setSubjects(responseData.data.subject);
+        } catch (error) {
+            console.error('Post subject error:', error);
+            return;
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await getSubject();
+        };
+        fetchData();
+    }, []);
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -120,14 +204,15 @@ const SubjectManagement = () => {
             return;
         }
 
-        setSubjects((prev) =>
+        setSubjects((prev: z.infer<typeof schema>[]) =>
             prev.map((item) => ({
                 ...item,
-                specialized: item.specialized ?? '',
+                specialized: item.specialized ?? undefined,
             })),
         );
+
         alert('Thêm môn học thành công!');
-        reset();
+        window.location.reload();
     };
 
     const onDeleteSubject = async () => {
@@ -156,7 +241,7 @@ const SubjectManagement = () => {
         }
 
         alert(`Xóa môn học ${deleteSubjectCode}!`);
-        reset();
+        window.location.reload();
     };
 
     const handlePatchSubject = (data: FormData) => {
@@ -236,9 +321,9 @@ const SubjectManagement = () => {
 
                     <div>
                         <label className="block text-sm font-medium">Liên quan đến ngành</label>
-                        {/* <input {...register('relatedToIndustry')} className="w-full p-2 border rounded" /> */}
+
                         <Select
-                            options={job} // Danh sách lựa chọn có kiểu đúng
+                            options={filteredJobs} // Danh sách lựa chọn có kiểu đúng
                             labelField="id"
                             valueField="name"
                             multi
@@ -292,10 +377,53 @@ const SubjectManagement = () => {
                                     </div>
                                 );
                             }}
+                            dropdownRenderer={() => (
+                                <div className="p-2">
+                                    {/* Ô tìm kiếm trong dropdown */}
+                                    <input
+                                        type="text"
+                                        placeholder="Tìm kiếm..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full p-2 border border-gray-300 rounded mb-2"
+                                    />
+
+                                    {/* Hiển thị danh sách đã lọc */}
+                                    {filteredJobs.length > 0 ? (
+                                        filteredJobs.map((item) => {
+                                            const isSelected = selectedJob.some((j) => j.id === item.id);
+
+                                            return (
+                                                <div
+                                                    key={item.id}
+                                                    className={`flex items-center justify-between p-2 cursor-pointer ${
+                                                        isSelected ? 'bg-blue-200' : ''
+                                                    }`}
+                                                    onClick={() => {
+                                                        if (isSelected) {
+                                                            setSelectedJob(selectedJob.filter((j) => j.id !== item.id));
+                                                        } else {
+                                                            setSelectedJob([...selectedJob, item]);
+                                                        }
+                                                    }}
+                                                >
+                                                    {item.id}
+                                                    <FontAwesomeIcon
+                                                        icon={isSelected ? faSquareCheck : faSquare}
+                                                        className="ml-2"
+                                                    />
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <p className="text-gray-500 text-center">Không tìm thấy kết quả</p>
+                                    )}
+                                </div>
+                            )}
                             dropdownPosition="auto"
                             dropdownHandleRenderer={() => null} // Ẩn phần điều khiển dropdown
                             dropdownGap={5}
-                            dropdownHeight="200px"
+                            dropdownHeight="300px"
                         />
 
                         {/* Input ẩn để lưu giá trị vào react-hook-form */}
@@ -342,51 +470,86 @@ const SubjectManagement = () => {
                     <tbody>
                         {subjects.length > 0
                             ? subjects.slice(page * subjectsPerPage, (page + 1) * subjectsPerPage).map((sub, index) => (
-                                  <tr
-                                      key={index}
-                                      className="text-center"
-                                      onClick={() =>
-                                          handlePatchSubject({
-                                              ...sub,
-                                              blockOfKnowledge: sub.blockOfKnowledge as
-                                                  | 'Các môn lý luận chính trị'
-                                                  | 'Toán – Tin học – Khoa học tự nhiên'
-                                                  | 'Ngoại ngữ'
-                                                  | 'Cơ sở ngành'
-                                                  | 'Chuyên ngành'
-                                                  | 'Tự chọn'
-                                                  | 'Thực tập doanh nghiệp'
-                                                  | 'Đồ án'
-                                                  | 'Khóa luận tốt nghiệp'
-                                                  | 'Chuyên đề tốt nghiệp',
-                                              specialized: sub.specialized as 'MMTT' | 'ATTT' | 'Trường' | undefined,
-                                          })
-                                      }
-                                  >
-                                      {[
-                                          sub.subjectCode,
-                                          sub.subjectName,
-                                          sub.credit,
-                                          sub.specialized || 'N/A',
-                                          sub.blockOfKnowledge,
-                                          sub.relatedToIndustry || 'N/A',
-                                          sub.subjectDescription || 'Không có mô tả',
-                                      ].map((val, i) => (
-                                          <td
-                                              key={i}
-                                              className={`border p-2 ${i === 6 ? 'w-[40%] text-left' : 'w-[10%]'}`}
-                                          >
-                                              {val}
+                                  <>
+                                      <tr
+                                          key={index}
+                                          className="text-center"
+                                          onClick={() =>
+                                              handlePatchSubject({
+                                                  ...sub,
+                                                  blockOfKnowledge: sub.blockOfKnowledge as
+                                                      | 'Các môn lý luận chính trị'
+                                                      | 'Toán – Tin học – Khoa học tự nhiên'
+                                                      | 'Ngoại ngữ'
+                                                      | 'Cơ sở ngành'
+                                                      | 'Chuyên ngành'
+                                                      | 'Tự chọn'
+                                                      | 'Thực tập doanh nghiệp'
+                                                      | 'Đồ án'
+                                                      | 'Khóa luận tốt nghiệp'
+                                                      | 'Chuyên đề tốt nghiệp',
+                                                  specialized: sub.specialized as
+                                                      | 'MMTT'
+                                                      | 'ATTT'
+                                                      | 'Trường'
+                                                      | undefined,
+                                              })
+                                          }
+                                      >
+                                          {[
+                                              sub.subjectCode,
+                                              sub.subjectName,
+                                              sub.credit,
+                                              sub.specialized || 'N/A',
+                                              sub.blockOfKnowledge,
+                                              sub.relatedToIndustry || 'N/A',
+                                          ].map((val, i) => (
+                                              <td
+                                                  key={i}
+                                                  className={`border p-2 ${
+                                                      [0, 2, 3, 4].includes(i)
+                                                          ? 'w-[10%]'
+                                                          : i === 1
+                                                          ? 'w-[15%]'
+                                                          : i === 5
+                                                          ? 'w-[35%]'
+                                                          : ''
+                                                  }`}
+                                              >
+                                                  {val}
+                                              </td>
+                                          ))}
+                                          <td className="border p-2 text-center w-[5%]">
+                                              <button
+                                                  className="text-blue-500 hover:underline"
+                                                  onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      toggleExpand(index);
+                                                  }}
+                                              >
+                                                  {expandedRows[index] ? 'Thu gọn' : 'Xem thêm'}
+                                              </button>
                                           </td>
-                                      ))}
-                                  </tr>
+                                      </tr>
+                                      {expandedRows[index] && (
+                                          <tr className="bg-gray-100">
+                                              <td colSpan={7} className="p-2 text-left border">
+                                                  <div className="max-h-20 w-[30%] overflow-y-auto p-2">
+                                                      {sub.subjectDescription || 'Không có mô tả'}
+                                                  </div>
+                                              </td>
+                                          </tr>
+                                      )}
+                                  </>
                               ))
                             : Array.from({ length: 5 }).map((_, index) => (
                                   <tr key={index} className="text-center animate-pulse">
                                       {Array.from({ length: 7 }).map((_, i) => (
                                           <td
                                               key={i}
-                                              className={`border p-2 ${i === 6 ? 'w-[40%] text-left' : 'w-[10%]'}`}
+                                              className={`border p-2 ${
+                                                  i === 6 ? 'w-[5%] text-left' : i === 5 ? 'w-[20%]' : 'w-[10%]'
+                                              }`}
                                           >
                                               <div className="h-5 w-full bg-gray-300 rounded"></div>
                                           </td>
@@ -399,7 +562,7 @@ const SubjectManagement = () => {
                     <ReactPaginate
                         previousLabel={'←'}
                         nextLabel={'→'}
-                        pageCount={Math.ceil(subjects.length / subjectsPerPage)}
+                        pageCount={totalPages}
                         onPageChange={(e) => setPage(e.selected)}
                         containerClassName={'flex space-x-2 border border-gray-300 rounded-lg p-2 bg-white'}
                         pageClassName={

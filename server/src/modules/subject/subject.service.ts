@@ -70,11 +70,11 @@ export class SubjectService {
     const { page = 1, limit = 10 } = paginationDto;
     const skip = (page - 1) * limit;
 
-    const users = await this.subjectModel.find().skip(skip).limit(limit);
+    const subject = await this.subjectModel.find().skip(skip).limit(limit);
     const total = await this.subjectModel.countDocuments();
 
     return {
-      users,
+      subject,
       totalRecords: total,
       totalPages: Math.ceil(total / limit),
     };
