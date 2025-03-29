@@ -25,13 +25,6 @@ export default function Home() {
                 <LoginButton />
             </header>
 
-            <img className="absolute h-[250px] w-[200px] top-[150px] left-12" src="/9c486b17fa4b4a15135a.jpg" />
-
-            <img
-                className="absolute h-[250px] w-[200px] top-[150px] right-12 scale-x-[-1]"
-                src="/9c486b17fa4b4a15135a.jpg"
-            />
-
             {/* Hero Section */}
             <main className="flex flex-col items-center text-center px-6 mt-40">
                 <motion.h2
