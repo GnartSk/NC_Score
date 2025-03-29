@@ -18,7 +18,12 @@ export class ScoreController {
     return this.scoreService.findAll(paginationDto);
   }
 
-  @Get()
+  @Get('users')
+  findAllScoreOfUsers(@Query() paginationDto: PaginationDto) {
+    return this.scoreService.findAll(paginationDto);
+  }
+
+  @Get('profile')
   findAllOfUser(@Request() req) {
     return this.scoreService.findAllOfUser(req.user._id);
   }
