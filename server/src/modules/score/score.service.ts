@@ -71,15 +71,29 @@ export class ScoreService {
     const { page = 1, limit = 10 } = paginationDto;
     const skip = (page - 1) * limit;
 
-    const users = await this.scoreModel.find().skip(skip).limit(limit);
+    const score = await this.scoreModel.find().skip(skip).limit(limit);
     const total = await this.scoreModel.countDocuments();
 
     return {
-      users,
+      score,
       totalRecords: total,
       totalPages: Math.ceil(total / limit),
     };
   }
+
+  // async findAllScoreOfUsers(paginationDto: PaginationDto) {
+  //   const { page = 1, limit = 10 } = paginationDto;
+  //   const skip = (page - 1) * limit;
+
+  //   const user = await this.userModel.find().skip(skip).limit(limit);
+  //   const total = await this.scoreModel.countDocuments();
+
+  //   const usersScore = [];
+
+  //   for (let i = 0; i < limit; i++) {
+  //     const scores = await this.scoreModel.find({ idStudent: user[i]._id });
+  //   }
+  // }
 
   async findAllOfUser(_id: string) {
     const scores = await this.scoreModel.find({ idStudent: _id });
@@ -116,5 +130,9 @@ export class ScoreService {
     } else {
       throw new BadRequestException('Invalid MongoDB _id');
     }
+  }
+
+  uploadAllScore() {
+    
   }
 }
