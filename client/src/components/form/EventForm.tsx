@@ -1,102 +1,72 @@
-import { useState } from "react";
-import { Button, Input, DatePicker, message } from "antd";
-import axios from "axios";
-import dayjs, { Dayjs } from "dayjs";
-
-interface EventData {
-  _id: string;
-  title: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-}
+'use client';
+import { useState } from 'react';
+import { Button, DatePicker, Form, Input, Modal } from 'antd';
+import dayjs from 'dayjs';
 
 interface EventFormProps {
-  onEventAdded?: (event: EventData) => void;
+  onSubmit: (event: {
+    title: string;
+    start: Date;
+    end: Date;
+    desc?: string;
+  }) => void;
+  onCancel: () => void;
 }
 
-const EventForm: React.FC<EventFormProps> = ({ onEventAdded }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [startTime, setStartTime] = useState<Dayjs | null>(null);
-  const [endTime, setEndTime] = useState<Dayjs | null>(null);
-  const [loading, setLoading] = useState(false);
+const EventForm = ({ onSubmit, onCancel }: EventFormProps) => {
+  const [form] = Form.useForm();
 
-  const handleSubmit = async () => {
-    if (!title || !startTime || !endTime) {
-      message.error("Vui lòng điền đầy đủ thông tin!");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await axios.post<EventData>("http://localhost:3000/events", {
-        title,
-        description,
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
-      });
-
-      message.success("Sự kiện đã được thêm!");
-
-      if (onEventAdded) {
-        onEventAdded(response.data);
-      }
-
-      setTitle("");
-      setDescription("");
-      setStartTime(null);
-      setEndTime(null);
-    } catch (error) {
-      message.error("Có lỗi xảy ra, vui lòng thử lại!");
-    } finally {
-      setLoading(false);
-    }
+  const handleSubmit = (values: any) => {
+    onSubmit({
+      title: values.title,
+      start: values.timeRange[0].toDate(),
+      end: values.timeRange[1].toDate(),
+      desc: values.desc
+    });
+    form.resetFields();
   };
 
   return (
-    <div className="p-6 border rounded-lg shadow-lg max-w-md mx-auto bg-white">
-      <h2 className="text-lg font-semibold mb-4 text-center text-blue-600">Thêm Lịch Học</h2>
-      <div className="space-y-4"> 
-        <Input
-          placeholder="Tiêu đề"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <Input
-          placeholder="Mô tả"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <DatePicker
-          showTime
-          value={startTime}
-          onChange={(value) => setStartTime(value)}
-          className="w-full p-2 border rounded"
-          placeholder="Chọn thời gian bắt đầu"
-        />
-        <DatePicker
-          showTime
-          value={endTime}
-          onChange={(value) => setEndTime(value)}
-          className="w-full p-2 border rounded"
-          placeholder="Chọn thời gian kết thúc"
-        />
-        <Button
-          type="primary"
-          onClick={handleSubmit}
-          loading={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded"
+    <Modal
+      title="Thêm Lịch Học Mới"
+      open={true}
+      onCancel={onCancel}
+      footer={null}
+    >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form.Item
+          label="Tên môn học"
+          name="title"
+          rules={[{ required: true, message: 'Vui lòng nhập tên môn học' }]}
         >
-          Thêm lịch học
-        </Button>
-      </div>
-    </div>
+          <Input placeholder="Nhập tên môn học" />
+        </Form.Item>
+
+        <Form.Item
+          label="Thời gian"
+          name="timeRange"
+          rules={[{ required: true, message: 'Vui lòng chọn thời gian' }]}
+        >
+          <DatePicker.RangePicker
+            showTime
+            format="DD/MM/YYYY HH:mm"
+            className="w-full"
+          />
+        </Form.Item>
+
+        <Form.Item label="Ghi chú" name="desc">
+          <Input.TextArea rows={3} />
+        </Form.Item>
+
+        <div className="flex justify-end gap-2">
+          <Button onClick={onCancel}>Hủy</Button>
+          <Button type="primary" htmlType="submit">
+            Lưu Lịch
+          </Button>
+        </div>
+      </Form>
+    </Modal>
   );
-  
 };
 
 export default EventForm;
