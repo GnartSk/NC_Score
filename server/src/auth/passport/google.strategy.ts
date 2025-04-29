@@ -20,14 +20,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallBack) {
-    console.log({ profile });
+    // console.log({ profile });
     try {
       const email = profile.emails[0].value; // Lấy email từ profile
       const username = email.split('@')[0]; // Lấy phần trước '@'
 
       const emailRegex = /^[0-9]{2}52[0-9]{4}@gm\.uit\.edu\.vn$/;
       if (!emailRegex.test(email)) {
-        return done(new UnauthorizedException('Invalid email format'), false);
+        return done(null, false);
       }
 
       const user = await this.authService.validateGoogleUser({
@@ -39,13 +39,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         academicYear: `20${username.substring(0, 2)}`,
         role: 'USER',
         specialized: '',
-        avatar: '',
+        avatar: profile.photos?.[0]?.value || '',
         birth: '',
         gender: '',
       });
       done(null, user);
     } catch (error) {
-      done(error, false);
+      console.log('Google Auth Error:', error.message);
+      return done(null, false);
     }
   }
 }

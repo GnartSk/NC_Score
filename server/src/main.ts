@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './Interceptor/response.interceptor';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,10 +14,14 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true,
       whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
 
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  
   app.setGlobalPrefix('api', { exclude: [''] });
 
   // Bật CORS

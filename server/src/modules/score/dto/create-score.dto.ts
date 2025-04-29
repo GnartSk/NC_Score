@@ -1,19 +1,31 @@
-import { IsEnum, IsNotEmpty, IsOptional, Matches } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, Matches } from 'class-validator';
 
 export class CreateScoreDto {
   @IsOptional()
+  @IsNumber({}, { message: 'QT must be a number' })
+  @Type(() => Number)
   QT: number;
 
   @IsOptional()
+  @IsNumber({}, { message: 'TH must be a number' })
+  @Type(() => Number)
   TH: number;
 
   @IsOptional()
+  @IsNumber({}, { message: 'GK must be a number' })
+  @Type(() => Number)
   GK: number;
 
   @IsOptional()
+  @IsNumber({}, { message: 'CK must be a number' })
+  @Type(() => Number)
   CK: number;
 
   @IsOptional()
+  @Matches(/^\d+(\.\d+)?$|^Miễn$/, {
+    message: 'TK must be a number or "Miễn"',
+  })
   TK: number;
 
   @IsNotEmpty({ message: 'status is required' })
