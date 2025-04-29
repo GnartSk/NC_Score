@@ -1,52 +1,56 @@
 // components/uploadbutton/ImportICS.tsx
 'use client';
-import { Button } from 'antd';
-import ical from 'ical.js';
+import { Button, message } from 'antd';
+import { useState } from 'react';
+import { parseICSContent } from '@/utils/icsHelper';
+
+interface Event {
+  title: string;
+  start: Date;
+  end: Date;
+  desc?: string;
+  location?: string;
+  allDay?: boolean;
+}
 
 interface ImportICSProps {
-  onImport: (events: any[]) => void;
+  onImport: (events: Event[]) => void;
 }
 
 const ImportICS = ({ onImport }: ImportICSProps) => {
-  // components/uploadbutton/ImportICS.tsx
-// components/uploadbutton/ImportICS.tsx
-const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-  
+    
+    setLoading(true);
     const reader = new FileReader();
+    
     reader.onload = (e) => {
       try {
-        const jcalData = ical.parse(e.target?.result as string);
-        const events = jcalData[2].map((component: any) => {
-          const event = new ical.Component(component);
-          
-          // Xử lý các trường có kiểu Time
-          const dtstart = event.getFirstPropertyValue('dtstart');
-          const dtend = event.getFirstPropertyValue('dtend');
-          const summary = event.getFirstPropertyValue('summary');
-  
-          // Kiểm tra kiểu dữ liệu
-          if (!(dtstart instanceof ical.Time) || !(dtend instanceof ical.Time)) {
-            console.warn('Invalid date format', component);
-            return null;
-          }
-  
-          return {
-            title: summary?.toString() || 'Không có tiêu đề',
-            start: dtstart.toJSDate(),
-            end: dtend.toJSDate(),
-            location: event.getFirstPropertyValue('location')?.toString() || '',
-            desc: event.getFirstPropertyValue('description')?.toString() || ''
-          };
-        }).filter(Boolean);
-  
-        onImport(events);
+        const data = e.target?.result as string;
+        const calendarEvents = parseICSContent(data);
+        
+        if (calendarEvents.length) {
+          onImport(calendarEvents);
+          message.success(`Đã import ${calendarEvents.length} sự kiện thành công`);
+        } else {
+          message.warning('Không tìm thấy sự kiện nào trong file ICS');
+        }
       } catch (error) {
         console.error('Error parsing ICS file:', error);
-        alert('File ICS không hợp lệ');
+        message.error('Không thể đọc file ICS. Vui lòng kiểm tra định dạng file.');
+      } finally {
+        setLoading(false);
       }
     };
+    
+    reader.onerror = () => {
+      message.error('Lỗi khi đọc file');
+      setLoading(false);
+    };
+    
     reader.readAsText(file);
   };
 
@@ -61,6 +65,7 @@ const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
       />
       <Button
         onClick={() => document.getElementById('ics-upload')?.click()}
+        loading={loading}
         className="bg-gray-100 hover:bg-gray-200 text-gray-800"
       >
         Import ICS

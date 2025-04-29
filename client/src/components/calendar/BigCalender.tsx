@@ -1,56 +1,53 @@
-// "use client";
-
-// import { Calendar, momentLocalizer, View, Views } from "react-big-calendar";
-// import moment from "moment";
-// import { calendarEvents } from "@/lib/data";
-// import "react-big-calendar/lib/css/react-big-calendar.css";
-// import { useState } from "react";
-
-// const localizer = momentLocalizer(moment);
-
-// const BigCalendar = () => {
-//   const [view, setView] = useState<View>(Views.WORK_WEEK);
-
-//   const handleOnChangeView = (selectedView: View) => {
-//     setView(selectedView);
-//   };
-
-//   return (
-//     <Calendar
-//       localizer={localizer}
-//       events={calendarEvents}
-//       startAccessor="start"
-//       endAccessor="end"
-//       views={["month","work_week","day","agenda"]}
-//       view={view}
-//       style={{ height: "98%" }}
-//       onView={handleOnChangeView}
-//       min={new Date(2025, 1, 0, 7, 0, 0)}
-//       max={new Date(2025, 1, 0, 17, 0, 0)}
-//     />
-//   );
-// };
-
-// export default BigCalendar;
-
 'use client';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { Calendar, momentLocalizer, Event, View, Views } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { useState } from 'react';
+import { Tooltip } from 'antd';
 
 moment.locale('vi');
 const localizer = momentLocalizer(moment);
 
+interface CalendarEvent extends Event {
+  title: string;
+  start: Date;
+  end: Date;
+  desc?: string;
+  location?: string;
+}
+
 interface BigCalendarProps {
-  events: Array<{
-    title: string;
-    start: Date;
-    end: Date;
-    desc?: string;
-  }>;
+  events: CalendarEvent[];
 }
 
 const BigCalendar = ({ events }: BigCalendarProps) => {
+  const [view, setView] = useState<View>(Views.WEEK);
+
+  const handleViewChange = (newView: View) => {
+    setView(newView);
+  };
+
+  // Custom event component with tooltip
+  const EventComponent = ({ event }: { event: CalendarEvent }) => {
+    const tooltipContent = (
+      <div>
+        <div><strong>{event.title}</strong></div>
+        {event.location && <div><strong>Địa điểm:</strong> {event.location}</div>}
+        {event.desc && <div><strong>Mô tả:</strong> {event.desc}</div>}
+        <div><strong>Bắt đầu:</strong> {moment(event.start).format('DD/MM/YYYY HH:mm')}</div>
+        <div><strong>Kết thúc:</strong> {moment(event.end).format('DD/MM/YYYY HH:mm')}</div>
+      </div>
+    );
+
+    return (
+      <Tooltip title={tooltipContent} color="#1677ff">
+        <div className="rbc-event-content">
+          {event.title}
+        </div>
+      </Tooltip>
+    );
+  };
+
   return (
     <Calendar
       localizer={localizer}
@@ -58,15 +55,22 @@ const BigCalendar = ({ events }: BigCalendarProps) => {
       startAccessor="start"
       endAccessor="end"
       style={{ height: 600 }}
-      views={['month', 'week', 'day']}
+      views={['month', 'week', 'day', 'agenda']}
+      view={view}
+      onView={handleViewChange}
       defaultView="week"
+      components={{
+        event: EventComponent
+      }}
       messages={{
         today: 'Hôm nay',
         previous: 'Trước',
         next: 'Sau',
         month: 'Tháng',
         week: 'Tuần',
-        day: 'Ngày'
+        day: 'Ngày',
+        agenda: 'Sự kiện',
+        showMore: (total) => `+${total} sự kiện khác`
       }}
       eventPropGetter={(event) => ({
         style: {
