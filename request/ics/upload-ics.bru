@@ -1,11 +1,11 @@
 meta {
-  name: Upload HTML
+  name: Upload ICS File
   type: http
-  seq: 1
+  seq: 3
 }
 
 post {
-  url: {{baseUrl}}/api/reader/html
+  url: {{baseUrl}}/api/ics/upload
   body: multipartForm
   auth: bearer
 }
@@ -15,5 +15,5 @@ auth:bearer {
 }
 
 body:multipart-form {
-  file: @file("C:\Users\ADMIN\Downloads\Kết quả học tập.html")
+  file: @file(C:\Users\ADMIN\Downloads\22521511_scheduled (2).ics)
 }
