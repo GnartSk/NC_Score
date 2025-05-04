@@ -2,18 +2,54 @@
 import { StudentContext } from '@/lib/student.context';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Layout } from 'antd';
-import { useContext } from 'react';
-import { DownOutlined, SmileOutlined } from '@ant-design/icons';
+import { useContext, useEffect, useState } from 'react';
+import { DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
-import { signOut } from "next-auth/react"
+import { signOut } from "next-auth/react";
+import { getCookie } from 'cookies-next';
+
+interface Profile {
+    fullName: string;
+    studentId: string;
+    specialized: string;
+    gmail: string;
+    avatar: string;
+}
 
 const StudentHeader = (props: any) => {
-    //const { data: session, status } = useSession();
     const { session } = props;
+    const [profile, setProfile] = useState<Profile | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const { Header } = Layout;
     const { collapseMenu, setCollapseMenu } = useContext(StudentContext)!;
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            setLoading(true);
+            try {
+                const token = getCookie('NCToken') as string | undefined;
+                if (!token) return;
+
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+                    method: 'GET',
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+                const data = await response.json();
+                setProfile(data.data);
+            } catch (error) {
+                console.error('Fetch error:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, []);
 
     const items: MenuProps['items'] = [
         {
@@ -24,13 +60,15 @@ const StudentHeader = (props: any) => {
                 </span>
             ),
         },
-
         {
             key: '4',
             danger: true,
             label: <span onClick={() => signOut()}>Đăng xuất</span>,
         },
     ];
+
+    // Ưu tiên hiển thị tên từ profile, nếu không có thì dùng từ session, hoặc giá trị mặc định
+    const displayName = profile?.fullName || session?.user?.name || "Người dùng";
 
     return (
         <>
@@ -58,7 +96,7 @@ const StudentHeader = (props: any) => {
                         style={{ color: "unset", lineHeight: "0 !important", marginRight: 20 }}
                     >
                         <Space>
-                            Xin chào {session?.user?.email ?? ""}
+                            Xin chào {displayName}
                             <DownOutlined />
                         </Space>
                     </a>

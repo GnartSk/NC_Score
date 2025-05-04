@@ -1,9 +1,9 @@
-const ProfileCard = ({ name, studentId, major, email }) => {
+const ProfileCard = ({ avatar, name, studentId, major, email }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
       <div className="flex items-center space-x-4">
         <img
-          src="/avtUser.jpg"
+          src={avatar}
           alt="User Avatar"
           className="w-12 h-12 rounded-full"
         />
