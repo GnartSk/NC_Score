@@ -276,7 +276,7 @@ export default function SubjectTable({ title, category }: { title: string; categ
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}
-        rowKey={(record) => record.id?.toString() || `${record.code}-${Math.random().toString(36).substring(2, 9)}`}
+        rowKey={(record) => `${category}-${record.code}-${record.id || Math.random().toString(36).substring(2, 9)}`}
         className="antd-custom-table"
       />
     </div>

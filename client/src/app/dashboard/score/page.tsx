@@ -35,40 +35,68 @@ export default function SubjectsPage() {
         <UploadHtmlButton onUploadSuccess={handleUploadSuccess} />
       </div>
       
-      {/* Môn lý luận chính trị */}
-      <div className="mb-6">
-        <SubjectTable 
-          title="Các môn lý luận chính trị" 
-          category="Môn lý luận chính trị"
-          key={`political-${refreshKey}`}
-        />
-      </div>
+      {/* Khối kiến thức đại cương */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">KHỐI KIẾN THỨC ĐẠI CƯƠNG</h2>
+        
+        {/* Môn lý luận chính trị */}
+        <div className="mb-6">
+          <SubjectTable 
+            title="Các môn lý luận chính trị" 
+            category="Môn lý luận chính trị"
+            key={`political-${refreshKey}`}
+          />
+        </div>
 
-      {/* Toán - Tin học */}
-      <div className="mb-6">
-        <SubjectTable 
-          title="Toán - Tin học - Khoa học tự nhiên" 
-          category="Toán - Tin học"
-          key={`math-${refreshKey}`}
-        />
+        {/* Toán - Tin học */}
+        <div className="mb-6">
+          <SubjectTable 
+            title="Toán - Tin học - Khoa học tự nhiên" 
+            category="Toán - Tin học"
+            key={`math-${refreshKey}`}
+          />
+        </div>
+        
+        {/* Môn đại cương khác (ngoại ngữ) */}
+        <div className="mb-6">
+          <SubjectTable 
+            title="Ngoại ngữ" 
+            category="Ngoại ngữ"
+            key={`general-${refreshKey}`}
+          />
+        </div>
       </div>
       
-      {/* Môn đại cương */}
-      <div className="mb-6">
-        <SubjectTable 
-          title="Các môn đại cương" 
-          category="Đại cương"
-          key={`general-${refreshKey}`}
-        />
-      </div>
-      
-      {/* Môn chuyên ngành */}
-      <div className="mb-6">
-        <SubjectTable 
-          title="Các môn chuyên ngành" 
-          category="Chuyên ngành"
-          key={`specialized-${refreshKey}`}
-        />
+      {/* Khối kiến thức chuyên ngành */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">KHỐI KIẾN THỨC CHUYÊN NGÀNH</h2>
+        
+        {/* Môn cơ sở ngành */}
+        <div className="mb-6">
+          <SubjectTable 
+            title="Các môn cơ sở ngành" 
+            category="Cơ sở ngành"
+            key={`foundation-${refreshKey}`}
+          />
+        </div>
+        
+        {/* Môn chuyên ngành */}
+        <div className="mb-6">
+          <SubjectTable 
+            title="Các môn chuyên ngành" 
+            category="Chuyên ngành"
+            key={`specialized-${refreshKey}`}
+          />
+        </div>
+        
+        {/* Môn tự chọn */}
+        <div className="mb-6">
+          <SubjectTable 
+            title="Các môn tự chọn" 
+            category="Tự chọn"
+            key={`elective-${refreshKey}`}
+          />
+        </div>
       </div>
     </div>
     </>

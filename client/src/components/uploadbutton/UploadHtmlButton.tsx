@@ -108,8 +108,11 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
     const categorizedData: { [key: string]: any[] } = {
       'Toán - Tin học': [],
       'Môn lý luận chính trị': [],
+      'Ngoại ngữ': [],
       'Đại cương': [],
-      'Chuyên ngành': []
+      'Cơ sở ngành': [],
+      'Chuyên ngành': [],
+      'Tự chọn': []
     };
 
     // Xử lý dữ liệu theo mẫu API trả về
@@ -123,16 +126,37 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
           if (semesterData && Array.isArray(semesterData.subjects)) {
             semesterData.subjects.forEach((subject: any, index: number) => {
               // Xác định category dựa vào mã môn học
-              let category = 'Đại cương';
+              let category = 'Tự chọn'; // Default category
               const code = subject.subjectCode || '';
               
-              if (code.startsWith('SS') || code.startsWith('MLN')) {
-                category = 'Môn lý luận chính trị'; // Môn chính trị
-              } else if (code.startsWith('NT') || code.startsWith('MA')) {
-                category = 'Toán - Tin học'; // Môn toán và tin học
-              } else if (code.startsWith('SE') || code.startsWith('PRN')) {
-                category = 'Chuyên ngành'; // Môn chuyên ngành
+              console.log(`Processing subject: ${code} - ${subject.subjectName}`);
+              
+              // Môn lý luận chính trị
+              if (code.startsWith('SS')) {
+                category = 'Môn lý luận chính trị';
+              } 
+              // Toán - Tin học - Khoa học tự nhiên (thuộc đại cương)
+              else if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') {
+                category = 'Toán - Tin học';
               }
+              // Ngoại ngữ (thuộc đại cương)
+              else if (code.startsWith('EN')) {
+                category = 'Ngoại ngữ';
+              }
+              // Cơ sở ngành
+              else if ((code.startsWith('IT') && code !== 'IT001') || 
+                      code === 'NT0' || code === 'NT1' || 
+                      code.startsWith('NT0') || code.startsWith('NT1')) {
+                category = 'Cơ sở ngành';
+              }
+              // Chuyên ngành - tất cả mã NT khác 
+              else if (code.startsWith('NT') && 
+                      !code.startsWith('NT0') && 
+                      !code.startsWith('NT1')) {
+                category = 'Chuyên ngành';
+              }
+              
+              console.log(`Categorized as: ${category}`);
               
               // Xác định trạng thái
               let status = 'Chưa học';
@@ -164,6 +188,15 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
     } catch (error) {
       console.error('Error processing API data:', error);
     }
+    
+    // Debug output - log how many subjects are in each category
+    console.log('Categorized data summary:');
+    Object.keys(categorizedData).forEach(category => {
+      console.log(`${category}: ${categorizedData[category].length} subjects`);
+      if (categorizedData[category].length > 0) {
+        console.log('Sample subjects:', categorizedData[category].slice(0, 3).map(s => `${s.code} - ${s.name}`));
+      }
+    });
     
     return categorizedData;
   };
