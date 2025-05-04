@@ -1,5 +1,5 @@
 'use client';
-import { Table, Tag, Spin } from 'antd';
+import { Table, Tag, Spin, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 
@@ -13,7 +13,7 @@ interface Subject {
   gk?: number;
   ck?: number;
   total?: number;
-  status: 'Hoàn thành' | 'Chưa học' | 'Rớt';
+  status: 'Hoàn thành' | 'Chưa học' | 'Rớt'|'Miễn';
   category: string;
 }
 
@@ -107,6 +107,25 @@ const mockData: Subject[] = [
   },
 ];
 
+// Hàm kiểm tra và lấy dữ liệu từ localStorage
+const getScoreDataFromLocalStorage = (category: string): Subject[] | null => {
+  try {
+    const scoreData = localStorage.getItem('html_score_data');
+    if (!scoreData) return null;
+    
+    const parsedData = JSON.parse(scoreData);
+    
+    // Kiểm tra xem có dữ liệu trong category này không
+    if (parsedData && parsedData[category] && Array.isArray(parsedData[category])) {
+      return parsedData[category];
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    return null;
+  }
+};
 
 export default function SubjectTable({ title, category }: { title: string; category: string }) {
   const [loading, setLoading] = useState(true);
@@ -183,7 +202,8 @@ export default function SubjectTable({ title, category }: { title: string; categ
         <Tag 
           color={
             status === 'Hoàn thành' ? 'green' :
-            status === 'Rớt' ? 'red' : 'default'
+            status === 'Rớt' ? 'red' :
+            status === 'Miễn' ? 'yellow' : 'default'
           }
           className="rounded-full px-3"
         >
@@ -195,22 +215,68 @@ export default function SubjectTable({ title, category }: { title: string; categ
 
   useEffect(() => {
     setLoading(true);
-    setTimeout(() => {
-      setData(mockData.filter(item => item.category === category));
+    
+    // Kiểm tra xem có dữ liệu từ file HTML đã được upload không
+    const storedData = typeof window !== 'undefined' ? getScoreDataFromLocalStorage(category) : null;
+    
+    if (storedData) {
+      // Nếu có dữ liệu từ localStorage, sử dụng dữ liệu đó
+      setData(storedData);
       setLoading(false);
-    }, 1000);
+    } else {
+      // Nếu không có, thử lấy từ API
+      fetchScoreData()
+        .then(apiData => {
+          if (apiData && apiData.length > 0) {
+            setData(apiData);
+          } else {
+            // Nếu không có dữ liệu từ API, dùng mock data
+            setData(mockData.filter(item => item.category === category));
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching score data:', error);
+          // Dùng mock data nếu có lỗi
+          setData(mockData.filter(item => item.category === category));
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   }, [category]);
+
+  // Hàm lấy dữ liệu điểm từ API
+  const fetchScoreData = async (): Promise<Subject[]> => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/scores?category=${category}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Error fetching score data:', error);
+      return [];
+    }
+  };
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm">
       <h2 className="text-lg font-semibold mb-4">{title}</h2>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={Array.isArray(data) ? data : []}
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}
-        rowKey="id"
+        rowKey={(record) => record.id?.toString() || `${record.code}-${Math.random().toString(36).substring(2, 9)}`}
         className="antd-custom-table"
       />
     </div>
