@@ -7,9 +7,10 @@ import { AuthController } from '@/auth/auth.controller';
 import { JwtStrategy } from '@/auth/passport/jwt.strategy';
 import { AuthService } from '@/auth/auth.service';
 import { LocalStrategy } from '@/auth/passport/local.strategy';
+import { SubjectSchema } from '../subject/schemas/subject.schema';
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, MongooseModule.forFeature([{ name: 'Subject', schema: SubjectSchema }])],
   controllers: [ReaderController, AuthController],
   providers: [ReaderService, AuthService, JwtStrategy, LocalStrategy],
 })

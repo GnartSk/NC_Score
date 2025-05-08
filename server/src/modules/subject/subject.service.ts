@@ -27,8 +27,10 @@ export class SubjectService {
 
     if (!user) throw new NotFoundException('User not found...');
 
-    const { subjectCode, subjectName, credit, blockOfKnowledge, specialized, subjectDescription, relatedToIndustry } =
-      createSubjectDto;
+    // const { subjectCode, subjectName, credit, blockOfKnowledge, specialized, subjectDescription, relatedToIndustry } =
+    //   createSubjectDto;
+
+    const { subjectCode, subjectName, credit } = createSubjectDto;
 
     const existingSubject = await this.subjectModel.findOne({ subjectCode });
     if (existingSubject) {
@@ -39,10 +41,6 @@ export class SubjectService {
           $set: {
             subjectName,
             credit,
-            blockOfKnowledge,
-            specialized,
-            subjectDescription,
-            relatedToIndustry,
           },
         },
       );
@@ -56,10 +54,6 @@ export class SubjectService {
         subjectCode,
         subjectName,
         credit,
-        blockOfKnowledge,
-        specialized,
-        subjectDescription,
-        relatedToIndustry,
       });
 
       return { message: `New ${subjectCode}: ${subjectName}`, subject: newSubject };

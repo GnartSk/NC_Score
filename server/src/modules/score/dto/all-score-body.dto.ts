@@ -37,6 +37,8 @@ export class SemesterDTO {
   @ValidateNested({ each: true })
   @Type(() => SubjectDTO)
   subjects: SubjectDTO[];
+
+  
 }
 
 export class StudentGradesDTO {

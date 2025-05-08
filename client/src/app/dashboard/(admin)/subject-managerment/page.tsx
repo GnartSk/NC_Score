@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -32,78 +32,37 @@ const schema = z.object({
     relatedToIndustry: z.string().optional(),
 });
 
-// const fakeSubjects = [
-//     {
-//         subjectCode: 'CS101',
-//         subjectName: 'Lập trình C++',
-//         credit: 3,
-//         specialized: 'MMTT',
-//         subjectDescription: 'Hehe',
-//         blockOfKnowledge: 'Cơ sở ngành',
-//     },
-//     {
-//         subjectCode: 'CS102',
-//         subjectName: 'Lập trình Java',
-//         credit: 3,
-//         specialized: 'ATTT',
-//         blockOfKnowledge: 'Chuyên ngành',
-//         relatedToIndustry: 'CNTT, Web dev',
-//     },
-// ];
-
 type JobType = { id: string; name: number };
 
 const job: JobType[] = [
-    { id: 'Software Developer', name: 1 },
-    { id: 'Embedded Software Engineer', name: 2 },
-    { id: 'Systems Engineer', name: 3 },
-    { id: 'DevOps Engineer', name: 4 },
-    { id: 'Frontend Developer', name: 5 },
-    { id: 'Backend Developer', name: 6 },
-    { id: 'Fullstack Developer', name: 7 },
-    { id: 'Software Tester', name: 8 },
-    { id: 'Automation Test Engineer', name: 9 },
-    { id: 'Game Developer', name: 10 },
-    { id: 'AR/VR Engineer', name: 11 },
-    { id: 'Mobile Developer', name: 12 },
-    { id: 'AI Engineer', name: 13 },
-    { id: 'Data Scientist', name: 14 },
-    { id: 'Data Engineer', name: 15 },
-    { id: 'Data Analyst', name: 16 },
-    { id: 'Machine Learning Engineer', name: 17 },
-    { id: 'Computer Vision Engineer', name: 18 },
-    { id: 'NLP Engineer', name: 19 },
-    { id: 'Big Data Engineer', name: 20 },
-    { id: 'Cybersecurity Specialist', name: 21 },
-    { id: 'Security Engineer', name: 22 },
-    { id: 'Penetration Tester', name: 23 },
-    { id: 'Malware Analyst', name: 24 },
-    { id: 'Information Security Analyst', name: 25 },
-    { id: 'Digital Forensics Expert', name: 26 },
-    { id: 'System Administrator', name: 27 },
-    { id: 'Network Administrator', name: 28 },
-    { id: 'Network Engineer', name: 29 },
-    { id: 'Cloud Engineer', name: 30 },
-    { id: 'Storage Engineer', name: 31 },
-    { id: 'IT Support Specialist', name: 32 },
-    { id: 'IT Project Manager', name: 33 },
-    { id: 'IT Business Analyst', name: 34 },
-    { id: 'Scrum Master', name: 35 },
-    { id: 'Product Manager', name: 36 },
-    { id: 'Blockchain Developer', name: 37 },
-    { id: 'Smart Contract Engineer', name: 38 },
-    { id: 'Cryptography Engineer', name: 39 },
-    { id: 'Web3 Developer', name: 40 },
-    { id: 'Hardware Engineer', name: 41 },
-    { id: 'IoT Engineer', name: 42 },
-    { id: 'Telecommunications Engineer', name: 43 },
-    { id: 'UI/UX Designer', name: 44 },
-    { id: 'User Experience Designer', name: 45 },
-    { id: 'Graphic Designer', name: 46 },
-    { id: '3D Modeler', name: 47 },
-    { id: 'IT Lecturer', name: 48 },
-    { id: 'IT Researcher', name: 49 },
-    { id: 'IT Consultant', name: 50 },
+    { id: 'Software Developer/ Engineer', name: 1 },
+    { id: 'Front-end Developer', name: 2 },
+    { id: 'Back-end Developer', name: 3 },
+    { id: 'Full-stack Developer', name: 4 },
+    { id: 'Mobile Application Developer', name: 5 },
+    { id: 'Android Developer', name: 6 },
+    { id: 'Kotlin Developer', name: 7 },
+    { id: 'DevOps Engineer', name: 8 },
+    { id: 'Software Architect', name: 9 },
+    { id: 'Embedded Systems Developer', name: 10 },
+    { id: 'C++ Developer', name: 11 },
+    { id: 'Game Developer', name: 12 },
+    { id: 'Data Engineer', name: 13 },
+    { id: 'Systems Engineer', name: 14 },
+    { id: 'AWS Cloud Engineer', name: 15 },
+    { id: 'Azure Cloud Engineer', name: 16 },
+    { id: 'Google Cloud (GCP) Engineer', name: 17 },
+    { id: 'JavaScript Developer', name: 18 },
+    { id: 'API Developer', name: 19 },
+    { id: 'Integration Engineer', name: 20 },
+    { id: 'Firmware Developer', name: 21 },
+    { id: 'Cybersecurity Engineering', name: 22 },
+    { id: 'Network and System Administration', name: 23 },
+    { id: 'Ethical Hacking and Penetration Testing	', name: 24 },
+    { id: 'Malware Analysis and Reverse Engineering	', name: 25 },
+    { id: 'Cloud Security', name: 26 },
+    { id: 'Linux System Administration', name: 27 },
+    { id: 'Cloud & Server Management', name: 28 },
 ];
 
 const SubjectManagement = () => {
@@ -166,11 +125,12 @@ const SubjectManagement = () => {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            await getSubject();
-        };
-        fetchData();
-    }, []);
+        window.scrollTo({ top: 400, behavior: 'smooth' });
+        getSubject();
+    }, [page]);
+
+    console.log(page);
+    console.log(subjects);
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -300,7 +260,8 @@ const SubjectManagement = () => {
                                 ))}
                             </select>
                         </div>
-                        {watch('blockOfKnowledge') === 'Chuyên ngành' && (
+                        {(watch('blockOfKnowledge') === 'Chuyên ngành' ||
+                            watch('blockOfKnowledge') === 'Cơ sở ngành') && (
                             <div>
                                 <label className="block text-sm font-medium">Thuộc chuyên ngành</label>
                                 <select {...register('specialized')} className="w-full p-2 border rounded">
@@ -469,11 +430,10 @@ const SubjectManagement = () => {
                     </thead>
                     <tbody>
                         {subjects.length > 0
-                            ? subjects.slice(page * subjectsPerPage, (page + 1) * subjectsPerPage).map((sub, index) => (
-                                  <>
+                            ? subjects.map((sub, index) => (
+                                  <Fragment key={index}>
                                       <tr
-                                          key={index}
-                                          className="text-center"
+                                          className="text-center hover:bg-gray-100 transition"
                                           onClick={() =>
                                               handlePatchSubject({
                                                   ...sub,
@@ -506,22 +466,22 @@ const SubjectManagement = () => {
                                           ].map((val, i) => (
                                               <td
                                                   key={i}
-                                                  className={`border p-2 ${
+                                                  className={`border p-3 text-sm ${
                                                       [0, 2, 3, 4].includes(i)
                                                           ? 'w-[10%]'
                                                           : i === 1
-                                                          ? 'w-[15%]'
+                                                          ? 'w-[15%] font-medium'
                                                           : i === 5
-                                                          ? 'w-[35%]'
+                                                          ? 'w-[30%]'
                                                           : ''
                                                   }`}
                                               >
                                                   {val}
                                               </td>
                                           ))}
-                                          <td className="border p-2 text-center w-[5%]">
+                                          <td className="border p-3 w-[5%]">
                                               <button
-                                                  className="text-blue-500 hover:underline"
+                                                  className="text-blue-600 hover:underline font-medium"
                                                   onClick={(e) => {
                                                       e.stopPropagation();
                                                       toggleExpand(index);
@@ -532,15 +492,15 @@ const SubjectManagement = () => {
                                           </td>
                                       </tr>
                                       {expandedRows[index] && (
-                                          <tr className="bg-gray-100">
-                                              <td colSpan={7} className="p-2 text-left border">
-                                                  <div className="max-h-20 w-[30%] overflow-y-auto p-2">
+                                          <tr className="bg-gray-50 border-t">
+                                              <td colSpan={7} className="p-4 text-left">
+                                                  <div className="text-gray-700 leading-relaxed whitespace-pre-line">
                                                       {sub.subjectDescription || 'Không có mô tả'}
                                                   </div>
                                               </td>
                                           </tr>
                                       )}
-                                  </>
+                                  </Fragment>
                               ))
                             : Array.from({ length: 5 }).map((_, index) => (
                                   <tr key={index} className="text-center animate-pulse">
@@ -548,7 +508,7 @@ const SubjectManagement = () => {
                                           <td
                                               key={i}
                                               className={`border p-2 ${
-                                                  i === 6 ? 'w-[5%] text-left' : i === 5 ? 'w-[20%]' : 'w-[10%]'
+                                                  i === 6 ? 'w-[5%] text-left' : i === 5 ? 'w-[30%]' : 'w-[10%]'
                                               }`}
                                           >
                                               <div className="h-5 w-full bg-gray-300 rounded"></div>
@@ -563,12 +523,16 @@ const SubjectManagement = () => {
                         previousLabel={'←'}
                         nextLabel={'→'}
                         pageCount={totalPages}
-                        onPageChange={(e) => setPage(e.selected)}
+                        onPageChange={(e) => {
+                            console.log('Selected page:', e.selected);
+                            setPage(e.selected);
+                        }}
                         containerClassName={'flex space-x-2 border border-gray-300 rounded-lg p-2 bg-white'}
                         pageClassName={
                             'px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition duration-200'
                         }
                         pageLinkClassName={'block'}
+                        activeLinkClassName="text-white"
                         activeClassName={'bg-blue-500 text-white border-blue-500'}
                         previousClassName={
                             'px-4 py-2 bg-gray-200 rounded-lg cursor-pointer hover:bg-gray-300 transition duration-200'
