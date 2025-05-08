@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Query, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ScoreService } from './score.service';
 import { CreateScoreDto } from './dto/create-score.dto';
 import { UpdateScoreDto } from './dto/update-score.dto';
 import { PaginationDto } from '../user/dto/pagination.dto';
+import { StudentGradesDTO } from './dto/all-score-body.dto';
 
 @Controller('score')
 export class ScoreController {
@@ -18,10 +19,10 @@ export class ScoreController {
     return this.scoreService.findAll(paginationDto);
   }
 
-  @Get('users')
-  findAllScoreOfUsers(@Query() paginationDto: PaginationDto) {
-    return this.scoreService.findAll(paginationDto);
-  }
+  // @Get('users')
+  // findAllScoreOfUsers(@Query() paginationDto: PaginationDto) {
+  //   return this.scoreService.findAllScoreOfUsers(paginationDto);
+  // }
 
   @Get('profile')
   findAllOfUser(@Request() req) {
@@ -41,5 +42,13 @@ export class ScoreController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.scoreService.remove(id);
+  }
+
+  //Hàm chưa xài được
+  @Post('allScore')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  uploadAllScore(@Request() req, @Body(new ValidationPipe({ transform: true })) body: StudentGradesDTO) {
+    console.log(body);
+    return this.scoreService.uploadAllScore();
   }
 }

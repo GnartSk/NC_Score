@@ -21,4 +21,12 @@ export class ReaderController {
 
     return await this.readerService.uploadPdf(file);
   }
+
+  @Post('getSubject')
+  @UseInterceptors(FileInterceptor('file'))
+  async getSubject(@UploadedFile() file: Express.Multer.File): Promise<Record<string, any>> {
+    if (!file) return { error: 'No file uploaded' };
+
+    return this.readerService.getSubject(file);
+  }
 }

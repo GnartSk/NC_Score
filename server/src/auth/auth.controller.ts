@@ -20,6 +20,8 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { ChangePasswrodDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
+import { UseFilters } from '@nestjs/common';
+import { UnauthorizedRedirectFilter } from './passport/unauthorized-exception.filter';
 
 @Controller('auth')
 export class AuthController {
@@ -63,11 +65,14 @@ export class AuthController {
   @Get('google/callback')
   @Public()
   @UseGuards(GoogleAuthGuard)
+  @UseFilters(UnauthorizedRedirectFilter)
   async googleCallback(@Req() req, @Res() res) {
+    console.log(req);
     if (!req.user) {
+      console.log('Google authentication failed, redirecting to login...');
       return res.redirect('http://localhost:3000/auth/login');
     }
-    console.log(`'http://localhost:3000/auth?token=${req.user.access_token}`);
+    console.log(`Redirecting to: http://localhost:3000/auth?token=${req.user.access_token}`);
     res.redirect(`http://localhost:3000/auth?token=${req.user.access_token}`);
   }
 }

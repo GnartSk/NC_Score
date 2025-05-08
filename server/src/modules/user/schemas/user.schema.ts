@@ -44,5 +44,11 @@ export class User {
 
   @Prop()
   specialized: string;
+
+  @Prop()
+  cumulativeCredit: string;
+
+  @Prop()
+  cumulativeScore: string;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

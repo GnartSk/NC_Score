@@ -10,16 +10,16 @@ export class Subject {
   @Prop() // tín chỉ
   credit: number;
 
-  @Prop()
-  blockOfKnowledge: string;
+  // @Prop()
+  // blockOfKnowledge: string;
 
-  @Prop()
-  specialized: string;
+  // @Prop()
+  // specialized: string;
 
-  @Prop()
-  subjectDescription: string;
+  // @Prop()
+  // subjectDescription: string;
 
-  @Prop()
-  relatedToIndustry: string;
+  // @Prop()
+  // relatedToIndustry: string;
 }
 export const SubjectSchema = SchemaFactory.createForClass(Subject);
