@@ -1,0 +1,320 @@
+meta {
+  name: Post all score
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/score/allScore
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjIyNTIxNjkxQGdtLnVpdC5lZHUudm4iLCJzdWIiOiI2N2MzMGVmMGI3Y2M1MzA3OGRiMjJlYjAiLCJpYXQiOjE3NDEwNTYyMTgsImV4cCI6MTgyNzQ1NjIxOH0.a19uu0F7uwl3Uk0plHvhRDBGwRVGag0njS44mcw1lYM
+}
+
+body:json {
+  {
+    "semesters": {
+      "Học kỳ 1 - Năm học 2024-2025": {
+        "subjects": [
+          {
+            "subjectCode": "ENG03",
+            "subjectName": "Anh văn 3",
+            "credit": 4,
+            "TK": "Miễn"
+          },
+          {
+            "subjectCode": "NT101",
+            "subjectName": "An toàn mạng máy tính",
+            "credit": 4,
+            "QT": 9.5,
+            "TH": 10,
+            "CK": 7,
+            "TK": "8.4"
+          },
+          {
+            "subjectCode": "NT118",
+            "subjectName": "Phát triển ứng dụng trên thiết bị di động",
+            "credit": 3,
+            "QT": 8,
+            "GK": 9.5,
+            "TH": 10,
+            "CK": 9,
+            "TK": "9.2"
+          },
+          {
+            "subjectCode": "NT131",
+            "subjectName": "Hệ thống nhúng Mạng không dây",
+            "credit": 4,
+            "QT": 7.5,
+            "TH": 9,
+            "CK": 9,
+            "TK": "8.6"
+          },
+          {
+            "subjectCode": "NT533",
+            "subjectName": "Hệ tính toán phân bố",
+            "credit": 3,
+            "QT": 8,
+            "TH": 10,
+            "CK": 7.5,
+            "TK": "8.2"
+          },
+          {
+            "subjectCode": "SE347",
+            "subjectName": "Công nghệ Web và ứng dụng",
+            "credit": 4,
+            "QT": 8.5,
+            "TH": 10,
+            "CK": 9,
+            "TK": "9.1"
+          }
+        ]
+      },
+      "Học kỳ 2 - Năm học 2023-2024": {
+        "subjects": [
+          {
+            "subjectCode": "IS201",
+            "subjectName": "Phân tích thiết kế hệ thống thông tin",
+            "credit": 4,
+            "TH": 9,
+            "CK": 5.5,
+            "TK": "7.3"
+          },
+          {
+            "subjectCode": "IT007",
+            "subjectName": "Hệ điều hành",
+            "credit": 4,
+            "QT": 8,
+            "GK": 9.5,
+            "TH": 10,
+            "CK": 7,
+            "TK": "8.1"
+          },
+          {
+            "subjectCode": "NT105",
+            "subjectName": "Truyền dữ liệu",
+            "credit": 4,
+            "QT": 7.5,
+            "GK": 10,
+            "TH": 10,
+            "CK": 7.5,
+            "TK": "8.6"
+          },
+          {
+            "subjectCode": "NT106",
+            "subjectName": "Lập trình mạng căn bản",
+            "credit": 3,
+            "QT": 6.5,
+            "TH": 10,
+            "CK": 10,
+            "TK": "9"
+          },
+          {
+            "subjectCode": "NT132",
+            "subjectName": "Quản trị mạng và hệ thống",
+            "credit": 4,
+            "QT": 8,
+            "TH": 8.5,
+            "CK": 5.5,
+            "TK": "7.2"
+          }
+        ]
+      },
+      "Học kỳ 1 - Năm học 2023-2024": {
+        "subjects": [
+          {
+            "subjectCode": "IT004",
+            "subjectName": "Cơ sở dữ liệu",
+            "credit": 4,
+            "GK": 9,
+            "TH": 6.5,
+            "CK": 7.5,
+            "TK": "7.5"
+          },
+          {
+            "subjectCode": "IT005",
+            "subjectName": "Nhập môn mạng máy tính",
+            "credit": 4,
+            "QT": 8.5,
+            "GK": 8,
+            "TH": 10,
+            "CK": 7.5,
+            "TK": "8.4"
+          },
+          {
+            "subjectCode": "IT006",
+            "subjectName": "Kiến trúc máy tính",
+            "credit": 3,
+            "QT": 10,
+            "GK": 10,
+            "CK": 8,
+            "TK": "9"
+          },
+          {
+            "subjectCode": "SS003",
+            "subjectName": "Tư tưởng Hồ Chí Minh",
+            "credit": 2,
+            "QT": 8.5,
+            "CK": 8,
+            "TK": "8.3"
+          },
+          {
+            "subjectCode": "SS004",
+            "subjectName": "Kỹ năng nghề nghiệp",
+            "credit": 2,
+            "QT": 8.5,
+            "GK": 9,
+            "CK": 8,
+            "TK": "8.4"
+          },
+          {
+            "subjectCode": "SS009",
+            "subjectName": "Chủ nghĩa xã hội khoa học",
+            "credit": 2,
+            "QT": 8.5,
+            "CK": 6.5,
+            "TK": "7.5"
+          },
+          {
+            "subjectCode": "SS010",
+            "subjectName": "Lịch sử Đảng Cộng sản Việt Nam",
+            "credit": 2,
+            "QT": 9,
+            "CK": 8,
+            "TK": "8.5"
+          }
+        ]
+      },
+      "Học kỳ 2 - Năm học 2022-2023": {
+        "subjects": [
+          {
+            "subjectCode": "IT002",
+            "subjectName": "Lập trình hướng đối tượng",
+            "credit": 4,
+            "QT": 9.5,
+            "TH": 10,
+            "CK": 7.5,
+            "TK": "8.7"
+          },
+          {
+            "subjectCode": "IT003",
+            "subjectName": "Cấu trúc dữ liệu và giải thuật",
+            "credit": 4,
+            "QT": 10,
+            "TH": 9.5,
+            "CK": 5.5,
+            "TK": "8"
+          },
+          {
+            "subjectCode": "MA004",
+            "subjectName": "Cấu trúc rời rạc",
+            "credit": 4,
+            "QT": 10,
+            "GK": 8,
+            "CK": 9,
+            "TK": "9"
+          },
+          {
+            "subjectCode": "MA005",
+            "subjectName": "Xác suất thống kê",
+            "credit": 3,
+            "QT": 10,
+            "GK": 10,
+            "CK": 9.5,
+            "TK": "9.7"
+          },
+          {
+            "subjectCode": "SS007",
+            "subjectName": "Triết học Mác – Lênin",
+            "credit": 3,
+            "QT": 7.5,
+            "CK": 8,
+            "TK": "7.8"
+          },
+          {
+            "subjectCode": "SS008",
+            "subjectName": "Kinh tế chính trị Mác – Lênin",
+            "credit": 2,
+            "QT": 8,
+            "CK": 7,
+            "TK": "7.5"
+          }
+        ]
+      },
+      "Học kỳ 1 - Năm học 2022-2023": {
+        "subjects": [
+          {
+            "subjectCode": "ENG01",
+            "subjectName": "Anh văn 1",
+            "credit": 4,
+            "TK": "Miễn"
+          },
+          {
+            "subjectCode": "ENG02",
+            "subjectName": "Anh văn 2",
+            "credit": 4,
+            "QT": 7.5,
+            "CK": 6.5,
+            "TK": "6.8"
+          },
+          {
+            "subjectCode": "IT001",
+            "subjectName": "Nhập môn lập trình",
+            "credit": 4,
+            "QT": 7,
+            "TH": 7,
+            "CK": 9.5,
+            "TK": "8"
+          },
+          {
+            "subjectCode": "MA003",
+            "subjectName": "Đại số tuyến tính",
+            "credit": 3,
+            "QT": 10,
+            "GK": 8.5,
+            "CK": 9,
+            "TK": "9.1"
+          },
+          {
+            "subjectCode": "MA006",
+            "subjectName": "Giải tích",
+            "credit": 4,
+            "QT": 10,
+            "GK": 10,
+            "CK": 3.5,
+            "TK": "6.1"
+          },
+          {
+            "subjectCode": "NT005",
+            "subjectName": "Giới thiệu ngành Mạng máy tính và Truyền thông dữ liệu",
+            "credit": 1,
+            "QT": 9,
+            "CK": 7,
+            "TK": "8"
+          },
+          {
+            "subjectCode": "PH002",
+            "subjectName": "Nhập môn mạch số",
+            "credit": 4,
+            "QT": 10,
+            "GK": 6.5,
+            "TH": 9.5,
+            "CK": 6.5,
+            "TK": "7.6"
+          },
+          {
+            "subjectCode": "SS006",
+            "subjectName": "Pháp luật đại cương",
+            "credit": 2,
+            "GK": 9,
+            "CK": 8,
+            "TK": "8.4"
+          }
+        ]
+      }
+    }
+  }
+}

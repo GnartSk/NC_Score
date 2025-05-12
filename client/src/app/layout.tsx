@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
+import { Montserrat } from 'next/font/google';
 import '@/app/globals.css';
 
 const geistSans = Geist({
@@ -11,6 +12,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
     variable: '--font-geist-mono',
     subsets: ['latin'],
+});
+
+const montserrat = Montserrat({
+    subsets: ['latin', 'vietnamese'],
+    weight: ['300', '400', '500', '600', '700'],
+    variable: '--font-montserrat',
 });
 
 export const metadata: Metadata = {
@@ -25,7 +32,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}>
                 <AntdRegistry>{children}</AntdRegistry>
             </body>
         </html>

@@ -15,8 +15,8 @@ const StudentContent = ({
                 style={{
                     padding: 24,
                     minHeight: 'calc(100vh - 180px)',
-                    // background: "#ccc",
-                    // borderRadius: "#ccc",
+                    background: "#F0F7FF",
+                    //borderRadius: "#ccc",
                 }}
             >
                 {children}
