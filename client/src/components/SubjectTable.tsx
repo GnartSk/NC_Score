@@ -4,16 +4,16 @@ import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 
 interface Subject {
-  id: number;
+  id: number | string;
   code: string;
   name: string;
-  credits: number;
-  qt?: number;
-  th?: number;
-  gk?: number;
-  ck?: number;
-  total?: number;
-  status: 'Hoàn thành' | 'Chưa học' | 'Rớt'|'Miễn';
+  credits: number | string;
+  qt?: number | string;
+  th?: number | string;
+  gk?: number | string;
+  ck?: number | string;
+  total?: number | string;
+  status: string;
   category: string;
 }
 
@@ -112,18 +112,47 @@ const getScoreDataFromLocalStorage = (category: string): Subject[] | null => {
   try {
     const scoreData = localStorage.getItem('html_score_data');
     if (!scoreData) return null;
-    
     const parsedData = JSON.parse(scoreData);
-    
-    // Kiểm tra xem có dữ liệu trong category này không
-    if (parsedData && parsedData[category] && Array.isArray(parsedData[category])) {
-      return parsedData[category];
+    // Lấy dữ liệu theo category từ parsedData.categories
+    if (parsedData && parsedData.categories && parsedData.categories[category] && Array.isArray(parsedData.categories[category])) {
+      return parsedData.categories[category];
     }
-    
     return null;
   } catch (error) {
     console.error('Error reading from localStorage:', error);
     return null;
+  }
+};
+
+// Hàm lấy danh sách mã môn đang học từ localStorage
+const getCurrentSubjectCodes = (): string[] => {
+  try {
+    const codes = localStorage.getItem('current_subject_codes');
+    if (!codes) return [];
+    // Nếu là mảng object {code, name}
+    const arr = JSON.parse(codes);
+    if (arr.length && typeof arr[0] === 'object') {
+      return arr.map((item: any) => item.code);
+    }
+    return arr;
+  } catch {
+    return [];
+  }
+};
+
+// Hàm lấy danh sách môn đang học từ localStorage (object {code, name})
+const getCurrentSubjectObjects = (): { code: string, name: string }[] => {
+  try {
+    const codes = localStorage.getItem('current_subject_codes');
+    if (!codes) return [];
+    const arr = JSON.parse(codes);
+    if (arr.length && typeof arr[0] === 'object') {
+      return arr;
+    }
+    // Nếu chỉ là mảng code cũ
+    return arr.map((code: string) => ({ code, name: '' }));
+  } catch {
+    return [];
   }
 };
 
@@ -151,6 +180,13 @@ export default function SubjectTable({ title, category }: { title: string; categ
       dataIndex: 'name',
       key: 'name',
       width: 250,
+      render: (value, record) => {
+        // Nếu value rỗng hoặc value là mã môn, tìm tên từ ICS
+        if (value && value !== record.code) return value;
+        const currentSubjects = typeof window !== 'undefined' ? getCurrentSubjectObjects() : [];
+        const found = currentSubjects.find(subj => subj.code === record.code);
+        return found && found.name ? found.name : value || record.code;
+      }
     },
     {
       title: 'TC',
@@ -163,35 +199,39 @@ export default function SubjectTable({ title, category }: { title: string; categ
       dataIndex: 'qt',
       key: 'qt',
       align: 'center',
-      render: (value) => value || '-',
+      render: (value) => (value !== undefined && value !== '' ? value : '-'),
     },
     {
       title: 'TH',
       dataIndex: 'th',
       key: 'th',
       align: 'center',
-      render: (value) => value || '-',
+      render: (value) => (value !== undefined && value !== '' ? value : '-'),
     },
     {
       title: 'GK',
       dataIndex: 'gk',
       key: 'gk',
       align: 'center',
-      render: (value) => value || '-',
+      render: (value) => (value !== undefined && value !== '' ? value : '-'),
     },
     {
       title: 'CK',
       dataIndex: 'ck',
       key: 'ck',
       align: 'center',
-      render: (value) => value || '-',
+      render: (value) => (value !== undefined && value !== '' ? value : '-'),
     },
     {
       title: 'TỔNG KẾT',
       dataIndex: 'total',
       key: 'total',
       align: 'center',
-      render: (value) => value?.toFixed(1) || '-',
+      render: (value) => {
+        if (typeof value === 'number') return value.toFixed(1);
+        if (typeof value === 'string' && value !== '' && !isNaN(Number(value))) return Number(value).toFixed(1);
+        return '-';
+      },
     },
     {
       title: 'TRẠNG THÁI',
@@ -203,7 +243,8 @@ export default function SubjectTable({ title, category }: { title: string; categ
           color={
             status === 'Hoàn thành' ? 'green' :
             status === 'Rớt' ? 'red' :
-            status === 'Miễn' ? 'yellow' : 'default'
+            status === 'Miễn' ? 'yellow' :
+            status === 'Đang học' ? 'gold' : 'default'
           }
           className="rounded-full px-3"
         >
@@ -267,12 +308,42 @@ export default function SubjectTable({ title, category }: { title: string; categ
     }
   };
 
+  // Lấy danh sách môn đang học từ ICS
+  const currentSubjects = typeof window !== 'undefined' ? getCurrentSubjectObjects() : [];
+  // Gộp các môn ICS vào data bảng điểm nếu chưa có
+  const dataWithCurrent = [
+    ...data,
+    ...currentSubjects
+      .filter(subj => !data.some(item => item.code === subj.code))
+      .map(subj => ({
+        id: `current-${subj.code}`,
+        code: subj.code,
+        name: subj.name,
+        credits: '',
+        qt: '',
+        th: '',
+        gk: '',
+        ck: '',
+        total: '',
+        status: 'Đang học',
+        category,
+      })),
+  ];
+
+  // Mapping trạng thái 'Đang học' cho các môn có code nằm trong current_subject_codes
+  const mappedData = dataWithCurrent.map(item => {
+    if (currentSubjects.some(subj => subj.code === item.code)) {
+      return { ...item, status: 'Đang học' };
+    }
+    return item;
+  });
+
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm">
       <h2 className="text-lg font-semibold mb-4">{title}</h2>
       <Table
         columns={columns}
-        dataSource={Array.isArray(data) ? data : []}
+        dataSource={Array.isArray(mappedData) ? mappedData : []}
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}

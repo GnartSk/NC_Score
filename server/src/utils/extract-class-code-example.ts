@@ -14,8 +14,3 @@ console.log('\nThông tin lớp học đầy đủ:');
 const classInfo = extractClassInfoFromICS(icsFilePath);
 console.log(classInfo);
 
-/**
- * Để chạy ví dụ này:
- * 1. Đảm bảo đã cài đặt ts-node: npm install -g ts-node
- * 2. Chạy lệnh: ts-node server/src/utils/extract-class-code-example.ts
- */ 
