@@ -15,29 +15,29 @@ export class UpdateSubjectDto extends PartialType(CreateSubjectDto) {
   @IsOptional() // tín chỉ
   credit: number;
 
-  @IsOptional({ message: 'blockOfKnowledge is required' })
-  @IsEnum([
-    'Các môn lý luận chính trị',
-    'Toán – Tin học – Khoa học tự nhiên',
-    'Ngoại ngữ',
-    'Cơ sở ngành',
-    'Chuyên ngành',
-    'Thực tập doanh nghiệp',
-    'Đồ án',
-    'Khóa luận tốt nghiệp',
-    'Chuyên đề tốt nghiệp',
-  ])
-  blockOfKnowledge: string;
+  // @IsOptional({ message: 'blockOfKnowledge is required' })
+  // @IsEnum([
+  //   'Các môn lý luận chính trị',
+  //   'Toán – Tin học – Khoa học tự nhiên',
+  //   'Ngoại ngữ',
+  //   'Cơ sở ngành',
+  //   'Chuyên ngành',
+  //   'Thực tập doanh nghiệp',
+  //   'Đồ án',
+  //   'Khóa luận tốt nghiệp',
+  //   'Chuyên đề tốt nghiệp',
+  // ])
+  // blockOfKnowledge: string;
 
-  @IsOptional({ message: 'specialized is required' })
-  @IsEnum(['MMTT', 'ATTT', 'Trường'], {
-    message: 'specialized must be a in the value: MMTT, ATTT, Trường',
-  })
-  specialized: string;
+  // @IsOptional({ message: 'specialized is required' })
+  // @IsEnum(['MMTT', 'ATTT', 'Trường'], {
+  //   message: 'specialized must be a in the value: MMTT, ATTT, Trường',
+  // })
+  // specialized: string;
 
-  @IsOptional()
-  subjectDescription: string;
+  // @IsOptional()
+  // subjectDescription: string;
 
-  @IsOptional()
-  relatedToIndustry: string;
+  // @IsOptional()
+  // relatedToIndustry: string;
 }
