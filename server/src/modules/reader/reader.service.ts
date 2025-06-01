@@ -27,6 +27,7 @@ export class ReaderService {
 
     // Regex để bắt tr cả các dòng có thuộc tính như style="background-color:#ffbfdf;"
     let regexRow =
+
       /<tr([^>]*)>\s*<td align='center'>\d+<\/td>\s*<td align='center' title='([^']+)'>([^<]+)<\/td>\s*<td[^>]*>\s*([^<]+)<\/td>\s*<td align='center'>(\d+)<\/td>\s*<td align='center' title='[^']*'>([^<]*)<\/td>\s*<td align='center' title='[^']*'>([^<]*)<\/td>\s*<td align='center' title='[^']*'>([^<]*)<\/td>\s*<td align='center' title='[^']*'>([^<]*)<\/td>\s*<td align='center'>([^<]*)<\/td>/g;
 
     // Regex để tìm điểm trung bình chung tích lũy
@@ -37,19 +38,22 @@ export class ReaderService {
     let cumulativeMatch = content.match(regexCumulative);
     let cumulativePoint = cumulativeMatch ? parseFloat(cumulativeMatch[1]) : undefined;
 
-    let matches = [...content.matchAll(regexStrong)];
 
+
+    let matches = [...content.matchAll(regexStrong)];
+ 
     for (let i = 0; i < matches.length; i++) {
       let matchStrong = matches[i];
       let semester = matchStrong[1].trim();
       let startIndex = matchStrong.index + matchStrong[0].length;
       let endIndex = i + 1 < matches.length ? matches[i + 1].index : content.length;
-
+ 
       result[semester] = { subjects: [] };
       let subContent = content.substring(startIndex, endIndex);
       let matchRow;
-
+ 
       while ((matchRow = regexRow.exec(subContent)) !== null) {
+
         let trAttributes = matchRow[1];
         let subjectCode = matchRow[3].split('.')[0];
         let subjectName = matchRow[4].replace(/&nbsp;/g, '').trim();
@@ -118,6 +122,7 @@ export class ReaderService {
               ...scores,
             });
           }
+
         }
 
         resolve({
@@ -187,5 +192,7 @@ export class ReaderService {
   private safeParseFloat(value: string): number | undefined {
     const v = parseFloat(value);
     return isNaN(v) ? undefined : v;
+
   }
 }
+ 

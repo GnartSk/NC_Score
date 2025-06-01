@@ -12,6 +12,7 @@ interface Profile {
     studentId: string;
     specialized: string;
     gmail: string;
+    avatar: string;
 }
 
 const DashboardPage = () => {
@@ -80,6 +81,7 @@ const DashboardPage = () => {
                 <div className="col-span-1 flex flex-col space-y-4">
                     <CalendarWidget />
                     <ProfileCard
+                        avatar={profile?.avatar}
                         name={profile?.fullName}
                         studentId={profile?.studentId}
                         major={profile?.specialized}

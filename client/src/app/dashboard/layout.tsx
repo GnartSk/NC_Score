@@ -12,13 +12,16 @@ const StudentLayout = async ({
     children: React.ReactNode;
 }>) => {
     const session = await auth();
+    
+    //  nên lấy thông tin này từ API hoặc session
+    // const isUser = session?.user?.role === 'user'
+    const isUser = true; // Đặt thành true để hiện StudentSideBar
 
     return (
         <StudentContextProvider>
             <div style={{ display: 'flex' }}>
                 <div className="left-side" style={{ minWidth: 80 }}>
-                    {/* <StudentSideBar /> */}
-                    <AdminSidebar />
+                    {isUser ? <StudentSideBar /> : <AdminSidebar />}
                 </div>
                 <div className="right-side" style={{ flex: 1 }}>
                     <StudentHeader session={session} />
