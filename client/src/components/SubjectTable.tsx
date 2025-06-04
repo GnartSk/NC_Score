@@ -160,7 +160,9 @@ function getCategoryFromCode(code: string) {
   if (code.startsWith('SS')) return 'Môn lý luận chính trị';
   if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học';
   if (code.startsWith('EN')) return 'Ngoại ngữ';
-  if ((code.startsWith('IT') && code !== 'IT001') || code.startsWith('NT0') || code.startsWith('NT1')) return 'Cơ sở ngành';
+  if ((code.startsWith('IT') && code !== 'IT001' ) || code.startsWith('NT0') || code.startsWith('NT1') ) return 'Cơ sở ngành';
+  if (code === 'NT209') return 'Chuyên ngành';
+  if (code.startsWith('NT2')) return 'Tự chọn';
   if (code.startsWith('NT')) return 'Chuyên ngành';
   return 'Tự chọn';
 }
@@ -324,11 +326,14 @@ export default function SubjectTable({ title, category }: { title: string; categ
 
   // Lấy danh sách môn đang học từ ICS
   const currentSubjects = typeof window !== 'undefined' ? getCurrentSubjectObjects() : [];
-  // Gộp các môn ICS vào data bảng điểm nếu chưa có
+  // Gộp các môn ICS vào data bảng điểm nếu chưa có và chỉ đúng category
   const dataWithCurrent = [
     ...data,
     ...currentSubjects
-      .filter(subj => !data.some(item => item.code === subj.code))
+      .filter(subj => {
+        const subjCategory = getCategoryFromCode(subj.code);
+        return subjCategory === category && !data.some(item => item.code === subj.code);
+      })
       .map(subj => ({
         id: `current-${subj.code}`,
         code: subj.code,

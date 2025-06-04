@@ -1,7 +1,7 @@
 'use client';
 import { Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-
+import { getCookie } from 'cookies-next';
 function getCategoryFromCode(code: string) {
   if (code.startsWith('SS')) return 'Môn lý luận chính trị';
   if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học';
@@ -17,7 +17,7 @@ const UploadIcsButton = () => {
     formData.append('file', file);
 
     try {
-      const token = localStorage.getItem('NCToken');
+      const token = getCookie('NCToken');
       const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/ics/extract-class-codes`, {
         method: 'POST',
         body: formData,

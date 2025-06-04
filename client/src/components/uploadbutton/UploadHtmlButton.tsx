@@ -154,8 +154,14 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
               // Chuyên ngành - tất cả mã NT khác 
               else if (code.startsWith('NT') && 
                       !code.startsWith('NT0') && 
-                      !code.startsWith('NT1')) {
+                      !code.startsWith('NT1') && !code.startsWith('NT2')) {
                 category = 'Chuyên ngành';
+              }
+              else if (code === 'NT209') {
+                category = 'Chuyên ngành';
+              }
+              else if (code.startsWith('NT2')) {
+                category = 'Tự chọn';
               }
               
               console.log(`Categorized as: ${category}`);
