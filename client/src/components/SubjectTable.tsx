@@ -156,9 +156,23 @@ const getCurrentSubjectObjects = (): { code: string, name: string }[] => {
   }
 };
 
+function getCategoryFromCode(code: string) {
+  if (code.startsWith('SS')) return 'Môn lý luận chính trị';
+  if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học';
+  if (code.startsWith('EN')) return 'Ngoại ngữ';
+  if ((code.startsWith('IT') && code !== 'IT001') || code.startsWith('NT0') || code.startsWith('NT1')) return 'Cơ sở ngành';
+  if (code.startsWith('NT')) return 'Chuyên ngành';
+  return 'Tự chọn';
+}
+
 export default function SubjectTable({ title, category }: { title: string; category: string }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Subject[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const columns: ColumnsType<Subject> = [
     {
@@ -326,7 +340,7 @@ export default function SubjectTable({ title, category }: { title: string; categ
         ck: '',
         total: '',
         status: 'Đang học',
-        category,
+        category: getCategoryFromCode(subj.code),
       })),
   ];
 
@@ -337,6 +351,8 @@ export default function SubjectTable({ title, category }: { title: string; categ
     }
     return item;
   });
+
+  if (!isClient) return null;
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm">

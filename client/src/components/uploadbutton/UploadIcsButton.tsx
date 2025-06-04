@@ -2,41 +2,63 @@
 import { Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 
+function getCategoryFromCode(code: string) {
+  if (code.startsWith('SS')) return 'Môn lý luận chính trị';
+  if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học';
+  if (code.startsWith('EN')) return 'Ngoại ngữ';
+  if ((code.startsWith('IT') && code !== 'IT001') || code.startsWith('NT0') || code.startsWith('NT1')) return 'Cơ sở ngành';
+  if (code.startsWith('NT')) return 'Chuyên ngành';
+  return 'Tự chọn';
+}
+
 const UploadIcsButton = () => {
   const beforeUpload = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
 
     try {
+      const token = localStorage.getItem('NCToken');
       const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/ics/extract-class-codes`, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      if (!response.ok) throw new Error('Lỗi khi gửi file ICS lên server');
-      const result = await response.json();
-      // result là mảng mã môn học hoặc object chứa mảng
-      const codes = Array.isArray(result)
-        ? result
-        : (result.codes || result.data || []);
-      if (Array.isArray(codes) && codes.length > 0) {
-        // Lưu cả object {code, name}
-        localStorage.setItem('current_subject_codes', JSON.stringify(codes));
-        message.success(`Đã lưu ${codes.length} môn đang học!`);
-        message.info('Đã cập nhật trạng thái điểm. Vui lòng kiểm tra lại bảng điểm!');
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('ICS API response:', data);
+        const arr = data.data;
+        if (Array.isArray(arr) && arr.length > 0) {
+          const categorizedCodes = arr.map(subj => ({
+            ...subj,
+            category: getCategoryFromCode(subj.code)
+          }));
+          console.log('Saving to localStorage:', categorizedCodes);
+          localStorage.setItem('current_subject_codes', JSON.stringify(categorizedCodes));
+          message.success(`Đã upload file lịch học và cập nhật ${arr.length} môn đang học!`);
+          message.info('Đã cập nhật trạng thái điểm từ file ICS. Vui lòng kiểm tra lại bảng điểm!');
+          window.location.reload();
+        } else {
+          console.warn('ICS data is not a valid array or is empty:', arr);
+        }
       } else {
-        message.warning('Không tìm thấy mã môn trong file ICS!');
+        message.error('Failed to upload file');
       }
-    } catch (err) {
-      message.error('Lỗi khi xử lý file ICS!');
+    } catch (error) {
+      message.error('An error occurred');
     }
-    return false; // Ngăn upload mặc định
   };
 
   return (
-    <Upload accept=".ics" showUploadList={false} beforeUpload={beforeUpload}>
-      <Button icon={<UploadOutlined />}>Tải lên file lịch học (.ics)</Button>
+    <Upload
+      beforeUpload={beforeUpload}
+      showUploadList={false}
+      accept=".ics"
+    >
+      <Button icon={<UploadOutlined />}>Upload ICS</Button>
     </Upload>
   );
 };
 
-export default UploadIcsButton; 
+export default UploadIcsButton;
