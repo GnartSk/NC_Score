@@ -17,18 +17,31 @@ export const sendRequest = async <T>(props: IRequest) => {
         url = `${url}?${queryString.stringify(queryParams)}`;
     }
 
-    return fetch(url, options).then((res) => {
+    return fetch(url, options).then(async (res) => {
+        const isJson = res.headers.get('content-type')?.includes('application/json');
         if (res.ok) {
-            return res.json() as T; //generic
+            if (isJson) {
+                return (await res.json()) as T;
+            } else {
+                return {} as T;
+            }
         } else {
-            return res.json().then(function (json) {
-                // to be able to access error status when you catch the error
+            if (isJson) {
+                return res.json().then(function (json) {
+                    // to be able to access error status when you catch the error
+                    return {
+                        statusCode: res.status,
+                        message: json?.message ?? '',
+                        error: json?.error ?? '',
+                    } as T;
+                });
+            } else {
                 return {
                     statusCode: res.status,
-                    message: json?.message ?? '',
-                    error: json?.error ?? '',
+                    message: '',
+                    error: '',
                 } as T;
-            });
+            }
         }
     });
 };
@@ -50,18 +63,31 @@ export const sendRequestFile = async <T>(props: IRequest) => {
         url = `${url}?${queryString.stringify(queryParams)}`;
     }
 
-    return fetch(url, options).then((res) => {
+    return fetch(url, options).then(async (res) => {
+        const isJson = res.headers.get('content-type')?.includes('application/json');
         if (res.ok) {
-            return res.json() as T; //generic
+            if (isJson) {
+                return (await res.json()) as T;
+            } else {
+                return {} as T;
+            }
         } else {
-            return res.json().then(function (json) {
-                // to be able to access error status when you catch the error
+            if (isJson) {
+                return res.json().then(function (json) {
+                    // to be able to access error status when you catch the error
+                    return {
+                        statusCode: res.status,
+                        message: json?.message ?? '',
+                        error: json?.error ?? '',
+                    } as T;
+                });
+            } else {
                 return {
                     statusCode: res.status,
-                    message: json?.message ?? '',
-                    error: json?.error ?? '',
+                    message: '',
+                    error: '',
                 } as T;
-            });
+            }
         }
     });
 };
