@@ -176,7 +176,15 @@ const CATEGORY_OPTIONS = [
   { value: 'Tự chọn', label: 'Tự chọn' },
 ];
 
-export default function SubjectTable({ title, category }: { title: string; category: string }) {
+export default function SubjectTable({ 
+  title, 
+  category,
+  onCreditsChange 
+}: { 
+  title: string; 
+  category: string;
+  onCreditsChange?: (credits: number) => void;
+}) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Subject[]>([]);
   const [isClient, setIsClient] = useState(false);
@@ -395,11 +403,50 @@ export default function SubjectTable({ title, category }: { title: string; categ
     return item;
   });
 
+  // Tính tổng số tín chỉ đã học được (các môn có status 'Hoàn thành')
+  useEffect(() => {
+    if (Array.isArray(mappedData)) {
+      const earnedCredits = mappedData
+        .filter(item => item.status === 'Hoàn thành')
+        .reduce((sum, item) => sum + (Number(item.credits) || 0), 0);
+      
+      if (onCreditsChange) {
+        onCreditsChange(earnedCredits);
+      }
+    }
+  }, [mappedData, onCreditsChange]);
+
   if (!isClient) return null;
+
+  // Tính tổng số tín chỉ đã học được
+  const earnedCredits = Array.isArray(mappedData)
+    ? mappedData
+        .filter(item => item.status === 'Hoàn thành')
+        .reduce((sum, item) => sum + (Number(item.credits) || 0), 0)
+    : 0;
+
+  // Lấy tổng số tín chỉ của category
+  const getTotalCredits = (category: string) => {
+    switch(category) {
+      case 'Môn lý luận chính trị': return 13;
+      case 'Toán - Tin học': return 22;
+      case 'Ngoại ngữ': return 12;
+      case 'Cơ sở ngành': return 49;
+      case 'Chuyên ngành': return 12;
+      case 'Tự chọn': return 6;
+      default: return 0;
+    }
+  };
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm">
-      <h2 className="text-lg font-semibold mb-4">{title}</h2>
+      <div className="flex items-center mb-4">
+        <h2 className="text-lg font-semibold">{title}</h2>
+        <div className="text-gray-600 ml-10">
+          <span className="font-medium">Tín chỉ: </span>
+          <span className="font-bold">{earnedCredits}/{getTotalCredits(category)}</span>
+        </div>
+      </div>
       <Table
         columns={columns}
         dataSource={Array.isArray(mappedData)
@@ -408,7 +455,7 @@ export default function SubjectTable({ title, category }: { title: string; categ
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}
-        rowKey={(record) => `${category}-${record.code}-${record.id || Math.random().toString(36).substring(2, 9)}`}
+        rowKey={(record) => `${record.code}-${record.id || Math.random().toString(36).substring(2, 9)}`}
         className="antd-custom-table"
       />
     </div>

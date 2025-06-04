@@ -11,17 +11,25 @@ import './scoreTabCustom.css';
 
 const CATEGORY_OPTIONS = [
   { value: 'Tất cả', label: 'Tất cả' },
-  { value: 'Môn lý luận chính trị', label: 'Môn lý luận chính trị' },
-  { value: 'Toán - Tin học', label: 'Toán - Tin học' },
-  { value: 'Ngoại ngữ', label: 'Ngoại ngữ' },
-  { value: 'Cơ sở ngành', label: 'Cơ sở ngành' },
-  { value: 'Chuyên ngành', label: 'Chuyên ngành' },
-  { value: 'Tự chọn', label: 'Tự chọn' },
+  { value: 'Môn lý luận chính trị', label: 'Môn lý luận chính trị', totalCredits: 13 },
+  { value: 'Toán - Tin học', label: 'Toán - Tin học', totalCredits: 22 },
+  { value: 'Ngoại ngữ', label: 'Ngoại ngữ', totalCredits: 12 },
+  { value: 'Cơ sở ngành', label: 'Cơ sở ngành', totalCredits: 49 },
+  { value: 'Chuyên ngành', label: 'Chuyên ngành', totalCredits: 12 },
+  { value: 'Tự chọn', label: 'Tự chọn', totalCredits: 6 },
 ];
 
 export default function SubjectsPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
+  const [earnedCredits, setEarnedCredits] = useState<Record<string, number>>({});
+
+  const handleCreditsChange = (category: string, credits: number) => {
+    setEarnedCredits(prev => ({
+      ...prev,
+      [category]: credits
+    }));
+  };
 
   const handleUploadSuccess = (data: any) => {
     // Sau khi upload thành công, cập nhật refreshKey để component SubjectTable re-render
@@ -51,18 +59,22 @@ export default function SubjectsPage() {
             </div>
             {selectedCategory === 'Tất cả' ? (
               CATEGORY_OPTIONS.filter(opt => opt.value !== 'Tất cả').map(category => (
-                <SubjectTable 
-                  key={`subject-table-${category.value}-${refreshKey}`}
-                  title={`${category.label}`}
-                  category={category.value}
-                />
+                <div key={`category-${category.value}`} className="mb-8">
+                  <SubjectTable 
+                    key={`subject-table-${category.value}-${refreshKey}`}
+                    title={`${category.label}`}
+                    category={category.value}
+                  />
+                </div>
               ))
             ) : (
-              <SubjectTable 
-                title={`${selectedCategory}`}
-                category={selectedCategory}
-                key={`subject-table-${selectedCategory}-${refreshKey}`}
-              />
+              <div className="mb-8">
+                <SubjectTable 
+                  title={`${selectedCategory}`}
+                  category={selectedCategory}
+                  key={`subject-table-${selectedCategory}-${refreshKey}`}
+                />
+              </div>
             )}
           </div>
         </>
