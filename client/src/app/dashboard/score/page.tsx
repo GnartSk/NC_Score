@@ -5,12 +5,23 @@ import OverviewChart from "@/components/chart/OverviewChart";
 import SubjectTable from '@/components/SubjectTable';
 import UploadHtmlButton from '@/components/uploadbutton/UploadHtmlButton';
 import UploadIcsButton from '@/components/uploadbutton/UploadIcsButton';
-import { Tabs } from 'antd';
+import { Tabs, Select } from 'antd';
 import SemesterScoreTable from '@/components/SemesterScoreTable';
 import './scoreTabCustom.css';
 
+const CATEGORY_OPTIONS = [
+  { value: 'Tất cả', label: 'Tất cả' },
+  { value: 'Môn lý luận chính trị', label: 'Môn lý luận chính trị' },
+  { value: 'Toán - Tin học', label: 'Toán - Tin học' },
+  { value: 'Ngoại ngữ', label: 'Ngoại ngữ' },
+  { value: 'Cơ sở ngành', label: 'Cơ sở ngành' },
+  { value: 'Chuyên ngành', label: 'Chuyên ngành' },
+  { value: 'Tự chọn', label: 'Tự chọn' },
+];
+
 export default function SubjectsPage() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
 
   const handleUploadSuccess = (data: any) => {
     // Sau khi upload thành công, cập nhật refreshKey để component SubjectTable re-render
@@ -29,70 +40,30 @@ export default function SubjectsPage() {
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">TỔNG QUAN</h1>
             </div>
-            
-            {/* Khối kiến thức đại cương */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">KHỐI KIẾN THỨC ĐẠI CƯƠNG</h2>
-              
-              {/* Môn lý luận chính trị */}
-              <div className="mb-6">
-                <SubjectTable 
-                  title="Các môn lý luận chính trị" 
-                  category="Môn lý luận chính trị"
-                  key={`political-${refreshKey}`}
-                />
-              </div>
-
-              {/* Toán - Tin học */}
-              <div className="mb-6">
-                <SubjectTable 
-                  title="Toán - Tin học - Khoa học tự nhiên" 
-                  category="Toán - Tin học"
-                  key={`math-${refreshKey}`}
-                />
-              </div>
-              
-              {/* Môn đại cương khác (ngoại ngữ) */}
-              <div className="mb-6">
-                <SubjectTable 
-                  title="Ngoại ngữ" 
-                  category="Ngoại ngữ"
-                  key={`general-${refreshKey}`}
-                />
-              </div>
+            <div className="mb-4 flex items-center gap-4">
+              <span className="font-semibold">Chọn nhóm môn:</span>
+              <Select
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                options={CATEGORY_OPTIONS}
+                style={{ minWidth: 220 }}
+              />
             </div>
-            
-            {/* Khối kiến thức chuyên ngành */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">KHỐI KIẾN THỨC CHUYÊN NGÀNH</h2>
-              
-              {/* Môn cơ sở ngành */}
-              <div className="mb-6">
+            {selectedCategory === 'Tất cả' ? (
+              CATEGORY_OPTIONS.filter(opt => opt.value !== 'Tất cả').map(category => (
                 <SubjectTable 
-                  title="Các môn cơ sở ngành" 
-                  category="Cơ sở ngành"
-                  key={`foundation-${refreshKey}`}
+                  key={`subject-table-${category.value}-${refreshKey}`}
+                  title={`${category.label}`}
+                  category={category.value}
                 />
-              </div>
-              
-              {/* Môn chuyên ngành */}
-              <div className="mb-6">
-                <SubjectTable 
-                  title="Các môn chuyên ngành" 
-                  category="Chuyên ngành"
-                  key={`specialized-${refreshKey}`}
-                />
-              </div>
-              
-              {/* Môn tự chọn */}
-              <div className="mb-6">
-                <SubjectTable 
-                  title="Các môn tự chọn" 
-                  category="Tự chọn"
-                  key={`elective-${refreshKey}`}
-                />
-              </div>
-            </div>
+              ))
+            ) : (
+              <SubjectTable 
+                title={`${selectedCategory}`}
+                category={selectedCategory}
+                key={`subject-table-${selectedCategory}-${refreshKey}`}
+              />
+            )}
           </div>
         </>
       ),

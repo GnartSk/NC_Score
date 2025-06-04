@@ -1,5 +1,5 @@
 'use client';
-import { Table, Tag, Spin, message } from 'antd';
+import { Table, Tag, Spin, message, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 
@@ -167,10 +167,20 @@ function getCategoryFromCode(code: string) {
   return 'Tự chọn';
 }
 
+const CATEGORY_OPTIONS = [
+  { value: 'Môn lý luận chính trị', label: 'Môn lý luận chính trị' },
+  { value: 'Toán - Tin học', label: 'Toán - Tin học' },
+  { value: 'Ngoại ngữ', label: 'Ngoại ngữ' },
+  { value: 'Cơ sở ngành', label: 'Cơ sở ngành' },
+  { value: 'Chuyên ngành', label: 'Chuyên ngành' },
+  { value: 'Tự chọn', label: 'Tự chọn' },
+];
+
 export default function SubjectTable({ title, category }: { title: string; category: string }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Subject[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(category);
 
   useEffect(() => {
     setIsClient(true);
@@ -272,38 +282,66 @@ export default function SubjectTable({ title, category }: { title: string; categ
 
   useEffect(() => {
     setLoading(true);
-    
     // Kiểm tra xem có dữ liệu từ file HTML đã được upload không
-    const storedData = typeof window !== 'undefined' ? getScoreDataFromLocalStorage(category) : null;
-    
-    if (storedData) {
-      // Nếu có dữ liệu từ localStorage, sử dụng dữ liệu đó
-      setData(storedData);
-      setLoading(false);
+    if (category === 'Tất cả') {
+      // Lấy dữ liệu cho tất cả các category
+      const allCategories = CATEGORY_OPTIONS.map(opt => opt.value);
+      const allData: Subject[] = [];
+      
+      allCategories.forEach(cat => {
+        const storedData = typeof window !== 'undefined' ? getScoreDataFromLocalStorage(cat) : null;
+        if (storedData) {
+          allData.push(...storedData);
+        }
+      });
+
+      if (allData.length > 0) {
+        setData(allData);
+        setLoading(false);
+      } else {
+        // Nếu không có dữ liệu từ localStorage, lấy từ API
+        Promise.all(allCategories.map(cat => fetchScoreData(cat)))
+          .then(results => {
+            const combinedData = results.flat();
+            if (combinedData.length > 0) {
+              setData(combinedData);
+            } else {
+              setData(mockData);
+            }
+          })
+          .catch(() => {
+            setData(mockData);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
     } else {
-      // Nếu không có, thử lấy từ API
-      fetchScoreData()
-        .then(apiData => {
-          if (apiData && apiData.length > 0) {
-            setData(apiData);
-          } else {
-            // Nếu không có dữ liệu từ API, dùng mock data
+      const storedData = typeof window !== 'undefined' ? getScoreDataFromLocalStorage(category) : null;
+      if (storedData) {
+        setData(storedData);
+        setLoading(false);
+      } else {
+        fetchScoreData(category)
+          .then(apiData => {
+            if (apiData && apiData.length > 0) {
+              setData(apiData);
+            } else {
+              setData(mockData.filter(item => item.category === category));
+            }
+          })
+          .catch(error => {
             setData(mockData.filter(item => item.category === category));
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching score data:', error);
-          // Dùng mock data nếu có lỗi
-          setData(mockData.filter(item => item.category === category));
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
     }
   }, [category]);
 
   // Hàm lấy dữ liệu điểm từ API
-  const fetchScoreData = async (): Promise<Subject[]> => {
+  const fetchScoreData = async (category: string): Promise<Subject[]> => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/scores?category=${category}`, {
         method: 'GET',
@@ -326,13 +364,13 @@ export default function SubjectTable({ title, category }: { title: string; categ
 
   // Lấy danh sách môn đang học từ ICS
   const currentSubjects = typeof window !== 'undefined' ? getCurrentSubjectObjects() : [];
-  // Gộp các môn ICS vào data bảng điểm nếu chưa có và chỉ đúng category
+  // Gộp các môn ICS vào data bảng điểm nếu chưa có
   const dataWithCurrent = [
     ...data,
     ...currentSubjects
       .filter(subj => {
         const subjCategory = getCategoryFromCode(subj.code);
-        return subjCategory === category && !data.some(item => item.code === subj.code);
+        return (category === 'Tất cả' || subjCategory === category) && !data.some(item => item.code === subj.code);
       })
       .map(subj => ({
         id: `current-${subj.code}`,
@@ -364,7 +402,9 @@ export default function SubjectTable({ title, category }: { title: string; categ
       <h2 className="text-lg font-semibold mb-4">{title}</h2>
       <Table
         columns={columns}
-        dataSource={Array.isArray(mappedData) ? mappedData : []}
+        dataSource={Array.isArray(mappedData)
+          ? (category === 'Tất cả' ? mappedData : mappedData.filter(item => item.category === category))
+          : []}
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}
