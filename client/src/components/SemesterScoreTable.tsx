@@ -2,6 +2,7 @@
 import { Table, Tag, Spin } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
+import { convertScore10to4 } from '@/utils/scoreConvert';
 
 interface Subject {
   id: number;
@@ -17,7 +18,7 @@ interface Subject {
   semester: string;
 }
 
-export default function SemesterScoreTable() {
+export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?: '10' | '4' }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{[key: string]: Subject[]}>({});
 
@@ -53,35 +54,63 @@ export default function SemesterScoreTable() {
       dataIndex: 'qt',
       key: 'qt',
       align: 'center',
-      render: (value) => value || '-',
+      render: (value) => {
+        if (value === undefined || value === null || value === '') return '-';
+        const score = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(score)) return '-';
+        return scoreScale === '4' ? convertScore10to4(score).toFixed(1) : score.toFixed(1);
+      },
     },
     {
       title: 'TH',
       dataIndex: 'th',
       key: 'th',
       align: 'center',
-      render: (value) => value || '-',
+      render: (value) => {
+        if (value === undefined || value === null || value === '') return '-';
+        const score = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(score)) return '-';
+        return scoreScale === '4' ? convertScore10to4(score).toFixed(1) : score.toFixed(1);
+      },
     },
     {
       title: 'GK',
       dataIndex: 'gk',
       key: 'gk',
       align: 'center',
-      render: (value) => value || '-',
+      render: (value) => {
+        if (value === undefined || value === null || value === '') return '-';
+        const score = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(score)) return '-';
+        return scoreScale === '4' ? convertScore10to4(score).toFixed(1) : score.toFixed(1);
+      },
     },
     {
       title: 'CK',
       dataIndex: 'ck',
       key: 'ck',
       align: 'center',
-      render: (value) => value || '-',
+      render: (value) => {
+        if (value === undefined || value === null || value === '') return '-';
+        const score = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(score)) return '-';
+        return scoreScale === '4' ? convertScore10to4(score).toFixed(1) : score.toFixed(1);
+      },
     },
     {
       title: 'TỔNG KẾT',
       dataIndex: 'total',
       key: 'total',
       align: 'center',
-      render: (value) => value?.toFixed(1) || '-',
+      render: (value) => {
+        if (value === 'Miễn') {
+          return <Tag color="green" className="px-2 py-1 rounded text-xs font-semibold">Miễn</Tag>;
+        }
+        if (value === undefined || value === null || value === '') return '-';
+        const score = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(score)) return '-';
+        return scoreScale === '4' ? convertScore10to4(score).toFixed(1) : score.toFixed(1);
+      },
     },
     {
       title: 'TRẠNG THÁI',

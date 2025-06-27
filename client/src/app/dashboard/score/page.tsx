@@ -23,6 +23,7 @@ export default function SubjectsPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [earnedCredits, setEarnedCredits] = useState<Record<string, number>>({});
+  const [scoreScale, setScoreScale] = useState<'10' | '4'>('10');
 
   const handleCreditsChange = (category: string, credits: number) => {
     setEarnedCredits(prev => ({
@@ -47,6 +48,18 @@ export default function SubjectsPage() {
           <div className="container mx-auto p-4">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">TỔNG QUAN</h1>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Thang điểm:</span>
+                <Select
+                  value={scoreScale}
+                  onChange={setScoreScale}
+                  options={[
+                    { value: '10', label: 'Thang 10' },
+                    { value: '4', label: 'Thang 4' }
+                  ]}
+                  style={{ width: 120 }}
+                />
+              </div>
             </div>
             <div className="mb-4 flex items-center gap-4">
               <span className="font-semibold">Chọn nhóm môn:</span>
@@ -64,6 +77,7 @@ export default function SubjectsPage() {
                     key={`subject-table-${category.value}-${refreshKey}`}
                     title={`${category.label}`}
                     category={category.value}
+                    scoreScale={scoreScale}
                   />
                 </div>
               ))
@@ -73,6 +87,7 @@ export default function SubjectsPage() {
                   title={`${selectedCategory}`}
                   category={selectedCategory}
                   key={`subject-table-${selectedCategory}-${refreshKey}`}
+                  scoreScale={scoreScale}
                 />
               </div>
             )}
@@ -87,8 +102,20 @@ export default function SubjectsPage() {
         <div className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">ĐIỂM THEO HỌC KỲ</h1>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Thang điểm:</span>
+              <Select
+                value={scoreScale}
+                onChange={setScoreScale}
+                options={[
+                  { value: '10', label: 'Thang 10' },
+                  { value: '4', label: 'Thang 4' }
+                ]}
+                style={{ width: 120 }}
+              />
+            </div>
           </div>
-          <SemesterScoreTable key={`semester-${refreshKey}`} />
+          <SemesterScoreTable key={`semester-${refreshKey}`} scoreScale={scoreScale} />
         </div>
       ),
     },

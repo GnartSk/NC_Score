@@ -168,10 +168,10 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
               
               // Xác định trạng thái
               let status = 'Chưa học';
-              if (subject.TK) {
-                status = parseFloat(subject.TK) >= 5 ? 'Hoàn thành' : 'Rớt';
-              } else if (!subject.QT && !subject.TH && !subject.GK && !subject.CK && subject.credit && subject.subjectName) {
+              if (subject.TK === 'Miễn') {
                 status = 'Miễn';
+              } else if (subject.TK) {
+                status = parseFloat(subject.TK) >= 5 ? 'Hoàn thành' : 'Rớt';
               }
               
               const subjectData = {
