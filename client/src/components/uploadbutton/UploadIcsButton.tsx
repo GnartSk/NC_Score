@@ -29,18 +29,53 @@ const UploadIcsButton = () => {
         const data = await response.json();
         console.log('ICS API response:', data);
         const arr = data.data;
-        if (Array.isArray(arr) && arr.length > 0) {
-          const categorizedCodes = arr.map(subj => ({
+        // Lấy danh sách mã môn đã có điểm từ localStorage
+        let scoredCodes = [];
+        try {
+          const htmlScoreData = localStorage.getItem('html_score_data');
+          if (htmlScoreData) {
+            const parsed = JSON.parse(htmlScoreData);
+            const allSubjects = Object.values(parsed.semesters || {}).flatMap((sem: any) => sem.subjects || []);
+            // Lấy tất cả các mã môn đã có điểm tổng kết hoặc có tag Rớt, Hoãn thi, Hoàn thành, Miễn
+            scoredCodes = allSubjects
+              .filter((subj: any) => {
+                const tk = (subj.TK ?? '').toString().trim();
+                const status = (subj.status ?? '').toString().trim();
+                if (tk && tk !== '-' && !isNaN(Number(tk))) return true;
+                if ([
+                  'Rớt', 'Hoãn thi', 'Hoàn thành', 'Miễn'
+                ].includes(status) || [
+                  'Rớt', 'Hoãn thi', 'Hoàn thành', 'Miễn'
+                ].includes(tk)) return true;
+                return false;
+              })
+              .map((subj: any) => (subj.subjectCode || subj.code || '').toString().toUpperCase().trim());
+            // Log danh sách mã môn đã có điểm
+            console.log('[DEBUG] Mã môn đã có điểm:', scoredCodes);
+          }
+        } catch (e) { console.warn('Error reading html_score_data:', e); }
+        // Lọc các môn chưa có điểm, normalize mã môn
+        const filteredArr = Array.isArray(arr)
+          ? arr.filter(subj => {
+              const code = (subj.code || subj.subjectCode || '').toString().toUpperCase().trim();
+              return !scoredCodes.includes(code);
+            })
+          : [];
+        // Log danh sách mã môn từ ICS
+        console.log('[DEBUG] Mã môn từ ICS:', Array.isArray(arr) ? arr.map(subj => (subj.code || subj.subjectCode || '').toString().toUpperCase().trim()) : []);
+        console.log('[DEBUG] Mã môn được thêm vào trạng thái đang học:', filteredArr.map(subj => (subj.code || subj.subjectCode || '').toString().toUpperCase().trim()));
+        if (filteredArr.length > 0) {
+          const categorizedCodes = filteredArr.map(subj => ({
             ...subj,
             category: getCategoryFromCode(subj.code)
           }));
           console.log('Saving to localStorage:', categorizedCodes);
           localStorage.setItem('current_subject_codes', JSON.stringify(categorizedCodes));
-          message.success(`Đã upload file lịch học và cập nhật ${arr.length} môn đang học!`);
+          message.success(`Đã upload file lịch học và cập nhật ${filteredArr.length} môn đang học!`);
           message.info('Đã cập nhật trạng thái điểm từ file ICS. Vui lòng kiểm tra lại bảng điểm!');
           window.location.reload();
         } else {
-          console.warn('ICS data is not a valid array or is empty:', arr);
+          message.info('Tất cả các môn trong file ICS đã có điểm, không có môn mới để cập nhật.');
         }
       } else {
         message.error('Failed to upload file');

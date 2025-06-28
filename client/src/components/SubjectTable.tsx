@@ -285,9 +285,6 @@ export default function SubjectTable({
       key: 'total',
       align: 'center',
       render: (value) => {
-        if (value === 'Miễn') {
-          return <Tag color="green" className="px-2 py-1 rounded text-xs font-semibold">Miễn</Tag>;
-        }
         if (value === undefined || value === null || value === '') return '-';
         const score = typeof value === 'string' ? parseFloat(value) : value;
         if (isNaN(score)) return '-';
@@ -304,8 +301,9 @@ export default function SubjectTable({
           color={
             status === 'Hoàn thành' ? 'green' :
             status === 'Rớt' ? 'red' :
-            status === 'Miễn' ? 'yellow' :
-            status === 'Đang học' ? 'gold' : 'default'
+            status === 'Miễn' ? 'blue' :
+            status === 'Đang học' ? 'gold' :
+            status === 'Hoãn thi' ? 'orange' : 'default'
           }
           className="rounded-full px-3"
         >
@@ -400,40 +398,51 @@ export default function SubjectTable({
   // Lấy danh sách môn đang học từ ICS
   const currentSubjects = typeof window !== 'undefined' ? getCurrentSubjectObjects() : [];
   // Gộp các môn ICS vào data bảng điểm nếu chưa có
-  const dataWithCurrent = [
-    ...data,
-    ...currentSubjects
-      .filter(subj => {
-        const subjCategory = getCategoryFromCode(subj.code);
-        return (category === 'Tất cả' || subjCategory === category) && !data.some(item => item.code === subj.code);
-      })
-      .map(subj => ({
-        id: `current-${subj.code}`,
-        code: subj.code,
-        name: subj.name,
-        credits: '',
-        qt: '',
-        th: '',
-        gk: '',
-        ck: '',
-        total: '',
-        status: 'Đang học',
-        category: getCategoryFromCode(subj.code),
-      })),
+  // Đảm bảo chỉ hiển thị 1 bản ghi duy nhất cho mỗi mã môn: ưu tiên Hoàn thành > Đang học > Rớt
+  const mergedData = [...data, ...currentSubjects
+    .filter(subj => {
+      const subjCategory = getCategoryFromCode(subj.code);
+      return (category === 'Tất cả' || subjCategory === category) && !data.some(item => item.code === subj.code);
+    })
+    .map(subj => ({
+      id: `current-${subj.code}`,
+      code: subj.code,
+      name: subj.name,
+      credits: '',
+      qt: '',
+      th: '',
+      gk: '',
+      ck: '',
+      total: '',
+      status: 'Đang học',
+      category: getCategoryFromCode(subj.code),
+    }))
   ];
 
-  // Mapping trạng thái 'Đang học' cho các môn có code nằm trong current_subject_codes
-  const mappedData = dataWithCurrent.map(item => {
-    if (currentSubjects.some(subj => subj.code === item.code)) {
-      return { ...item, status: 'Đang học' };
-    }
-    return item;
-  });
+  // Chỉ giữ lại bản ghi ưu tiên: Hoàn thành > Đang học > Rớt cho mỗi mã môn
+  type StatusType = 'Hoàn thành' | 'Đang học' | 'Rớt';
+  const priority: Record<StatusType, number> = { 'Hoàn thành': 3, 'Đang học': 2, 'Rớt': 1 };
+  const uniqueData = Object.values(
+    mergedData.reduce((acc, item) => {
+      const code = item.code;
+      if (!acc[code]) {
+        acc[code] = item;
+      } else {
+        // Ưu tiên Hoàn thành > Đang học > Rớt
+        const s1 = (item.status as StatusType);
+        const s2 = (acc[code].status as StatusType);
+        if ((priority[s1] || 0) > (priority[s2] || 0)) {
+          acc[code] = item;
+        }
+      }
+      return acc;
+    }, {} as Record<string, any>)
+  );
 
   // Tính tổng số tín chỉ đã học được (các môn có status 'Hoàn thành')
   useEffect(() => {
-    if (Array.isArray(mappedData)) {
-      const earnedCredits = mappedData
+    if (Array.isArray(uniqueData)) {
+      const earnedCredits = uniqueData
         .filter(item => item.status === 'Hoàn thành')
         .reduce((sum, item) => sum + (Number(item.credits) || 0), 0);
       
@@ -441,13 +450,13 @@ export default function SubjectTable({
         onCreditsChange(earnedCredits);
       }
     }
-  }, [mappedData, onCreditsChange]);
+  }, [uniqueData, onCreditsChange]);
 
   if (!isClient) return null;
 
   // Tính tổng số tín chỉ đã học được
-  const earnedCredits = Array.isArray(mappedData)
-    ? mappedData
+  const earnedCredits = Array.isArray(uniqueData)
+    ? uniqueData
         .filter(item => item.status === 'Hoàn thành')
         .reduce((sum, item) => sum + (Number(item.credits) || 0), 0)
     : 0;
@@ -465,6 +474,15 @@ export default function SubjectTable({
     }
   };
 
+  // Lọc dữ liệu: Nếu có nhiều môn cùng mã, chỉ giữ lại bản ghi có status là 'Hoàn thành' hoặc 'Đang học', loại bỏ các bản ghi 'Rớt' nếu đã có bản ghi khác cùng mã không phải 'Rớt'
+  const filteredData = Array.isArray(uniqueData)
+    ? uniqueData.filter((item, idx, arr) => {
+        if (item.status !== 'Rớt') return true;
+        // Nếu là 'Rớt', chỉ giữ nếu không có bản ghi cùng code với status khác 'Rớt'
+        return !arr.some(other => other.code === item.code && other.status !== 'Rớt');
+      })
+    : [];
+
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm">
       <div className="flex items-center mb-4">
@@ -476,9 +494,7 @@ export default function SubjectTable({
       </div>
       <Table
         columns={columns}
-        dataSource={Array.isArray(mappedData)
-          ? (category === 'Tất cả' ? mappedData : mappedData.filter(item => item.category === category))
-          : []}
+        dataSource={category === 'Tất cả' ? uniqueData : uniqueData.filter(item => item.category === category)}
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}

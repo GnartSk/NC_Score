@@ -170,9 +170,15 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
               let status = 'Chưa học';
               if (subject.TK === 'Miễn') {
                 status = 'Miễn';
-              } else if (subject.TK) {
+              } else if (subject.TK === 'Hoãn thi') {
+                status = 'Hoãn thi';
+              } else if (subject.TK === '&nbsp;' || subject.TK === '' || subject.TK === undefined || subject.TK === null) {
+                status = 'Đang học';
+              } else if (!isNaN(Number(subject.TK))) {
                 status = parseFloat(subject.TK) >= 5 ? 'Hoàn thành' : 'Rớt';
               }
+              // Log trạng thái từng môn để debug
+              console.log(`[DEBUG] ${code} - ${subject.subjectName} | TK: ${subject.TK} | Status: ${status}`);
               
               const subjectData = {
                 id: index + 1,
