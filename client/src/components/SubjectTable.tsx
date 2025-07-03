@@ -114,9 +114,36 @@ const getScoreDataFromLocalStorage = (category: string): Subject[] | null => {
     const scoreData = localStorage.getItem('html_score_data');
     if (!scoreData) return null;
     const parsedData = JSON.parse(scoreData);
-    // Lấy dữ liệu theo category từ parsedData.categories
-    if (parsedData && parsedData.categories && parsedData.categories[category] && Array.isArray(parsedData.categories[category])) {
-      return parsedData.categories[category];
+    if (parsedData && parsedData.semesters) {
+      let allSubjects: any[] = [];
+      Object.values(parsedData.semesters).forEach((value: any) => {
+        if (Array.isArray(value.subjects)) {
+          allSubjects.push(...value.subjects);
+        }
+      });
+      // Map lại các trường cho columns
+      allSubjects = allSubjects.map(subj => {
+        const tk = subj.TK || subj.total;
+        let status = 'Chưa học';
+        if (tk === 'Miễn') status = 'Miễn';
+        else if (tk === 'Hoãn thi') status = 'Hoãn thi';
+        else if (tk === '&nbsp;' || tk === '' || tk === undefined || tk === null) status = 'Đang học';
+        else if (!isNaN(Number(tk))) status = parseFloat(tk) >= 5 ? 'Hoàn thành' : 'Rớt';
+        return {
+          ...subj,
+          code: subj.subjectCode || subj.code,
+          name: subj.subjectName || subj.name,
+          credits: subj.credit || subj.credits,
+          qt: subj.QT || subj.qt,
+          th: subj.TH || subj.th,
+          gk: subj.GK || subj.gk,
+          ck: subj.CK || subj.ck,
+          total: tk,
+          status,
+        };
+      });
+      if (category === 'Tất cả') return allSubjects;
+      return allSubjects.filter(subj => getCategoryFromCode(subj.code) === category);
     }
     return null;
   } catch (error) {
@@ -157,7 +184,8 @@ const getCurrentSubjectObjects = (): { code: string, name: string }[] => {
   }
 };
 
-function getCategoryFromCode(code: string) {
+function getCategoryFromCode(code: string | undefined) {
+  if (!code || typeof code !== 'string') return 'Tự chọn';
   if (code.startsWith('SS')) return 'Môn lý luận chính trị';
   if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học';
   if (code.startsWith('EN')) return 'Ngoại ngữ';
@@ -443,9 +471,16 @@ export default function SubjectTable({
   useEffect(() => {
     if (Array.isArray(uniqueData)) {
       const earnedCredits = uniqueData
-        .filter(item => item.status === 'Hoàn thành')
+        .filter(item => {
+          // Tính lại status dựa vào TK
+          let status = 'Chưa học';
+          if (item.total === 'Miễn') status = 'Miễn';
+          else if (item.total === 'Hoãn thi') status = 'Hoãn thi';
+          else if (item.total === '&nbsp;' || item.total === '' || item.total === undefined || item.total === null) status = 'Đang học';
+          else if (!isNaN(Number(item.total))) status = parseFloat(item.total) >= 5 ? 'Hoàn thành' : 'Rớt';
+          return status === 'Hoàn thành';
+        })
         .reduce((sum, item) => sum + (Number(item.credits) || 0), 0);
-      
       if (onCreditsChange) {
         onCreditsChange(earnedCredits);
       }
@@ -457,7 +492,14 @@ export default function SubjectTable({
   // Tính tổng số tín chỉ đã học được
   const earnedCredits = Array.isArray(uniqueData)
     ? uniqueData
-        .filter(item => item.status === 'Hoàn thành')
+        .filter(item => {
+          let status = 'Chưa học';
+          if (item.total === 'Miễn') status = 'Miễn';
+          else if (item.total === 'Hoãn thi') status = 'Hoãn thi';
+          else if (item.total === '&nbsp;' || item.total === '' || item.total === undefined || item.total === null) status = 'Đang học';
+          else if (!isNaN(Number(item.total))) status = parseFloat(item.total) >= 5 ? 'Hoàn thành' : 'Rớt';
+          return status === 'Hoàn thành';
+        })
         .reduce((sum, item) => sum + (Number(item.credits) || 0), 0)
     : 0;
 
@@ -477,9 +519,21 @@ export default function SubjectTable({
   // Lọc dữ liệu: Nếu có nhiều môn cùng mã, chỉ giữ lại bản ghi có status là 'Hoàn thành' hoặc 'Đang học', loại bỏ các bản ghi 'Rớt' nếu đã có bản ghi khác cùng mã không phải 'Rớt'
   const filteredData = Array.isArray(uniqueData)
     ? uniqueData.filter((item, idx, arr) => {
-        if (item.status !== 'Rớt') return true;
+        let status = 'Chưa học';
+        if (item.total === 'Miễn') status = 'Miễn';
+        else if (item.total === 'Hoãn thi') status = 'Hoãn thi';
+        else if (item.total === '&nbsp;' || item.total === '' || item.total === undefined || item.total === null) status = 'Đang học';
+        else if (!isNaN(Number(item.total))) status = parseFloat(item.total) >= 5 ? 'Hoàn thành' : 'Rớt';
+        if (status !== 'Rớt') return true;
         // Nếu là 'Rớt', chỉ giữ nếu không có bản ghi cùng code với status khác 'Rớt'
-        return !arr.some(other => other.code === item.code && other.status !== 'Rớt');
+        return !arr.some(other => {
+          let otherStatus = 'Chưa học';
+          if (other.total === 'Miễn') otherStatus = 'Miễn';
+          else if (other.total === 'Hoãn thi') otherStatus = 'Hoãn thi';
+          else if (other.total === '&nbsp;' || other.total === '' || other.total === undefined || other.total === null) otherStatus = 'Đang học';
+          else if (!isNaN(Number(other.total))) otherStatus = parseFloat(other.total) >= 5 ? 'Hoàn thành' : 'Rớt';
+          return other.code === item.code && otherStatus !== 'Rớt';
+        });
       })
     : [];
 
@@ -494,7 +548,7 @@ export default function SubjectTable({
       </div>
       <Table
         columns={columns}
-        dataSource={category === 'Tất cả' ? uniqueData : uniqueData.filter(item => item.category === category)}
+        dataSource={category === 'Tất cả' ? uniqueData : uniqueData.filter(item => getCategoryFromCode(item.code) === category)}
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}

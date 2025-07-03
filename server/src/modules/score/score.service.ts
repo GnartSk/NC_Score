@@ -45,16 +45,16 @@ export class ScoreService {
     const isNotExits = await this.isSubjectCodeNotExits(subjectCode, subjectName, credit, semester);
 
     const updateData: any = { status };
-    if (QT !== undefined) updateData.QT = QT;
-    if (TH !== undefined) updateData.TH = TH;
-    if (GK !== undefined) updateData.GK = GK;
-    if (CK !== undefined) updateData.CK = CK;
-    if (TK !== undefined) updateData.TK = TK;
+    if (QT !== undefined && !isNaN(QT)) updateData.QT = QT;
+    if (TH !== undefined && !isNaN(TH)) updateData.TH = TH;
+    if (GK !== undefined && !isNaN(GK)) updateData.GK = GK;
+    if (CK !== undefined && !isNaN(CK)) updateData.CK = CK;
+    if (TK !== undefined && !isNaN(TK)) updateData.TK = TK;
 
     const score = await this.scoreModel.findOneAndUpdate(
-      { subjectCode, idStudent: userId }, // Điều kiện tìm kiếm
-      updateData, // Dữ liệu cập nhật
-      { upsert: true, new: true }, // Tạo mới nếu không tồn tại, trả về dữ liệu mới sau khi cập nhật
+      { subjectCode, idStudent: userId },
+      updateData,
+      { upsert: true, new: true },
     );
 
     if (isNotExits)
@@ -132,7 +132,67 @@ export class ScoreService {
     }
   }
 
-  uploadAllScore() {
-    
+  async uploadAllScore(userId: string, body: any, currentSubjects: any[] = []) {
+    // Log dữ liệu đầu vào để debug
+    console.log('--- [uploadAllScore] ---');
+    console.log('userId:', userId);
+    console.log('body:', JSON.stringify(body, null, 2));
+    console.log('currentSubjects:', JSON.stringify(currentSubjects, null, 2));
+    // Lưu điểm từ file HTML
+    if (body && body.semesters) {
+      for (const [semester, semDataRaw] of Object.entries(body.semesters)) {
+        const semData = semDataRaw as { subjects?: any[] };
+        if (!semData || !Array.isArray(semData.subjects)) continue;
+        for (const subjRaw of semData.subjects) {
+          const subj = subjRaw as any;
+          const parseScore = (val: any) => (val !== undefined && val !== null && val !== '' && val !== '&nbsp;' && !isNaN(Number(val))) ? Number(val) : undefined;
+          const credit = parseScore(subj.credit);
+          if (credit === undefined) continue;
+          const tk = subj?.TK;
+          const tkNum = parseScore(tk);
+          const scoreData: any = {
+            subjectCode: subj.subjectCode,
+            subjectName: subj.subjectName,
+            credit,
+            semester,
+            status: (typeof tk === 'string' && tk === 'Miễn') ? 'Miễn'
+                  : (tkNum !== undefined && tkNum >= 5) ? 'Hoàn thành'
+                  : (tkNum !== undefined && tkNum < 5) ? 'Rớt'
+                  : 'Đang học',
+            type: 'Học phần chính',
+          };
+          ['QT', 'GK', 'TH', 'CK'].forEach(key => {
+            const val = parseScore(subj[key]);
+            if (val !== undefined && !isNaN(val)) scoreData[key] = val;
+          });
+          if (tkNum !== undefined && !isNaN(tkNum)) scoreData.TK = tkNum;
+          await this.create(scoreData, userId);
+        }
+      }
+    }
+    // Lưu các môn đang học từ ICS (nếu có)
+    if (Array.isArray(currentSubjects)) {
+      for (const subjRaw of currentSubjects) {
+        if (!subjRaw || typeof subjRaw !== 'object') continue;
+        const subj = subjRaw as any;
+        const parseScore = (val: any) => (val !== undefined && val !== null && val !== '' && val !== '&nbsp;' && !isNaN(Number(val))) ? Number(val) : undefined;
+        const credit = parseScore(subj.credits || subj.credit);
+        if (credit === undefined) continue;
+        const scoreData: any = {
+          subjectCode: subj.code || subj.subjectCode,
+          subjectName: subj.name,
+          credit,
+          semester: subj.semester || 'Học kỳ mới nhất',
+          status: 'Đang học',
+          type: 'Học phần chính',
+        };
+        ['QT', 'GK', 'TH', 'CK', 'TK'].forEach(key => {
+          const val = parseScore(subj[key]);
+          if (val !== undefined && !isNaN(val)) scoreData[key] = val;
+        });
+        await this.create(scoreData, userId);
+      }
+    }
+    return { message: 'Upload all scores success' };
   }
 }

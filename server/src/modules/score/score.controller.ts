@@ -47,8 +47,9 @@ export class ScoreController {
   //Hàm chưa xài được
   @Post('allScore')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
-  uploadAllScore(@Request() req, @Body(new ValidationPipe({ transform: true })) body: StudentGradesDTO) {
-    console.log(body);
-    return this.scoreService.uploadAllScore();
+  async uploadAllScore(@Request() req, @Body(new ValidationPipe({ transform: true })) body: any) {
+    // Lấy currentSubjects từ body nếu client gửi lên, hoặc [] nếu không có
+    const currentSubjects = body.currentSubjects || [];
+    return this.scoreService.uploadAllScore(req.user._id, body, currentSubjects);
   }
 }

@@ -22,7 +22,7 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{[key: string]: Subject[]}>({});
 
-  const columns: ColumnsType<Subject> = [
+  const columns: ColumnsType<any> = [
     {
       title: 'STT',
       dataIndex: 'id',
@@ -33,26 +33,26 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'MÃ MÔN',
-      dataIndex: 'code',
-      key: 'code',
+      dataIndex: 'subjectCode',
+      key: 'subjectCode',
       align: 'center',
     },
     {
       title: 'TÊN MÔN',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'subjectName',
+      key: 'subjectName',
       width: 250,
     },
     {
       title: 'TC',
-      dataIndex: 'credits',
-      key: 'credits',
+      dataIndex: 'credit',
+      key: 'credit',
       align: 'center',
     },
     {
       title: 'QT',
-      dataIndex: 'qt',
-      key: 'qt',
+      dataIndex: 'QT',
+      key: 'QT',
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
@@ -63,8 +63,8 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'TH',
-      dataIndex: 'th',
-      key: 'th',
+      dataIndex: 'TH',
+      key: 'TH',
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
@@ -75,8 +75,8 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'GK',
-      dataIndex: 'gk',
-      key: 'gk',
+      dataIndex: 'GK',
+      key: 'GK',
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
@@ -87,8 +87,8 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'CK',
-      dataIndex: 'ck',
-      key: 'ck',
+      dataIndex: 'CK',
+      key: 'CK',
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
@@ -99,11 +99,10 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'TỔNG KẾT',
-      dataIndex: 'total',
-      key: 'total',
+      dataIndex: 'TK',
+      key: 'TK',
       align: 'center',
       render: (value) => {
-        
         if (value === undefined || value === null || value === '') return '-';
         const score = typeof value === 'string' ? parseFloat(value) : value;
         if (isNaN(score)) return '-';
@@ -115,20 +114,22 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
       dataIndex: 'status',
       key: 'status',
       align: 'center',
-      render: (status) => (
-        <Tag 
-          color={
-            status === 'Hoàn thành' ? 'green' :
-            status === 'Rớt' ? 'red' :
-            status === 'Miễn' ? 'blue' :
-            status === 'Hoãn thi' ? 'orange' :
-            status === 'Đang học' ? 'gold' : 'default'
-          }
-          className="rounded-full px-3"
-        >
-          {status}
-        </Tag>
-      ),
+      render: (status) => {
+        return (
+          <Tag 
+            color={
+              status === 'Hoàn thành' ? 'green' :
+              status === 'Rớt' ? 'red' :
+              status === 'Miễn' ? 'blue' :
+              status === 'Hoãn thi' ? 'orange' :
+              status === 'Đang học' ? 'gold' : 'default'
+            }
+            className="rounded-full px-3"
+          >
+            {status}
+          </Tag>
+        );
+      },
     },
   ];
 
@@ -141,7 +142,31 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
       try {
         parsedData = JSON.parse(scoreData);
         if (parsedData && parsedData.semesters) {
-          semestersData = { ...parsedData.semesters };
+          // Sử dụng đúng định dạng server trả về
+          Object.entries(parsedData.semesters).forEach(([semester, value]) => {
+            semestersData[semester] = (value as any).subjects
+              ? (value as any).subjects.map((subj: any) => {
+                  const tk = subj.TK || subj.total;
+                  let status = 'Chưa học';
+                  if (tk === 'Miễn') status = 'Miễn';
+                  else if (tk === 'Hoãn thi') status = 'Hoãn thi';
+                  else if (tk === '&nbsp;' || tk === '' || tk === undefined || tk === null) status = 'Đang học';
+                  else if (!isNaN(Number(tk))) status = parseFloat(tk) >= 5 ? 'Hoàn thành' : 'Rớt';
+                  return {
+                    ...subj,
+                    code: subj.subjectCode || subj.code,
+                    name: subj.subjectName || subj.name,
+                    credits: subj.credit || subj.credits,
+                    qt: subj.QT || subj.qt,
+                    th: subj.TH || subj.th,
+                    gk: subj.GK || subj.gk,
+                    ck: subj.CK || subj.ck,
+                    total: tk,
+                    status,
+                  };
+                })
+              : [];
+          });
         }
       } catch (error) {
         console.error('Error parsing score data:', error);
@@ -153,7 +178,7 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
       try {
         const icsSubjects = JSON.parse(icsRaw);
         if (Array.isArray(icsSubjects) && icsSubjects.length > 0) {
-          let semesters = semestersData ? Object.keys(semestersData) : [];
+          let semesters = Object.keys(semestersData);
           // Sắp xếp học kỳ theo năm và số học kỳ
           semesters.sort((a, b) => {
             const regex = /Học kỳ (\d+) - Năm học (\d{4})-(\d{4})/;
@@ -175,13 +200,15 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
             latestSemester = 'Học kỳ mới nhất';
             semestersData[latestSemester] = [];
           }
-          const currentSubjects = semestersData[latestSemester] ? semestersData[latestSemester].map((s: any) => s.subjectCode || s.code) : [];
+          const currentSubjects = semestersData[latestSemester] ? semestersData[latestSemester].map((s: any) => s.code) : [];
           const icsToAdd = icsSubjects.filter((ics: any) => !currentSubjects.includes(ics.code));
           if (icsToAdd.length > 0) {
             const newSubjects = icsToAdd.map((ics: any, idx: number) => ({
               id: `ics-${ics.code}`,
               code: ics.code,
+              subjectCode: ics.code,
               name: ics.name,
+              subjectName: ics.name,
               credits: '',
               qt: '',
               th: '',

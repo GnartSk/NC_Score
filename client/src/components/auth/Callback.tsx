@@ -6,6 +6,8 @@ export default function Callback() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
+      localStorage.removeItem('html_score_data');
+      localStorage.removeItem('current_subject_codes');
       localStorage.setItem('NCToken', token);
       window.location.href = '/';
     } else {

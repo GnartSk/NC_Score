@@ -41,6 +41,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [parsedData, setParsedData] = useState<{[key: string]: Subject[]}>({});
   const [activeTab, setActiveTab] = useState('political');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Cấu hình cột cho bảng xác nhận
   const columns: ColumnsType<Subject> = [
@@ -226,7 +227,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
     };
   };
 
-  // Bước 1: Xử lý file HTML và hiển thị dữ liệu để xác nhận
+  // Xử lý file HTML và hiển thị dữ liệu để xác nhận
   const handleUpload = async (file: File) => {
     setLoading(true);
     
@@ -262,7 +263,9 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
         throw new Error('Không tìm thấy dữ liệu từ file HTML');
       }
       
-      // Xử lý và phân loại dữ liệu
+      // Lưu dữ liệu server gốc để xác nhận lưu
+      (window as any)._lastServerScoreData = result.data;
+      // Xử lý và phân loại dữ liệu chỉ để hiển thị modal
       const processedData = processApiData(result);
       
       // Lưu dữ liệu để hiển thị trong modal (chỉ show categories)
@@ -282,24 +285,26 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
     }
   };
 
-  // Bước 2: Gửi dữ liệu đã xác nhận lên server
+  // Gửi dữ liệu đã xác nhận lên server
   const handleConfirmUpload = async () => {
     setConfirmLoading(true);
     
     try {
-      // Lấy processedData đã lưu tạm ở window
-      const processedData = (window as any)._lastProcessedScoreData;
+      // Lấy dữ liệu server gốc đã lưu tạm ở window
+      const serverData = (window as any)._lastServerScoreData;
       
-      // Lưu dữ liệu vào localStorage
-      localStorage.setItem('html_score_data', JSON.stringify(processedData));
+      // Lưu dữ liệu vào localStorage đúng định dạng server
+      localStorage.setItem('html_score_data', JSON.stringify(serverData));
       
       // Gọi callback khi upload thành công
       if (onUploadSuccess) {
-        onUploadSuccess(processedData);
+        onUploadSuccess(serverData);
       }
       
       message.success('Đã lưu điểm thành công!');
       setModalVisible(false);
+      setRefreshKey(prev => prev + 1);
+      uploadAllScoreToServer();
     } catch (error) {
       console.error('Error saving score data:', error);
       message.error('Có lỗi xảy ra khi lưu điểm!');
@@ -333,6 +338,45 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       math: 'Toán - Tin học'
     };
     return `${titles[category] || category} (${count})`;
+  };
+
+  // Hàm gọi API lưu điểm lên server
+  const uploadAllScoreToServer = async () => {
+    const htmlScoreData = localStorage.getItem('html_score_data');
+    // Lấy token từ cookie hoặc localStorage
+    const token = getCookie('NCToken') || localStorage.getItem('NCToken');
+    if (!token || token === 'null') {
+      message.error('Bạn cần đăng nhập lại để sử dụng tính năng này!');
+      return;
+    }
+    try {
+      // Lọc lại dữ liệu semesters nếu cần (giữ nguyên logic cũ)
+      const rawSemesters = htmlScoreData ? JSON.parse(htmlScoreData).semesters : {};
+      const semesters: Record<string, any> = {};
+      Object.entries(rawSemesters).forEach(([key, value]) => {
+        if (value && Array.isArray((value as any).subjects)) {
+          semesters[key] = { subjects: (value as any).subjects };
+        }
+      });
+      // Gửi chỉ trường semesters
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/allScore`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          semesters,
+        }),
+      });
+      if (res.ok) {
+        message.success('Đã lưu điểm lên hệ thống!');
+      } else {
+        message.error('Lưu điểm lên hệ thống thất bại!');
+      }
+    } catch (e) {
+      message.error('Lỗi khi lưu điểm lên hệ thống!');
+    }
   };
 
   return (

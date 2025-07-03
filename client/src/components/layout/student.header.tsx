@@ -53,6 +53,10 @@ const StudentHeader = (props: any) => {
 
     const handleSignOut = async () => {
         try {
+            // Xóa dữ liệu điểm khỏi localStorage khi đăng xuất
+            localStorage.removeItem('html_score_data');
+            localStorage.removeItem('current_subject_codes');
+            localStorage.removeItem('NCToken');
             deleteCookie('NCToken');
             await signOut({ redirect: false }).catch((error: any) => {
                 if (

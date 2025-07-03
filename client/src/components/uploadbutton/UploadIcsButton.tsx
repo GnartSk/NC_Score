@@ -73,6 +73,7 @@ const UploadIcsButton = () => {
           localStorage.setItem('current_subject_codes', JSON.stringify(categorizedCodes));
           message.success(`Đã upload file lịch học và cập nhật ${filteredArr.length} môn đang học!`);
           message.info('Đã cập nhật trạng thái điểm từ file ICS. Vui lòng kiểm tra lại bảng điểm!');
+          uploadAllScoreToServer();
           window.location.reload();
         } else {
           message.info('Tất cả các môn trong file ICS đã có điểm, không có môn mới để cập nhật.');
@@ -82,6 +83,38 @@ const UploadIcsButton = () => {
       }
     } catch (error) {
       message.error('An error occurred');
+    }
+  };
+
+  // Hàm gọi API lưu điểm lên server
+  const uploadAllScoreToServer = async () => {
+    const htmlScoreData = localStorage.getItem('html_score_data');
+    const icsSubjects = localStorage.getItem('current_subject_codes');
+    // Lấy token từ cookie hoặc localStorage
+    const token = getCookie('NCToken') || localStorage.getItem('NCToken');
+    if (!token || token === 'null') {
+      message.error('Bạn cần đăng nhập lại để sử dụng tính năng này!');
+      return;
+    }
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/allScore`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          semesters: htmlScoreData ? JSON.parse(htmlScoreData).semesters : {},
+          currentSubjects: icsSubjects ? JSON.parse(icsSubjects) : [],
+        }),
+      });
+      if (res.ok) {
+        message.success('Đã lưu điểm lên hệ thống!');
+      } else {
+        message.error('Lưu điểm lên hệ thống thất bại!');
+      }
+    } catch (e) {
+      message.error('Lỗi khi lưu điểm lên hệ thống!');
     }
   };
 
