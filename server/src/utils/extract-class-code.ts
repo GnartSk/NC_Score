@@ -13,14 +13,19 @@ export function extractClassCodesFromICS(icsFilePath: string): string[] {
   const summaryRegex = /SUMMARY:(.*?)(?:\r?\n|\r|$)/g;
   const matches = [...icsContent.matchAll(summaryRegex)];
   
-  // Trích xuất mã lớp học (phần trước dấu " - ")
+  // Trích xuất mã lớp học (phần trước dấu chấm đầu tiên)
   const classCodes = matches.map(match => {
     const summary = match[1];
     const dashIndex = summary.indexOf(' - ');
+    let classPart = summary;
     if (dashIndex !== -1) {
-      return summary.substring(0, dashIndex);
+      classPart = summary.substring(0, dashIndex);
     }
-    return summary; // Nếu không có dấu " - " thì trả về toàn bộ chuỗi
+    const dotIndex = classPart.indexOf('.');
+    if (dotIndex !== -1) {
+      return classPart.substring(0, dotIndex).trim();
+    }
+    return classPart.trim();
   });
   
   return classCodes;
@@ -43,12 +48,18 @@ export function extractClassInfoFromICS(icsFilePath: string): Array<{code: strin
   const classInfo = matches.map(match => {
     const summary = match[1];
     const dashIndex = summary.indexOf(' - ');
+    let classPart = summary;
+    let room = '';
     if (dashIndex !== -1) {
-      const code = summary.substring(0, dashIndex);
-      const room = summary.substring(dashIndex + 3);
-      return { code, room };
+      classPart = summary.substring(0, dashIndex);
+      room = summary.substring(dashIndex + 3);
     }
-    return { code: summary, room: '' }; // Nếu không có dấu " - " thì phòng học để trống
+    const dotIndex = classPart.indexOf('.');
+    let code = classPart;
+    if (dotIndex !== -1) {
+      code = classPart.substring(0, dotIndex);
+    }
+    return { code: code.trim(), room: room.trim() };
   });
   
   return classInfo;

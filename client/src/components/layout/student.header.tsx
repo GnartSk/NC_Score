@@ -7,7 +7,7 @@ import { DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
 import { signOut } from "next-auth/react";
-import { getCookie } from 'cookies-next';
+import { getCookie, deleteCookie } from 'cookies-next';
 
 interface Profile {
     fullName: string;
@@ -51,6 +51,25 @@ const StudentHeader = (props: any) => {
         fetchProfile();
     }, []);
 
+    const handleSignOut = async () => {
+        try {
+            deleteCookie('NCToken');
+            await signOut({ redirect: false }).catch((error: any) => {
+                if (
+                    typeof error?.message === 'string' &&
+                    error.message.includes('Unexpected end of JSON input')
+                ) {
+                    // Bỏ qua lỗi này
+                    return;
+                }
+                console.error('Logout error:', error);
+            });
+            window.location.href = '/auth/login';
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
+
     const items: MenuProps['items'] = [
         {
             key: '1',
@@ -63,7 +82,7 @@ const StudentHeader = (props: any) => {
         {
             key: '4',
             danger: true,
-            label: <span onClick={() => signOut()}>Đăng xuất</span>,
+            label: <span onClick={handleSignOut}>Đăng xuất</span>,
         },
     ];
 

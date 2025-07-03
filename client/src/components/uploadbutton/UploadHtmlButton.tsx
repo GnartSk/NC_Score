@@ -115,16 +115,18 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       'Tự chọn': []
     };
 
+    const semesterData: { [key: string]: any[] } = {};
+
     // Xử lý dữ liệu theo mẫu API trả về
     try {
       if (apiData?.data?.semesters) {
         // Lặp qua các học kỳ
         Object.keys(apiData.data.semesters).forEach(semester => {
-          const semesterData = apiData.data.semesters[semester];
+          const semesterInfo = apiData.data.semesters[semester];
           
           // Lặp qua danh sách môn học trong học kỳ
-          if (semesterData && Array.isArray(semesterData.subjects)) {
-            semesterData.subjects.forEach((subject: any, index: number) => {
+          if (semesterInfo && Array.isArray(semesterInfo.subjects)) {
+            semesterInfo.subjects.forEach((subject: any, index: number) => {
               // Xác định category dựa vào mã môn học
               let category = 'Tự chọn'; // Default category
               const code = subject.subjectCode || '';
@@ -152,22 +154,33 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
               // Chuyên ngành - tất cả mã NT khác 
               else if (code.startsWith('NT') && 
                       !code.startsWith('NT0') && 
-                      !code.startsWith('NT1')) {
+                      !code.startsWith('NT1') && !code.startsWith('NT2')) {
                 category = 'Chuyên ngành';
+              }
+              else if (code === 'NT209') {
+                category = 'Chuyên ngành';
+              }
+              else if (code.startsWith('NT2')) {
+                category = 'Tự chọn';
               }
               
               console.log(`Categorized as: ${category}`);
               
               // Xác định trạng thái
               let status = 'Chưa học';
-              if (subject.TK) {
-                status = parseFloat(subject.TK) >= 5 ? 'Hoàn thành' : 'Rớt';
-              } else if (!subject.QT && !subject.TH && !subject.GK && !subject.CK && subject.credit && subject.subjectName) {
+              if (subject.TK === 'Miễn') {
                 status = 'Miễn';
+              } else if (subject.TK === 'Hoãn thi') {
+                status = 'Hoãn thi';
+              } else if (subject.TK === '&nbsp;' || subject.TK === '' || subject.TK === undefined || subject.TK === null) {
+                status = 'Đang học';
+              } else if (!isNaN(Number(subject.TK))) {
+                status = parseFloat(subject.TK) >= 5 ? 'Hoàn thành' : 'Rớt';
               }
+              // Log trạng thái từng môn để debug
+              console.log(`[DEBUG] ${code} - ${subject.subjectName} | TK: ${subject.TK} | Status: ${status}`);
               
-              // Thêm vào danh sách tương ứng
-              categorizedData[category].push({
+              const subjectData = {
                 id: index + 1,
                 code: subject.subjectCode || '',
                 name: subject.subjectName || '',
@@ -180,7 +193,16 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
                 status: status,
                 category: category,
                 semester: semester
-              });
+              };
+
+              // Thêm vào danh sách theo category
+              categorizedData[category].push(subjectData);
+
+              // Thêm vào danh sách theo học kỳ
+              if (!semesterData[semester]) {
+                semesterData[semester] = [];
+              }
+              semesterData[semester].push(subjectData);
             });
           }
         });
@@ -198,7 +220,10 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       }
     });
     
-    return categorizedData;
+    return {
+      categories: categorizedData,
+      semesters: semesterData
+    };
   };
 
   // Bước 1: Xử lý file HTML và hiển thị dữ liệu để xác nhận
@@ -240,8 +265,11 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       // Xử lý và phân loại dữ liệu
       const processedData = processApiData(result);
       
-      // Lưu dữ liệu để hiển thị trong modal
-      setParsedData(processedData);
+      // Lưu dữ liệu để hiển thị trong modal (chỉ show categories)
+      setParsedData(processedData.categories);
+      
+      // Lưu tạm processedData vào state để dùng khi xác nhận
+      (window as any)._lastProcessedScoreData = processedData;
       
       // Hiển thị modal xác nhận
       setModalVisible(true);
@@ -259,53 +287,22 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
     setConfirmLoading(true);
     
     try {
-      // Lấy token xác thực
-      const token = localStorage.getItem('NCToken') || getCookieValue('NCToken');
+      // Lấy processedData đã lưu tạm ở window
+      const processedData = (window as any)._lastProcessedScoreData;
       
-      if (!token) {
-        message.error('Bạn cần đăng nhập để lưu thông tin điểm');
-        setConfirmLoading(false);
-        return;
-      }
+      // Lưu dữ liệu vào localStorage
+      localStorage.setItem('html_score_data', JSON.stringify(processedData));
       
-      // Lưu kết quả vào localStorage trước
-      localStorage.setItem('html_score_data', JSON.stringify(parsedData));
-      
-      try {
-        // Gửi dữ liệu đã được xác nhận lên server - có thể bỏ qua phần này nếu API chưa sẵn sàng
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/api/scores`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            data: parsedData
-          }),
-        });
-  
-        if (!response.ok) {
-          console.warn(`API response not OK: ${response.status}`);
-          // Tiếp tục quy trình ngay cả khi API không thành công
-        }
-      } catch (apiError) {
-        console.error('API error:', apiError);
-        // Tiếp tục quy trình ngay cả khi có lỗi API
-      }
-
-      message.success('Đã lưu thông tin điểm thành công!');
-      
-      // Đóng modal
-      setModalVisible(false);
-      
-      // Gọi callback nếu có
+      // Gọi callback khi upload thành công
       if (onUploadSuccess) {
-        onUploadSuccess(parsedData);
+        onUploadSuccess(processedData);
       }
       
+      message.success('Đã lưu điểm thành công!');
+      setModalVisible(false);
     } catch (error) {
-      console.error('Confirm upload error:', error);
-      message.error('Lỗi khi lưu thông tin điểm');
+      console.error('Error saving score data:', error);
+      message.error('Có lỗi xảy ra khi lưu điểm!');
     } finally {
       setConfirmLoading(false);
     }
