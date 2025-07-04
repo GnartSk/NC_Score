@@ -205,6 +205,16 @@ const CATEGORY_OPTIONS = [
   { value: 'Tự chọn', label: 'Tự chọn' },
 ];
 
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    const part = parts.pop();
+    return part ? part.split(';').shift() : null;
+  }
+  return null;
+}
+
 export default function SubjectTable({ 
   title, 
   category,
@@ -343,85 +353,52 @@ export default function SubjectTable({
 
   useEffect(() => {
     setLoading(true);
-    // Kiểm tra xem có dữ liệu từ file HTML đã được upload không
-    if (category === 'Tất cả') {
-      // Lấy dữ liệu cho tất cả các category
-      const allCategories = CATEGORY_OPTIONS.map(opt => opt.value);
-      const allData: Subject[] = [];
-      
-      allCategories.forEach(cat => {
-        const storedData = typeof window !== 'undefined' ? getScoreDataFromLocalStorage(cat) : null;
-        if (storedData) {
-          allData.push(...storedData);
+    const userToken = getCookie('NCToken');
+    fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/profile`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+      .then(res => res.json())
+      .then(res => {
+        const scores = res.data?.scores || [];
+        // Map lại các trường cho columns
+        let allSubjects = (scores as any[]).map((subj: any) => {
+          const tk = subj.TK || subj.total;
+          let status = 'Chưa học';
+          if (tk === 'Miễn') status = 'Miễn';
+          else if (tk === 'Hoãn thi') status = 'Hoãn thi';
+          else if (tk === '&nbsp;' || tk === '' || tk === undefined || tk === null) status = 'Đang học';
+          else if (!isNaN(Number(tk))) status = parseFloat(tk) >= 5 ? 'Hoàn thành' : 'Rớt';
+          return {
+            ...subj,
+            code: subj.subjectCode || subj.code,
+            name: subj.subjectName || subj.name,
+            credits: subj.credit || subj.credits,
+            qt: subj.QT || subj.qt,
+            th: subj.TH || subj.th,
+            gk: subj.GK || subj.gk,
+            ck: subj.CK || subj.ck,
+            total: tk,
+            status,
+          };
+        });
+        if (category !== 'Tất cả') {
+          allSubjects = allSubjects.filter((subj: any) => getCategoryFromCode(subj.code) === category);
         }
-      });
-
-      if (allData.length > 0) {
-        setData(allData);
-        setLoading(false);
-      } else {
-        // Nếu không có dữ liệu từ localStorage, lấy từ API
-        Promise.all(allCategories.map(cat => fetchScoreData(cat)))
-          .then(results => {
-            const combinedData = results.flat();
-            if (combinedData.length > 0) {
-              setData(combinedData);
-            } else {
-              setData(mockData);
-            }
-          })
-          .catch(() => {
-            setData(mockData);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      }
-    } else {
-      const storedData = typeof window !== 'undefined' ? getScoreDataFromLocalStorage(category) : null;
-      if (storedData) {
-        setData(storedData);
-        setLoading(false);
-      } else {
-        fetchScoreData(category)
-          .then(apiData => {
-            if (apiData && apiData.length > 0) {
-              setData(apiData);
-            } else {
-              setData(mockData.filter(item => item.category === category));
-            }
-          })
-          .catch(error => {
-            setData(mockData.filter(item => item.category === category));
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      }
-    }
-  }, [category]);
-
-  // Hàm lấy dữ liệu điểm từ API
-  const fetchScoreData = async (category: string): Promise<Subject[]> => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/scores?category=${category}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.data || [];
-    } catch (error) {
-      console.error('Error fetching score data:', error);
-      return [];
-    }
-  };
+        setData(allSubjects);
+        // Tính tổng số tín chỉ đã học được (các môn có status 'Hoàn thành')
+        if (onCreditsChange) {
+          const earnedCredits = allSubjects
+            .filter((item: any) => item.status === 'Hoàn thành')
+            .reduce((sum: number, item: any) => sum + (Number(item.credits) || 0), 0);
+          onCreditsChange(earnedCredits);
+        }
+      })
+      .catch(() => setData([]))
+      .finally(() => setLoading(false));
+  }, [category, onCreditsChange]);
 
   // Lấy danh sách môn đang học từ ICS
   const currentSubjects = typeof window !== 'undefined' ? getCurrentSubjectObjects() : [];
@@ -466,26 +443,6 @@ export default function SubjectTable({
       return acc;
     }, {} as Record<string, any>)
   );
-
-  // Tính tổng số tín chỉ đã học được (các môn có status 'Hoàn thành')
-  useEffect(() => {
-    if (Array.isArray(uniqueData)) {
-      const earnedCredits = uniqueData
-        .filter(item => {
-          // Tính lại status dựa vào TK
-          let status = 'Chưa học';
-          if (item.total === 'Miễn') status = 'Miễn';
-          else if (item.total === 'Hoãn thi') status = 'Hoãn thi';
-          else if (item.total === '&nbsp;' || item.total === '' || item.total === undefined || item.total === null) status = 'Đang học';
-          else if (!isNaN(Number(item.total))) status = parseFloat(item.total) >= 5 ? 'Hoàn thành' : 'Rớt';
-          return status === 'Hoàn thành';
-        })
-        .reduce((sum, item) => sum + (Number(item.credits) || 0), 0);
-      if (onCreditsChange) {
-        onCreditsChange(earnedCredits);
-      }
-    }
-  }, [uniqueData, onCreditsChange]);
 
   if (!isClient) return null;
 

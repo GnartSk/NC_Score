@@ -44,7 +44,7 @@ export class ScoreService {
 
     const isNotExits = await this.isSubjectCodeNotExits(subjectCode, subjectName, credit, semester);
 
-    const updateData: any = { status };
+    const updateData: any = { status, subjectName, credit, semester };
     if (QT !== undefined && !isNaN(QT)) updateData.QT = QT;
     if (TH !== undefined && !isNaN(TH)) updateData.TH = TH;
     if (GK !== undefined && !isNaN(GK)) updateData.GK = GK;

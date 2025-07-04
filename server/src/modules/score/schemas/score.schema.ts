@@ -44,7 +44,13 @@ export class Score {
   @Prop({ type: String, required: true })
   subjectCode: string;
 
-  @Prop ()
+  @Prop({ type: String, required: true })
+  subjectName: string;
+
+  @Prop({ type: String, required: true })
   semester: string;
+
+  @Prop({ type: Number, required: true })
+  credit: number;
 }
 export const ScoreSchema = SchemaFactory.createForClass(Score);

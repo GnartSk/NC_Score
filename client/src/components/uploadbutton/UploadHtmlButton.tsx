@@ -107,13 +107,12 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   // Hàm xử lý dữ liệu từ API để phân loại theo category
   const processApiData = (apiData: any) => {
     const categorizedData: { [key: string]: any[] } = {
-      'Toán - Tin học': [],
-      'Môn lý luận chính trị': [],
+      'Toán - Tin học - Khoa học tự nhiên': [],
+      'Môn lý luận chính trị và pháp luật': [],
       'Ngoại ngữ': [],
-      'Đại cương': [],
       'Cơ sở ngành': [],
       'Chuyên ngành': [],
-      'Tự chọn': []
+      'Môn học khác': []
     };
 
     const semesterData: { [key: string]: any[] } = {};
@@ -129,18 +128,18 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
           if (semesterInfo && Array.isArray(semesterInfo.subjects)) {
             semesterInfo.subjects.forEach((subject: any, index: number) => {
               // Xác định category dựa vào mã môn học
-              let category = 'Tự chọn'; // Default category
+              let category = 'Môn học khác'; // Default category
               const code = subject.subjectCode || '';
               
               console.log(`Processing subject: ${code} - ${subject.subjectName}`);
               
               // Môn lý luận chính trị
-              if (code.startsWith('SS')) {
-                category = 'Môn lý luận chính trị';
+              if (code.startsWith('SS') && code !== 'SS004') {
+                category = 'Môn lý luận chính trị và pháp luật';
               } 
               // Toán - Tin học - Khoa học tự nhiên (thuộc đại cương)
               else if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') {
-                category = 'Toán - Tin học';
+                category = 'Toán - Tin học - Khoa học tự nhiên';
               }
               // Ngoại ngữ (thuộc đại cương)
               else if (code.startsWith('EN')) {
@@ -153,16 +152,12 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
                 category = 'Cơ sở ngành';
               }
               // Chuyên ngành - tất cả mã NT khác 
-              else if (code.startsWith('NT') && 
-                      !code.startsWith('NT0') && 
-                      !code.startsWith('NT1') && !code.startsWith('NT2')) {
+              else if (code.startsWith('NT5') || code.startsWith('NT4') || (code === 'NT209')) {
                 category = 'Chuyên ngành';
               }
-              else if (code === 'NT209') {
-                category = 'Chuyên ngành';
-              }
+            
               else if (code.startsWith('NT2')) {
-                category = 'Tự chọn';
+                category = 'Môn học khác';
               }
               
               console.log(`Categorized as: ${category}`);
