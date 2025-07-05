@@ -185,24 +185,24 @@ const getCurrentSubjectObjects = (): { code: string, name: string }[] => {
 };
 
 function getCategoryFromCode(code: string | undefined) {
-  if (!code || typeof code !== 'string') return 'Tự chọn';
-  if (code.startsWith('SS')) return 'Môn lý luận chính trị';
-  if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học';
+  if (!code || typeof code !== 'string') return 'Môn học khác';
+  if (code.startsWith('SS') && code !== 'SS004') return 'Môn lý luận chính trị và pháp luật';
+  if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học - Khoa học tự nhiên';
   if (code.startsWith('EN')) return 'Ngoại ngữ';
   if ((code.startsWith('IT') && code !== 'IT001' ) || code.startsWith('NT0') || code.startsWith('NT1') ) return 'Cơ sở ngành';
   if (code === 'NT209') return 'Chuyên ngành';
-  if (code.startsWith('NT2')) return 'Tự chọn';
+  if (code.startsWith('NT2')) return 'Môn học khác';
   if (code.startsWith('NT')) return 'Chuyên ngành';
-  return 'Tự chọn';
+  return 'Môn học khác';
 }
 
 const CATEGORY_OPTIONS = [
-  { value: 'Môn lý luận chính trị', label: 'Môn lý luận chính trị' },
-  { value: 'Toán - Tin học', label: 'Toán - Tin học' },
+  { value: 'Môn lý luận chính trị và pháp luật', label: 'Môn lý luận chính trị và pháp luật' },
+  { value: 'Toán - Tin học - Khoa học tự nhiên', label: 'Toán - Tin học - Khoa học tự nhiên' },
   { value: 'Ngoại ngữ', label: 'Ngoại ngữ' },
   { value: 'Cơ sở ngành', label: 'Cơ sở ngành' },
   { value: 'Chuyên ngành', label: 'Chuyên ngành' },
-  { value: 'Tự chọn', label: 'Tự chọn' },
+  { value: 'Môn học khác', label: 'Môn học khác' },
 ];
 
 function getCookie(name: string) {
@@ -230,9 +230,28 @@ export default function SubjectTable({
   const [data, setData] = useState<Subject[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(category);
+  const [currentSubjectObjects, setCurrentSubjectObjects] = useState<{ code: string, name: string }[]>([]);
 
   useEffect(() => {
     setIsClient(true);
+    // Lấy danh sách môn đang học từ localStorage khi ở client
+    if (typeof window !== 'undefined') {
+      try {
+        const codes = localStorage.getItem('current_subject_codes');
+        if (codes) {
+          const arr = JSON.parse(codes);
+          if (arr.length && typeof arr[0] === 'object') {
+            setCurrentSubjectObjects(arr);
+          } else {
+            setCurrentSubjectObjects(arr.map((code: string) => ({ code, name: '' })));
+          }
+        } else {
+          setCurrentSubjectObjects([]);
+        }
+      } catch {
+        setCurrentSubjectObjects([]);
+      }
+    }
   }, []);
 
   const columns: ColumnsType<Subject> = [
@@ -258,8 +277,7 @@ export default function SubjectTable({
       render: (value, record) => {
         // Nếu value rỗng hoặc value là mã môn, tìm tên từ ICS
         if (value && value !== record.code) return value;
-        const currentSubjects = typeof window !== 'undefined' ? getCurrentSubjectObjects() : [];
-        const found = currentSubjects.find(subj => subj.code === record.code);
+        const found = currentSubjectObjects.find(subj => subj.code === record.code);
         return found && found.name ? found.name : value || record.code;
       }
     },
@@ -463,12 +481,12 @@ export default function SubjectTable({
   // Lấy tổng số tín chỉ của category
   const getTotalCredits = (category: string) => {
     switch(category) {
-      case 'Môn lý luận chính trị': return 13;
-      case 'Toán - Tin học': return 22;
+      case 'Môn lý luận chính trị và pháp luật': return 13;
+      case 'Toán - Tin học - Khoa học tự nhiên': return 22;
       case 'Ngoại ngữ': return 12;
       case 'Cơ sở ngành': return 49;
       case 'Chuyên ngành': return 12;
-      case 'Tự chọn': return 6;
+      case 'Môn học khác': return 8;
       default: return 0;
     }
   };

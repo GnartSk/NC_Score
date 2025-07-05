@@ -180,7 +180,7 @@ export class ScoreService {
         if (credit === undefined) continue;
         const scoreData: any = {
           subjectCode: subj.code || subj.subjectCode,
-          subjectName: subj.name,
+          subjectName: subj.subjectName || subj.name,
           credit,
           semester: subj.semester || 'Học kỳ mới nhất',
           status: 'Đang học',

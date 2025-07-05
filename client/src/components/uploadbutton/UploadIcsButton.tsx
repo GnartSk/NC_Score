@@ -66,14 +66,19 @@ const UploadIcsButton = () => {
         console.log('[DEBUG] Mã môn được thêm vào trạng thái đang học:', filteredArr.map(subj => (subj.code || subj.subjectCode || '').toString().toUpperCase().trim()));
         if (filteredArr.length > 0) {
           const categorizedCodes = filteredArr.map(subj => ({
-            ...subj,
+            subjectCode: subj.code,
+            subjectName: subj.name,
+            credit: subj.credit || 0,
+            status: 'Đang học',
+            
             category: getCategoryFromCode(subj.code)
           }));
           console.log('Saving to localStorage:', categorizedCodes);
           localStorage.setItem('current_subject_codes', JSON.stringify(categorizedCodes));
+          // Tự động lưu tất cả các môn lên database
+          await uploadAllScoreToServer();
           message.success(`Đã upload file lịch học và cập nhật ${filteredArr.length} môn đang học!`);
           message.info('Đã cập nhật trạng thái điểm từ file ICS. Vui lòng kiểm tra lại bảng điểm!');
-          uploadAllScoreToServer();
           window.location.reload();
         } else {
           message.info('Tất cả các môn trong file ICS đã có điểm, không có môn mới để cập nhật.');

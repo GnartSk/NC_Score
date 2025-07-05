@@ -11,12 +11,12 @@ import './scoreTabCustom.css';
 
 const CATEGORY_OPTIONS = [
   { value: 'Tất cả', label: 'Tất cả' },
-  { value: 'Môn lý luận chính trị', label: 'Môn lý luận chính trị', totalCredits: 13 },
-  { value: 'Toán - Tin học', label: 'Toán - Tin học', totalCredits: 22 },
+  { value: 'Môn lý luận chính trị và pháp luật', label: 'Môn lý luận chính trị và pháp luật', totalCredits: 13 },
+  { value: 'Toán - Tin học - Khoa học tự nhiên', label: 'Toán - Tin học - Khoa học tự nhiên', totalCredits: 22 },
   { value: 'Ngoại ngữ', label: 'Ngoại ngữ', totalCredits: 12 },
   { value: 'Cơ sở ngành', label: 'Cơ sở ngành', totalCredits: 49 },
   { value: 'Chuyên ngành', label: 'Chuyên ngành', totalCredits: 12 },
-  { value: 'Tự chọn', label: 'Tự chọn', totalCredits: 6 },
+  { value: 'Môn học khác', label: 'Môn học khác', totalCredits: 6 },
 ];
 
 export default function SubjectsPage() {
