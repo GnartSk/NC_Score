@@ -198,7 +198,12 @@ export class ScoreService {
     const earnedCredits = allScores
       .filter(item => item.status === 'Hoàn thành' || item.status === 'Miễn')
       .reduce((sum, item) => sum + (Number(item.credit) || 0), 0);
-    await this.userModel.findByIdAndUpdate(userId, { earnedCredits });
+    
+    // Update cumulativePoint (GPA) if present
+    const cumulativePoint = body.cumulativePoint !== undefined ? body.cumulativePoint : undefined;
+    const updateFields: any = { earnedCredits };
+    if (cumulativePoint !== undefined) updateFields.cumulativePoint = cumulativePoint;
+    await this.userModel.findByIdAndUpdate(userId, updateFields);
     return { message: 'Upload all scores success' };
   }
 }

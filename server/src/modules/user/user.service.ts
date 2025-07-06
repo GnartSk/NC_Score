@@ -88,6 +88,7 @@ export class UserService {
       course: user.course,
       major: user.major,
       earnedCredits: user.earnedCredits,
+      cumulativePoint: user.cumulativePoint,
     };
   }
 

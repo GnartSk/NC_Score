@@ -357,14 +357,16 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
     }
     try {
       // Lọc lại dữ liệu semesters nếu cần (giữ nguyên logic cũ)
-      const rawSemesters = htmlScoreData ? JSON.parse(htmlScoreData).semesters : {};
+      const rawData = htmlScoreData ? JSON.parse(htmlScoreData) : {};
+      const rawSemesters = rawData.semesters || {};
+      const cumulativePoint = rawData.cumulativePoint;
       const semesters: Record<string, any> = {};
       Object.entries(rawSemesters).forEach(([key, value]) => {
         if (value && Array.isArray((value as any).subjects)) {
           semesters[key] = { subjects: (value as any).subjects };
         }
       });
-      // Gửi chỉ trường semesters
+      // Gửi cả cumulativePoint lên backend
       const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/allScore`, {
         method: 'POST',
         headers: {
@@ -373,6 +375,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
         },
         body: JSON.stringify({
           semesters,
+          cumulativePoint,
         }),
       });
       if (res.ok) {

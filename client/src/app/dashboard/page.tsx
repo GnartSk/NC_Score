@@ -16,6 +16,7 @@ interface Profile {
     course?: string;
     major?: string;
     earnedCredits?: number;
+    cumulativePoint?: number;
 }
 
 const DashboardPage = () => {
@@ -89,7 +90,7 @@ const DashboardPage = () => {
                         <StatsCard value="6" label="Kì học" bgColor="bg-blue-100" />
                         <StatsCard value={remainingCredits} label="Số tín chỉ còn lại" bgColor="bg-orange-300" />
                         <StatsCard value={earnedCredits} label="Số tín chỉ hoàn thành" bgColor="bg-teal-300" />
-                        <StatsCard value="7.52" label="GPA" bgColor="bg-blue-100" />
+                        <StatsCard value={profile?.cumulativePoint !== undefined ? profile.cumulativePoint.toFixed(2) : '--'} label="GPA" bgColor="bg-blue-100" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

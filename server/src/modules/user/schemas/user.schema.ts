@@ -59,5 +59,8 @@ export class User {
 
   @Prop({ default: 0 })
   earnedCredits: number;
+
+  @Prop({ default: 0 })
+  cumulativePoint: number; // GPA
 }
 export const UserSchema = SchemaFactory.createForClass(User);
