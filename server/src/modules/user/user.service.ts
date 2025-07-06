@@ -173,7 +173,9 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
+    if (!user.course || !user.major) {
+      throw new NotFoundException('Course selection not found');
+    }
     return {
       course: user.course,
       major: user.major

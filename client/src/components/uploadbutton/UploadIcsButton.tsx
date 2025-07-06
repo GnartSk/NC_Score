@@ -2,6 +2,9 @@
 import { Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { getCookie } from 'cookies-next';
+import { isGroupSubject } from '@/utils/groupSubjectMap';
+import { getCourseSelection } from '@/utils/courseUtils';
+
 function getCategoryFromCode(code: string) {
   if (code.startsWith('SS')) return 'Môn lý luận chính trị';
   if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học';
@@ -54,6 +57,9 @@ const UploadIcsButton = () => {
             console.log('[DEBUG] Mã môn đã có điểm:', scoredCodes);
           }
         } catch (e) { console.warn('Error reading html_score_data:', e); }
+        // Lấy ngành học hiện tại
+        const courseSelection = getCourseSelection();
+        const major = courseSelection?.major || '';
         // Lọc các môn chưa có điểm, normalize mã môn
         const filteredArr = Array.isArray(arr)
           ? arr.filter(subj => {
@@ -65,14 +71,28 @@ const UploadIcsButton = () => {
         console.log('[DEBUG] Mã môn từ ICS:', Array.isArray(arr) ? arr.map(subj => (subj.code || subj.subjectCode || '').toString().toUpperCase().trim()) : []);
         console.log('[DEBUG] Mã môn được thêm vào trạng thái đang học:', filteredArr.map(subj => (subj.code || subj.subjectCode || '').toString().toUpperCase().trim()));
         if (filteredArr.length > 0) {
-          const categorizedCodes = filteredArr.map(subj => ({
-            subjectCode: subj.code,
-            subjectName: subj.name,
-            credit: subj.credit || 0,
-            status: 'Đang học',
-            
-            category: getCategoryFromCode(subj.code)
-          }));
+          const categorizedCodes = filteredArr.map(subj => {
+            const code = subj.code;
+            let category = 'Tự chọn';
+            if (isGroupSubject('Cơ sở ngành', major, code)) {
+              category = 'Cơ sở ngành';
+            } else if (isGroupSubject('Chuyên ngành', major, code)) {
+              category = 'Chuyên ngành';
+            } else if (code.startsWith('SS')) {
+              category = 'Môn lý luận chính trị';
+            } else if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') {
+              category = 'Toán - Tin học';
+            } else if (code.startsWith('EN')) {
+              category = 'Ngoại ngữ';
+            }
+            return {
+              subjectCode: code,
+              subjectName: subj.name,
+              credit: subj.credit || 0,
+              status: 'Đang học',
+              category
+            };
+          });
           console.log('Saving to localStorage:', categorizedCodes);
           localStorage.setItem('current_subject_codes', JSON.stringify(categorizedCodes));
           // Tự động lưu tất cả các môn lên database

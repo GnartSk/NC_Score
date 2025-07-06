@@ -45,8 +45,14 @@ const CourseSelectionPage = () => {
 
         setLoading(true);
         try {
+            // Lấy tên ngành đúng với DTO
+            const selectedMajor = majors.find(m => m.id === selection.major)?.name || selection.major;
+            const payload = {
+                course: selection.course,
+                major: selectedMajor
+            };
             // Lưu lựa chọn vào localStorage
-            setCourseSelection(selection);
+            setCourseSelection(payload);
             
             // Gửi lên server để lưu vào database
             if (token) {
@@ -56,7 +62,7 @@ const CourseSelectionPage = () => {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`
                     },
-                    body: JSON.stringify(selection)
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {

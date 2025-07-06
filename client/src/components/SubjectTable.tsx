@@ -364,20 +364,24 @@ export default function SubjectTable({
       dataIndex: 'status',
       key: 'status',
       align: 'center',
-      render: (status) => (
-        <Tag 
-          color={
-            status === 'Hoàn thành' ? 'green' :
-            status === 'Rớt' ? 'red' :
-            status === 'Miễn' ? 'blue' :
-            status === 'Đang học' ? 'gold' :
-            status === 'Hoãn thi' ? 'orange' : 'default'
-          }
-          className="rounded-full px-3"
-        >
-          {status}
-        </Tag>
-      ),
+      render: (status) => {
+        if (status === 'Miễn') {
+          return <Tag color="blue" className="rounded-full px-3">Miễn</Tag>;
+        }
+        return (
+          <Tag 
+            color={
+              status === 'Hoàn thành' ? 'green' :
+              status === 'Rớt' ? 'red' :
+              status === 'Đang học' ? 'gold' :
+              status === 'Hoãn thi' ? 'orange' : 'default'
+            }
+            className="rounded-full px-3"
+          >
+            {status}
+          </Tag>
+        );
+      },
     },
   ];
 
@@ -537,15 +541,6 @@ export default function SubjectTable({
             <span className="font-bold">{earnedCredits}/{getTotalCredits(category)}</span>
           </div>
         </div>
-        {courseSelection && (
-          <div className="text-sm text-gray-500">
-            <span className="font-medium">Khóa: </span>
-            <span>{courseSelection.course}</span>
-            <span className="mx-2">|</span>
-            <span className="font-medium">Ngành: </span>
-            <span>{courseSelection.major}</span>
-          </div>
-        )}
       </div>
       <Table
         columns={columns}
