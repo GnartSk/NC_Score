@@ -21,7 +21,7 @@ const CourseSelectionPage = () => {
 
     const majors = [
         { id: 'ATTT', name: getMajorDisplayName('An toàn thông tin') },
-        { id: 'MMT', name: getMajorDisplayName('Mạng máy tính và truyền thông dữ liệu') }
+        { id: 'MMT', name: getMajorDisplayName('Mạng máy tính & Truyền thông dữ liệu') }
     ];
 
     useEffect(() => {
