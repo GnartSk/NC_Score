@@ -28,7 +28,7 @@ function getCookie(name: string) {
   return null;
 }
 
-export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?: '10' | '4' }) {
+export default function SemesterScoreTable({ scoreScale = '10', userId }: { scoreScale?: '10' | '4'; userId?: string }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{[key: string]: any[]}>({});
 
@@ -145,12 +145,20 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
 
   useEffect(() => {
     setLoading(true);
-    const userToken = getCookie('NCToken');
-    fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/profile`, {
+    let url = '';
+    let headers: any = {};
+    if (userId) {
+      url = `${process.env.NEXT_PUBLIC_BackendURL}/score/user/${userId}`;
+      const token = getCookie('NCToken');
+      headers = { Authorization: `Bearer ${token}` };
+    } else {
+      url = `${process.env.NEXT_PUBLIC_BackendURL}/score/profile`;
+      const userToken = getCookie('NCToken');
+      headers = { Authorization: `Bearer ${userToken}` };
+    }
+    fetch(url, {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
+      headers,
     })
       .then(res => res.json())
       .then(res => {
@@ -176,7 +184,7 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
       })
       .catch(() => setData({}))
       .finally(() => setLoading(false));
-  }, []);
+  }, [userId, scoreScale]);
 
   return (
     <div className="space-y-8">

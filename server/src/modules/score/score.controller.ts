@@ -29,6 +29,11 @@ export class ScoreController {
     return this.scoreService.findAllOfUser(req.user._id);
   }
 
+  @Get('user/:userId')
+  findAllScoreOfUser(@Param('userId') userId: string) {
+    return this.scoreService.findAllOfUser(userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.scoreService.findOne(id);

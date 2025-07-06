@@ -55,8 +55,8 @@ export class UserService {
     const { page = 1, limit = 10 } = paginationDto;
     const skip = (page - 1) * limit;
 
-    const users = await this.userModel.find().skip(skip).limit(limit);
-    const total = await this.userModel.countDocuments();
+    const users = await this.userModel.find({ role: 'USER' }).skip(skip).limit(limit);
+    const total = await this.userModel.countDocuments({ role: 'USER' });
 
     return {
       users,
