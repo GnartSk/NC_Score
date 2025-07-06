@@ -4,6 +4,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import { convertScore10to4 } from '@/utils/scoreConvert';
 import { getCourseSelection } from '@/utils/courseUtils';
+import { isGroupSubject } from '@/utils/groupSubjectMap';
 
 interface Subject {
   id: number | string;
@@ -146,12 +147,12 @@ const getScoreDataFromLocalStorage = (category: string): Subject[] | null => {
 
       // Lọc theo khóa học và ngành học nếu có
       const courseSelection = getCourseSelection();
-      if (courseSelection) {
-        allSubjects = allSubjects.filter(subj => {
-          // Logic lọc theo khóa học và ngành học
-          // Có thể thêm logic phức tạp hơn ở đây
-          return true; // Tạm thời return true, có thể mở rộng sau
-        });
+      const major = courseSelection?.major;
+      if (major && category === 'Chuyên ngành') {
+        allSubjects = allSubjects.filter(subj => isGroupSubject('Chuyên ngành', major, subj.code));
+      }
+      if (major && category === 'Cơ sở ngành') {
+        allSubjects = allSubjects.filter(subj => isGroupSubject('Cơ sở ngành', major, subj.code));
       }
 
       if (category === 'Tất cả') return allSubjects;
@@ -202,7 +203,6 @@ function getCategoryFromCode(code: string | undefined) {
   if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') return 'Toán - Tin học - Khoa học tự nhiên';
   if (code.startsWith('EN')) return 'Ngoại ngữ';
   if ((code.startsWith('IT') && code !== 'IT001' ) || code.startsWith('NT0') || code.startsWith('NT1') ) return 'Cơ sở ngành';
-  if (code === 'NT209') return 'Chuyên ngành';
   if (code.startsWith('NT2')) return 'Môn học khác';
   if (code.startsWith('NT')) return 'Chuyên ngành';
   return 'Môn học khác';
