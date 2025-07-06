@@ -37,9 +37,5 @@ export const getCourseDisplayName = (courseId: string): string => {
 };
 
 export const getMajorDisplayName = (majorId: string): string => {
-    const majorMap: { [key: string]: string } = {
-        'ATTT': 'An toàn thông tin',
-        'MMT': 'Mạng máy tính & Truyền thông dữ liệu'
-    };
-    return majorMap[majorId] || majorId;
+    return majorId || '';
 }; 

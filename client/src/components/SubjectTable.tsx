@@ -227,6 +227,21 @@ function getCookie(name: string) {
   return null;
 }
 
+async function fetchUserMajor(): Promise<string | null> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
+    if (!token) return null;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.data?.major || null;
+  } catch {
+    return null;
+  }
+}
+
 export default function SubjectTable({ 
   title, 
   category,
@@ -243,6 +258,7 @@ export default function SubjectTable({
   const [isClient, setIsClient] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(category);
   const [currentSubjectObjects, setCurrentSubjectObjects] = useState<{ code: string, name: string }[]>([]);
+  const [major, setMajor] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -264,6 +280,8 @@ export default function SubjectTable({
         setCurrentSubjectObjects([]);
       }
     }
+    // Lấy ngành học từ API
+    fetchUserMajor().then(setMajor);
   }, []);
 
   const columns: ColumnsType<Subject> = [
@@ -541,6 +559,15 @@ export default function SubjectTable({
             <span className="font-bold">{earnedCredits}/{getTotalCredits(category)}</span>
           </div>
         </div>
+        {courseSelection && (
+          <div className="text-sm text-gray-500">
+            <span className="font-medium">Khóa: </span>
+            <span>-</span>
+            <span className="mx-2">|</span>
+            <span className="font-medium">Ngành: </span>
+            <span>{major || '-'}</span>
+          </div>
+        )}
       </div>
       <Table
         columns={columns}

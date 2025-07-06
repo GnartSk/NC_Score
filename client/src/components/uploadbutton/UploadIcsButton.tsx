@@ -4,6 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { getCookie } from 'cookies-next';
 import { isGroupSubject } from '@/utils/groupSubjectMap';
 import { getCourseSelection } from '@/utils/courseUtils';
+import { useEffect, useState } from 'react';
 
 function getCategoryFromCode(code: string) {
   if (code.startsWith('SS')) return 'Môn lý luận chính trị';
@@ -14,7 +15,28 @@ function getCategoryFromCode(code: string) {
   return 'Tự chọn';
 }
 
+// Hàm lấy ngành học từ API
+async function fetchUserMajor(): Promise<string | null> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
+    if (!token) return null;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.data?.major || null;
+  } catch {
+    return null;
+  }
+}
+
 const UploadIcsButton = () => {
+  const [major, setMajor] = useState<string | null>(null);
+  useEffect(() => {
+    fetchUserMajor().then(setMajor);
+  }, []);
+
   const beforeUpload = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -57,9 +79,6 @@ const UploadIcsButton = () => {
             console.log('[DEBUG] Mã môn đã có điểm:', scoredCodes);
           }
         } catch (e) { console.warn('Error reading html_score_data:', e); }
-        // Lấy ngành học hiện tại
-        const courseSelection = getCourseSelection();
-        const major = courseSelection?.major || '';
         // Lọc các môn chưa có điểm, normalize mã môn
         const filteredArr = Array.isArray(arr)
           ? arr.filter(subj => {
@@ -74,9 +93,14 @@ const UploadIcsButton = () => {
           const categorizedCodes = filteredArr.map(subj => {
             const code = subj.code;
             let category = 'Tự chọn';
-            if (isGroupSubject('Cơ sở ngành', major, code)) {
+            let status = 'Đang học';
+            // Nếu có logic phát hiện môn miễn từ ICS, set status = 'Miễn'
+            if (subj.TK === 'Miễn' || subj.status === 'Miễn') {
+              status = 'Miễn';
+            }
+            if (isGroupSubject('Cơ sở ngành', major || '', code)) {
               category = 'Cơ sở ngành';
-            } else if (isGroupSubject('Chuyên ngành', major, code)) {
+            } else if (isGroupSubject('Chuyên ngành', major || '', code)) {
               category = 'Chuyên ngành';
             } else if (code.startsWith('SS')) {
               category = 'Môn lý luận chính trị';
@@ -89,7 +113,7 @@ const UploadIcsButton = () => {
               subjectCode: code,
               subjectName: subj.name,
               credit: subj.credit || 0,
-              status: 'Đang học',
+              status,
               category
             };
           });

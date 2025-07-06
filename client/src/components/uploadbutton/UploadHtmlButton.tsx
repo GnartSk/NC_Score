@@ -1,7 +1,7 @@
 'use client';
 import { Button, Upload, message, Modal, Table, Tabs, Space } from 'antd';
 import { UploadOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import { getCookie } from 'cookies-next';
 import { isGroupSubject } from '@/utils/groupSubjectMap';
@@ -37,6 +37,22 @@ const getCookieValue = (name: string): string | null => {
   }
 };
 
+// Hàm lấy ngành học từ API
+async function fetchUserMajor(): Promise<string | null> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
+    if (!token) return null;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.data?.major || null;
+  } catch {
+    return null;
+  }
+}
+
 const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   const [loading, setLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -44,6 +60,11 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   const [parsedData, setParsedData] = useState<{[key: string]: Subject[]}>({});
   const [activeTab, setActiveTab] = useState('political');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [major, setMajor] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchUserMajor().then(setMajor);
+  }, []);
 
   // Cấu hình cột cho bảng xác nhận
   const columns: ColumnsType<Subject> = [
@@ -138,9 +159,9 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
               const code = subject.subjectCode || '';
               
               // Ưu tiên kiểm tra theo ngành
-              if (isGroupSubject('Cơ sở ngành', major, code)) {
+              if (isGroupSubject('Cơ sở ngành', major || '', code)) {
                 category = 'Cơ sở ngành';
-              } else if (isGroupSubject('Chuyên ngành', major, code)) {
+              } else if (isGroupSubject('Chuyên ngành', major || '', code)) {
                 category = 'Chuyên ngành';
               } else if (code.startsWith('SS') && code !== 'SS004') {
                 category = 'Môn lý luận chính trị và pháp luật';
@@ -175,7 +196,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
                 th: subject.TH ? parseFloat(subject.TH) : undefined,
                 gk: subject.GK ? parseFloat(subject.GK) : undefined,
                 ck: subject.CK ? parseFloat(subject.CK) : undefined,
-                total: subject.TK ? parseFloat(subject.TK) : undefined,
+                total: subject.TK ? (subject.TK === 'Miễn' ? 'Miễn' : parseFloat(subject.TK)) : undefined,
                 status: status,
                 category: category,
                 semester: semester
