@@ -15,12 +15,23 @@ interface Profile {
     avatar: string;
     course?: string;
     major?: string;
+    earnedCredits?: number;
 }
 
 const DashboardPage = () => {
     const [profile, setProfile] = useState<Profile | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [earnedCredits, setEarnedCredits] = useState(0);
+    const [remainingCredits, setRemainingCredits] = useState(0);
+
+    // Hàm lấy tổng tín chỉ ngành
+    function getTotalCreditsByMajor(major: string | undefined) {
+      if (!major) return 130;
+      if (major.toLowerCase().includes('mạng máy tính & truyền thông dữ liệu')) return 130;
+      if (major.toLowerCase().includes('an toàn thông tin')) return 129;
+      return 130;
+    }
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -28,6 +39,13 @@ const DashboardPage = () => {
         let storedToken = getCookie('NCToken') as string | undefined;
         setToken(storedToken ?? null);
     }, []);
+
+    useEffect(() => {
+        if (profile?.earnedCredits !== undefined) {
+            setEarnedCredits(profile.earnedCredits);
+            setRemainingCredits(getTotalCreditsByMajor(profile.major) - profile.earnedCredits);
+        }
+    }, [profile]);
 
     const getProfile = useCallback(async (userToken: string) => {
         setLoading(true);
@@ -69,8 +87,8 @@ const DashboardPage = () => {
 
                     <div className="bg-white p-6 rounded-lg shadow-md flex justify-around">
                         <StatsCard value="6" label="Kì học" bgColor="bg-blue-100" />
-                        <StatsCard value="30" label="Số tín chỉ còn lại" bgColor="bg-orange-300" />
-                        <StatsCard value="91" label="Số tín chỉ hoàn thành" bgColor="bg-teal-300" />
+                        <StatsCard value={remainingCredits} label="Số tín chỉ còn lại" bgColor="bg-orange-300" />
+                        <StatsCard value={earnedCredits} label="Số tín chỉ hoàn thành" bgColor="bg-teal-300" />
                         <StatsCard value="7.52" label="GPA" bgColor="bg-blue-100" />
                     </div>
 

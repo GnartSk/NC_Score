@@ -372,6 +372,7 @@ export default function SubjectTable({
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
+        if (value === 'Miễn') return 'Miễn';
         const score = typeof value === 'string' ? parseFloat(value) : value;
         if (isNaN(score)) return '-';
         return scoreScale === '4' ? convertScore10to4(score).toFixed(1) : score.toFixed(1);
@@ -417,6 +418,21 @@ export default function SubjectTable({
         const scores = res.data?.scores || [];
         // Map lại các trường cho columns
         let allSubjects = (scores as any[]).map((subj: any) => {
+          // Nếu status là 'Miễn' từ database, ưu tiên lấy luôn
+          if (subj.status === 'Miễn') {
+            return {
+              ...subj,
+              code: subj.subjectCode || subj.code,
+              name: subj.subjectName || subj.name,
+              credits: subj.credit || subj.credits,
+              qt: subj.QT || subj.qt,
+              th: subj.TH || subj.th,
+              gk: subj.GK || subj.gk,
+              ck: subj.CK || subj.ck,
+              total: 'Miễn',
+              status: 'Miễn',
+            };
+          }
           const tk = subj.TK || subj.total;
           let status = 'Chưa học';
           if (tk === 'Miễn') status = 'Miễn';
@@ -443,7 +459,7 @@ export default function SubjectTable({
         // Tính tổng số tín chỉ đã học được (các môn có status 'Hoàn thành')
         if (onCreditsChange) {
           const earnedCredits = allSubjects
-            .filter((item: any) => item.status === 'Hoàn thành')
+            .filter((item: any) => item.status === 'Hoàn thành' || item.status === 'Miễn')
             .reduce((sum: number, item: any) => sum + (Number(item.credits) || 0), 0);
           onCreditsChange(earnedCredits);
         }
@@ -507,7 +523,7 @@ export default function SubjectTable({
           else if (item.total === 'Hoãn thi') status = 'Hoãn thi';
           else if (item.total === '&nbsp;' || item.total === '' || item.total === undefined || item.total === null) status = 'Đang học';
           else if (!isNaN(Number(item.total))) status = parseFloat(item.total) >= 5 ? 'Hoàn thành' : 'Rớt';
-          return status === 'Hoàn thành';
+          return status === 'Hoàn thành' || status === 'Miễn';
         })
         .reduce((sum, item) => sum + (Number(item.credits) || 0), 0)
     : 0;
@@ -581,3 +597,5 @@ export default function SubjectTable({
     </div>
   );
 }
+
+export { getScoreDataFromLocalStorage };

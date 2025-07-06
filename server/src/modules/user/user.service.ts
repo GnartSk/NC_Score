@@ -66,7 +66,29 @@ export class UserService {
   }
 
   async findOne(_id: string) {
-    return await this.userModel.findOne({ _id });
+    const user = await this.userModel.findOne({ _id });
+    if (!user) return null;
+    return {
+      _id: user._id,
+      gmail: user.gmail,
+      username: user.username,
+      fullName: user.fullName,
+      avatar: user.avatar,
+      role: user.role,
+      codeId: user.codeId,
+      codeExpired: user.codeExpired,
+      birth: user.birth,
+      gender: user.gender,
+      studentId: user.studentId,
+      isActive: user.isActive,
+      academicYear: user.academicYear,
+      specialized: user.specialized,
+      cumulativeCredit: user.cumulativeCredit,
+      cumulativeScore: user.cumulativeScore,
+      course: user.course,
+      major: user.major,
+      earnedCredits: user.earnedCredits,
+    };
   }
 
   async findByGmail(gmail: string) {

@@ -193,6 +193,12 @@ export class ScoreService {
         await this.create(scoreData, userId);
       }
     }
+    // Sau khi lưu xong hết điểm, cập nhật earnedCredits cho user
+    const allScores = await this.scoreModel.find({ idStudent: userId });
+    const earnedCredits = allScores
+      .filter(item => item.status === 'Hoàn thành' || item.status === 'Miễn')
+      .reduce((sum, item) => sum + (Number(item.credit) || 0), 0);
+    await this.userModel.findByIdAndUpdate(userId, { earnedCredits });
     return { message: 'Upload all scores success' };
   }
 }

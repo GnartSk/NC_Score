@@ -56,5 +56,8 @@ export class User {
 
   @Prop()
   major: string; // An toàn thông tin, Mạng máy tính & Truyền thông dữ liệu
+
+  @Prop({ default: 0 })
+  earnedCredits: number;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
