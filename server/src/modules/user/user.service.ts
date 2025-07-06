@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 import { PaginationDto } from './dto/pagination.dto';
+import { CourseSelectionDto } from './dto/course-selection.dto';
 
 @Injectable()
 export class UserService {
@@ -164,5 +165,36 @@ export class UserService {
     await user.save();
 
     return true;
+  }
+
+  async getCourseSelection(userId: string) {
+    const user = await this.userModel.findById(userId);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      course: user.course,
+      major: user.major
+    };
+  }
+
+  async setCourseSelection(userId: string, courseSelectionDto: CourseSelectionDto) {
+    const user = await this.userModel.findById(userId);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.course = courseSelectionDto.course;
+    user.major = courseSelectionDto.major;
+    
+    await user.save();
+    
+    return {
+      course: user.course,
+      major: user.major
+    };
   }
 }

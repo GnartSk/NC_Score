@@ -3,6 +3,7 @@ import { Table, Tag, Spin, message, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import { convertScore10to4 } from '@/utils/scoreConvert';
+import { getCourseSelection } from '@/utils/courseUtils';
 
 interface Subject {
   id: number | string;
@@ -142,6 +143,17 @@ const getScoreDataFromLocalStorage = (category: string): Subject[] | null => {
           status,
         };
       });
+
+      // Lọc theo khóa học và ngành học nếu có
+      const courseSelection = getCourseSelection();
+      if (courseSelection) {
+        allSubjects = allSubjects.filter(subj => {
+          // Logic lọc theo khóa học và ngành học
+          // Có thể thêm logic phức tạp hơn ở đây
+          return true; // Tạm thời return true, có thể mở rộng sau
+        });
+      }
+
       if (category === 'Tất cả') return allSubjects;
       return allSubjects.filter(subj => getCategoryFromCode(subj.code) === category);
     }
@@ -512,14 +524,28 @@ export default function SubjectTable({
       })
     : [];
 
+  // Lấy thông tin khóa học và ngành học
+  const courseSelection = getCourseSelection();
+
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm">
-      <div className="flex items-center mb-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <div className="text-gray-600 ml-10">
-          <span className="font-medium">Tín chỉ: </span>
-          <span className="font-bold">{earnedCredits}/{getTotalCredits(category)}</span>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <h2 className="text-lg font-semibold">{title}</h2>
+          <div className="text-gray-600 ml-10">
+            <span className="font-medium">Tín chỉ: </span>
+            <span className="font-bold">{earnedCredits}/{getTotalCredits(category)}</span>
+          </div>
         </div>
+        {courseSelection && (
+          <div className="text-sm text-gray-500">
+            <span className="font-medium">Khóa: </span>
+            <span>{courseSelection.course}</span>
+            <span className="mx-2">|</span>
+            <span className="font-medium">Ngành: </span>
+            <span>{courseSelection.major}</span>
+          </div>
+        )}
       </div>
       <Table
         columns={columns}

@@ -18,7 +18,7 @@ const AuthPage = () => {
             setCookie('NCToken', token, { maxAge: 3 * 60 * 60, path: '/' });
 
             // Chuyển hướng đến dashboard
-            router.replace('/dashboard');
+            router.replace('/course-selection');
         } else {
             // Không có token -> quay về login
             router.replace('/auth/login');

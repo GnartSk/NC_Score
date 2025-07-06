@@ -13,6 +13,8 @@ interface Profile {
     specialized: string;
     gmail: string;
     avatar: string;
+    course?: string;
+    major?: string;
 }
 
 const DashboardPage = () => {
@@ -62,7 +64,7 @@ const DashboardPage = () => {
                 <div className="col-span-2 flex flex-col space-y-4">
                     <div className="flex items-center bg-gradient-to-r from-blue-400 to-blue-200 p-6 rounded-lg shadow-md">
                         <h1 className="text-3xl text-white font-bold">Xin chào, {profile?.fullName}! 👋</h1>
-                        <img src="/School.svg" className="h-24 object-contain ml-auto" alt="School" />
+                        <img src="/School.svg" className="h-24 object-contain ml-4" alt="School" />
                     </div>
 
                     <div className="bg-white p-6 rounded-lg shadow-md flex justify-around">
@@ -84,7 +86,8 @@ const DashboardPage = () => {
                         avatar={profile?.avatar}
                         name={profile?.fullName}
                         studentId={profile?.studentId}
-                        major={profile?.specialized}
+                        major={profile?.major}
+                        course={profile?.course}
                         email={profile?.gmail}
                     />
                 </div>

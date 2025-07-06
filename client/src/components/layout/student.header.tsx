@@ -8,6 +8,7 @@ import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
 import { signOut } from "next-auth/react";
 import { getCookie, deleteCookie } from 'cookies-next';
+import { getCourseSelection, getCourseDisplayName, getMajorDisplayName } from '@/utils/courseUtils';
 
 interface Profile {
     fullName: string;
@@ -56,6 +57,7 @@ const StudentHeader = (props: any) => {
             // Xóa dữ liệu điểm khỏi localStorage khi đăng xuất
             localStorage.removeItem('html_score_data');
             localStorage.removeItem('current_subject_codes');
+            localStorage.removeItem('userCourseSelection');
             localStorage.removeItem('NCToken');
             deleteCookie('NCToken');
             await signOut({ redirect: false }).catch((error: any) => {
@@ -92,6 +94,7 @@ const StudentHeader = (props: any) => {
 
     // Ưu tiên hiển thị tên từ profile, nếu không có thì dùng từ session, hoặc giá trị mặc định
     const displayName = profile?.fullName || session?.user?.name || "Người dùng";
+    const courseSelection = getCourseSelection();
 
     return (
         <>
@@ -104,16 +107,25 @@ const StudentHeader = (props: any) => {
                     alignItems: "center"
                 }} >
 
-                <Button
-                    type="text"
-                    icon={collapseMenu ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                    onClick={() => setCollapseMenu(!collapseMenu)}
-                    style={{
-                         fontSize: '16px',
-                         width: 64,
-                         height: 64,
-                     }}
-                />
+                <div className="flex items-center">
+                    <Button
+                        type="text"
+                        icon={collapseMenu ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                        onClick={() => setCollapseMenu(!collapseMenu)}
+                        style={{
+                             fontSize: '16px',
+                             width: 64,
+                             height: 64,
+                         }}
+                    />
+                    {courseSelection && (
+                        <div className="ml-4 text-sm text-gray-600">
+                            <span className="font-medium">{getCourseDisplayName(courseSelection.course)}</span>
+                            <span className="mx-2">•</span>
+                            <span className="font-medium">{getMajorDisplayName(courseSelection.major)}</span>
+                        </div>
+                    )}
+                </div>
                 <Dropdown menu={{ items }} >
                     <a onClick={(e) => e.preventDefault()}
                         style={{ color: "unset", lineHeight: "0 !important", marginRight: 20 }}

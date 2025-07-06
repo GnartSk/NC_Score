@@ -14,11 +14,13 @@ import type { MenuProps } from 'antd';
 import Link from 'next/link'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGraduationCap } from "@fortawesome/free-solid-svg-icons/faGraduationCap";
+import { getCourseSelection, getCourseDisplayName, getMajorDisplayName } from '@/utils/courseUtils';
 
 type MenuItem = Required<MenuProps>['items'][number];
 const StudentSideBar = () => {
     const { Sider } = Layout;
     const { collapseMenu } = useContext(StudentContext)!;
+    const courseSelection = getCourseSelection();
 
     const items: MenuItem[] = [
 
@@ -67,7 +69,15 @@ const StudentSideBar = () => {
         <Sider
             collapsed={collapseMenu}
         >
-
+            {courseSelection && !collapseMenu && (
+                <div className="p-4 bg-blue-50 border-b border-blue-200">
+                    <div className="text-xs text-blue-600 font-medium mb-1">Thông tin học tập</div>
+                    <div className="text-xs text-blue-800">
+                        <div>{getCourseDisplayName(courseSelection.course)}</div>
+                        <div>{getMajorDisplayName(courseSelection.major)}</div>
+                    </div>
+                </div>
+            )}
             <Menu
                 mode="inline"
                 defaultSelectedKeys={['dashboard']}
