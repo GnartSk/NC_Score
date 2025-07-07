@@ -28,6 +28,28 @@ function getCookie(name: string) {
   return null;
 }
 
+// Hàm so sánh học kỳ dạng "Học kỳ X - Năm học YYYY-YYYY" hoặc "Học kỳ X YYYY-YYYY"
+function compareSemester(a: string, b: string): number {
+  const parse = (s: string) => {
+    // Chỉ bắt định dạng 'Học kỳ X - Năm học YYYY-YYYY'
+    const match = s.match(/Học kỳ\s*(\d)[\s-]*Năm học\s*(\d{4})[- ]?(\d{4})?/);
+    if (!match) return null;
+    const hk = parseInt(match[1]);
+    const y1 = parseInt(match[2]);
+    const y2 = parseInt(match[3] || match[2]);
+    return { hk, y1, y2 };
+  };
+  const sa = parse(a);
+  const sb = parse(b);
+  if (!sa || !sb) return 0;
+  // So sánh năm học mới nhất trước
+  if (sa.y2 !== sb.y2) return sa.y2 - sb.y2;
+  if (sa.y1 !== sb.y1) return sa.y1 - sb.y1;
+  // Nếu cùng năm, học kỳ 2 trước học kỳ 1
+  if (sa.hk !== sb.hk) return sa.hk - sb.hk;
+  return 0;
+}
+
 export default function SemesterScoreTable({ scoreScale = '10', userId }: { scoreScale?: '10' | '4'; userId?: string }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{[key: string]: any[]}>({});
@@ -188,21 +210,23 @@ export default function SemesterScoreTable({ scoreScale = '10', userId }: { scor
 
   return (
     <div className="space-y-8">
-      {Object.entries(data).map(([semester, subjects]) => (
-        <div key={semester} className="p-4 bg-white rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">{semester}</h2>
-          <Table
-            columns={columns}
-            dataSource={subjects}
-            loading={loading}
-            pagination={false}
-            scroll={{ x: 1000 }}
-            rowKey={(record) => `${semester}-${record.code}-${record.id || Math.random().toString(36).substring(2, 9)}`}
-            className="antd-custom-table"
-            rowClassName={(record) => record.status === 'Rớt' ? 'bg-red-100' : ''}
-          />
-        </div>
-      ))}
+      {Object.entries(data)
+        .sort(([a], [b]) => compareSemester(b, a))
+        .map(([semester, subjects]) => (
+          <div key={semester} className="p-4 bg-white rounded-lg shadow-sm">
+            <h2 className="text-lg font-semibold mb-4">{semester}</h2>
+            <Table
+              columns={columns}
+              dataSource={subjects}
+              loading={loading}
+              pagination={false}
+              scroll={{ x: 1000 }}
+              rowKey={(record) => `${semester}-${record.code}-${record.id || Math.random().toString(36).substring(2, 9)}`}
+              className="antd-custom-table"
+              rowClassName={(record) => record.status === 'Rớt' ? 'bg-red-100' : ''}
+            />
+          </div>
+        ))}
       {Object.keys(data).length === 0 && !loading && (
         <div className="text-center text-gray-500 py-8">
           Chưa có dữ liệu điểm học kỳ. Vui lòng tải lên file điểm để xem.
