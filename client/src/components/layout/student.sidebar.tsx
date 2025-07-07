@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGraduationCap } from "@fortawesome/free-solid-svg-icons/faGraduationCap";
 import { getCourseSelection, getCourseDisplayName, getMajorDisplayName } from '@/utils/courseUtils';
+import Image from 'next/image';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -47,7 +48,13 @@ const StudentSideBar = () => {
 
         {
             key: 'grp',
-            label: 'NC Score',
+            label: (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 32 }}>
+                    <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image src="/LogoUIT.svg" alt="Logo UIT" width={32} height={32} priority />
+                    </Link>
+                </div>
+            ),
             type: 'group',
             children: [
                 {
