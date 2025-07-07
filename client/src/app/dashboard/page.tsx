@@ -44,15 +44,12 @@ const DashboardPage = () => {
         const currentMonth = now.getMonth() + 1; // 1-12
         let yearsPassed = currentYear - startYear;
         let semester;
-        if (currentMonth >= 9 || currentMonth === 1) {
-            // Kỳ lẻ: tháng 9-12 hoặc tháng 1
-            semester = yearsPassed * 2 + 1;
-        } else if (currentMonth >= 2 && currentMonth <= 7) {
-            // Kỳ chẵn: tháng 2-7
-            semester = yearsPassed * 2 + 2;
-        } else if (currentMonth === 8) {
-            // Tháng 8 vẫn tính là kỳ 2 của năm trước
-            semester = yearsPassed * 2 + 2;
+        if (currentMonth >= 9 && currentMonth <= 12) {
+            // Kỳ 1: tháng 9-12
+            semester = yearsPassed * 2 +1 ;
+        } else if (currentMonth >= 1 && currentMonth <= 8) {
+            // Kỳ 2: tháng 1-8
+            semester = yearsPassed * 2;
         } else {
             semester = '--';
         }
