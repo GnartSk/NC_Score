@@ -51,11 +51,22 @@ export class ScoreService {
     if (CK !== undefined && !isNaN(CK)) updateData.CK = CK;
     if (TK !== undefined && !isNaN(TK)) updateData.TK = TK;
 
-    const score = await this.scoreModel.findOneAndUpdate(
-      { subjectCode, idStudent: userId },
-      updateData,
-      { upsert: true, new: true },
-    );
+    // Nếu đã có bản ghi mã môn với status 'Rớt' cho user này thì luôn tạo bản ghi mới
+    const hasFailed = await this.scoreModel.exists({ subjectCode, idStudent: userId, status: 'Rớt' });
+    let score;
+    if (hasFailed) {
+      score = await this.scoreModel.create({
+        ...updateData,
+        subjectCode,
+        idStudent: userId,
+      });
+    } else {
+      score = await this.scoreModel.findOneAndUpdate(
+        { subjectCode, idStudent: userId },
+        updateData,
+        { upsert: true, new: true },
+      );
+    }
 
     if (isNotExits)
       return {

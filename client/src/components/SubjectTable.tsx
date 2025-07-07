@@ -247,11 +247,13 @@ export default function SubjectTable({
   category,
   onCreditsChange,
   scoreScale = '10',
+  viewType = 'curriculum',
 }: { 
   title: string; 
   category: string;
   onCreditsChange?: (credits: number) => void;
   scoreScale?: '10' | '4';
+  viewType?: 'curriculum' | 'semester';
 }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Subject[]>([]);
@@ -512,11 +514,38 @@ export default function SubjectTable({
     }, {} as Record<string, any>)
   );
 
+  let filteredData: any[] = [];
+  if (viewType === 'curriculum') {
+    // Chỉ giữ bản ghi ưu tiên nhất cho mỗi mã môn
+    filteredData = Array.isArray(uniqueData)
+      ? Object.values(
+          (uniqueData as any[]).reduce((acc, item) => {
+            const code = item.code;
+            let status: StatusType = 'Rớt';
+            if (item.total === 'Miễn') status = 'Hoàn thành';
+            else if (item.total === 'Hoãn thi') status = 'Đang học';
+            else if (item.total === '&nbsp;' || item.total === '' || item.total === undefined || item.total === null) status = 'Đang học';
+            else if (!isNaN(Number(item.total))) status = parseFloat(item.total) >= 5 ? 'Hoàn thành' : 'Rớt';
+            if (!acc[code] || (priority[status as StatusType] > priority[acc[code].__status as StatusType])) {
+              acc[code] = { ...item, __status: status };
+            }
+            return acc;
+          }, {} as Record<string, any>)
+        ).map((item: any) => {
+          const { __status, ...rest } = item;
+          return rest;
+        })
+      : [];
+  } else {
+    // Hiển thị tất cả bản ghi (theo học kỳ)
+    filteredData = Array.isArray(uniqueData) ? uniqueData : [];
+  }
+
   if (!isClient) return null;
 
   // Tính tổng số tín chỉ đã học được
-  const earnedCredits = Array.isArray(uniqueData)
-    ? uniqueData
+  const earnedCredits = Array.isArray(filteredData)
+    ? filteredData
         .filter(item => {
           let status = 'Chưa học';
           if (item.total === 'Miễn') status = 'Miễn';
@@ -541,27 +570,6 @@ export default function SubjectTable({
     }
   };
 
-  // Lọc dữ liệu: Nếu có nhiều môn cùng mã, chỉ giữ lại bản ghi có status là 'Hoàn thành' hoặc 'Đang học', loại bỏ các bản ghi 'Rớt' nếu đã có bản ghi khác cùng mã không phải 'Rớt'
-  const filteredData = Array.isArray(uniqueData)
-    ? uniqueData.filter((item, idx, arr) => {
-        let status = 'Chưa học';
-        if (item.total === 'Miễn') status = 'Miễn';
-        else if (item.total === 'Hoãn thi') status = 'Hoãn thi';
-        else if (item.total === '&nbsp;' || item.total === '' || item.total === undefined || item.total === null) status = 'Đang học';
-        else if (!isNaN(Number(item.total))) status = parseFloat(item.total) >= 5 ? 'Hoàn thành' : 'Rớt';
-        if (status !== 'Rớt') return true;
-        // Nếu là 'Rớt', chỉ giữ nếu không có bản ghi cùng code với status khác 'Rớt'
-        return !arr.some(other => {
-          let otherStatus = 'Chưa học';
-          if (other.total === 'Miễn') otherStatus = 'Miễn';
-          else if (other.total === 'Hoãn thi') otherStatus = 'Hoãn thi';
-          else if (other.total === '&nbsp;' || other.total === '' || other.total === undefined || other.total === null) otherStatus = 'Đang học';
-          else if (!isNaN(Number(other.total))) otherStatus = parseFloat(other.total) >= 5 ? 'Hoàn thành' : 'Rớt';
-          return other.code === item.code && otherStatus !== 'Rớt';
-        });
-      })
-    : [];
-
   // Lấy thông tin khóa học và ngành học
   const courseSelection = getCourseSelection();
 
@@ -579,7 +587,7 @@ export default function SubjectTable({
       </div>
       <Table
         columns={columns}
-        dataSource={category === 'Tất cả' ? uniqueData : uniqueData.filter(item => getCategoryFromCode(item.code) === category)}
+        dataSource={category === 'Tất cả' ? filteredData : filteredData.filter(item => getCategoryFromCode(item.code) === category)}
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}
