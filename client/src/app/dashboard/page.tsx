@@ -17,6 +17,7 @@ interface Profile {
     major?: string;
     earnedCredits?: number;
     cumulativePoint?: number;
+    academicYear?: number;
 }
 
 const DashboardPage = () => {
@@ -32,6 +33,30 @@ const DashboardPage = () => {
       if (major.toLowerCase().includes('mạng máy tính & truyền thông dữ liệu')) return 130;
       if (major.toLowerCase().includes('an toàn thông tin')) return 129;
       return 130;
+    }
+
+    // Hàm tính học kỳ hiện tại
+    function getCurrentSemester(academicYear?: number) {
+        if (!academicYear) return '--';
+        const now = new Date();
+        const startYear = academicYear;
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1; // 1-12
+        let yearsPassed = currentYear - startYear;
+        let semester;
+        if (currentMonth >= 9 || currentMonth === 1) {
+            // Kỳ lẻ: tháng 9-12 hoặc tháng 1
+            semester = yearsPassed * 2 + 1;
+        } else if (currentMonth >= 2 && currentMonth <= 7) {
+            // Kỳ chẵn: tháng 2-7
+            semester = yearsPassed * 2 + 2;
+        } else if (currentMonth === 8) {
+            // Tháng 8 vẫn tính là kỳ 2 của năm trước
+            semester = yearsPassed * 2 + 2;
+        } else {
+            semester = '--';
+        }
+        return semester;
     }
 
     useEffect(() => {
@@ -87,7 +112,7 @@ const DashboardPage = () => {
                     </div>
 
                     <div className="bg-white p-6 rounded-lg shadow-md flex justify-around">
-                        <StatsCard value="6" label="Kì học" bgColor="bg-blue-100" />
+                        <StatsCard value={getCurrentSemester(profile?.academicYear)} label="Kì học" bgColor="bg-blue-100" />
                         <StatsCard value={remainingCredits} label="Số tín chỉ còn lại" bgColor="bg-orange-300" />
                         <StatsCard value={earnedCredits} label="Số tín chỉ hoàn thành" bgColor="bg-teal-300" />
                         <StatsCard value={profile?.cumulativePoint !== undefined ? profile.cumulativePoint.toFixed(2) : '--'} label="GPA" bgColor="bg-blue-100" />

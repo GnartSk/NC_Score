@@ -20,7 +20,7 @@ const AdminSidebar = () => {
             label: (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 64 }}>
                     <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Image src="/LogoUIT.svg" alt="Logo UIT" width={32} height={32} priority />
+                        <Image src="/LogoUIT.svg" alt="Logo UIT" width={64} height={64} priority />
                     </Link>
                 </div>
             ),
