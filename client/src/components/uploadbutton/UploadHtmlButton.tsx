@@ -53,6 +53,14 @@ async function fetchUserMajor(): Promise<string | null> {
   }
 }
 
+// Hàm chuẩn hóa tên ngành về đúng key trong groupSubjectMap
+function normalizeMajor(major: string) {
+  if (!major) return '';
+  if (major.toLowerCase().includes('an toàn thông tin')) return 'An toàn thông tin';
+  if (major.toLowerCase().includes('mạng máy tính')) return 'Mạng máy tính & Truyền thông dữ liệu';
+  return major;
+}
+
 const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   const [loading, setLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -60,10 +68,14 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   const [parsedData, setParsedData] = useState<{[key: string]: Subject[]}>({});
   const [activeTab, setActiveTab] = useState('political');
   const [refreshKey, setRefreshKey] = useState(0);
-  const [major, setMajor] = useState<string | null>(null);
+  const [major, setMajor] = useState<string>('');
 
   useEffect(() => {
-    fetchUserMajor().then(setMajor);
+    // Lấy ngành học từ localStorage (chỉ chạy ở client)
+    if (typeof window !== 'undefined') {
+      const courseSelection = getCourseSelection();
+      setMajor(normalizeMajor(courseSelection?.major || ''));
+    }
   }, []);
 
   // Cấu hình cột cho bảng xác nhận
@@ -94,31 +106,51 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       title: 'QT',
       dataIndex: 'qt',
       key: 'qt',
-      render: val => val || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'TH',
       dataIndex: 'th',
       key: 'th',
-      render: val => val || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'GK',
       dataIndex: 'gk',
       key: 'gk',
-      render: val => val || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'CK',
       dataIndex: 'ck',
       key: 'ck',
-      render: val => val || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'TK',
       dataIndex: 'total',
       key: 'total',
-      render: val => val?.toFixed(1) || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'TT',
@@ -140,9 +172,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
 
     const semesterData: { [key: string]: any[] } = {};
 
-    // Lấy ngành học hiện tại
-    const courseSelection = getCourseSelection();
-    const major = courseSelection?.major || '';
+    // Dùng biến major từ state (đã lấy ở useEffect)
 
     // Xử lý dữ liệu theo mẫu API trả về
     try {
@@ -159,9 +189,9 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
               const code = subject.subjectCode || '';
               
               // Ưu tiên kiểm tra theo ngành
-              if (isGroupSubject('Cơ sở ngành', major || '', code)) {
+              if (isGroupSubject('Cơ sở ngành', major, code)) {
                 category = 'Cơ sở ngành';
-              } else if (isGroupSubject('Chuyên ngành', major || '', code)) {
+              } else if (isGroupSubject('Chuyên ngành', major, code)) {
                 category = 'Chuyên ngành';
               } else if (code.startsWith('SS') && code !== 'SS004') {
                 category = 'Môn lý luận chính trị và pháp luật';

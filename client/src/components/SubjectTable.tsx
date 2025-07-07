@@ -575,15 +575,7 @@ export default function SubjectTable({
             <span className="font-bold">{earnedCredits}/{getTotalCredits(category)}</span>
           </div>
         </div>
-        {courseSelection && (
-          <div className="text-sm text-gray-500">
-            <span className="font-medium">Khóa: </span>
-            <span>-</span>
-            <span className="mx-2">|</span>
-            <span className="font-medium">Ngành: </span>
-            <span>{major || '-'}</span>
-          </div>
-        )}
+        
       </div>
       <Table
         columns={columns}
