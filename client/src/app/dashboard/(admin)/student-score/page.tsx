@@ -254,7 +254,7 @@ const StudentScore = () => {
                           <span className="font-medium text-gray-800">
                             {user.fullName}
                           </span>
-                                                     {user._id === scoreUserId && (
+                              {user._id === scoreUserId && (
                              <Tag color="blue">Đang xem</Tag>
                            )}
                         </div>

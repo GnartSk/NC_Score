@@ -51,6 +51,22 @@ export class ScoreService {
     if (CK !== undefined && !isNaN(CK)) updateData.CK = CK;
     if (TK !== undefined && !isNaN(TK)) updateData.TK = TK;
 
+    // Nếu đã có bản ghi trùng hoàn toàn thì không tạo mới
+    const existed = await this.scoreModel.findOne({
+      subjectCode,
+      idStudent: userId,
+      status,
+      QT,
+      TH,
+      GK,
+      CK,
+      TK,
+      credit,
+      semester,
+    });
+    if (existed) {
+      return existed;
+    }
     // Nếu đã có bản ghi mã môn với status 'Rớt' cho user này thì luôn tạo bản ghi mới
     const hasFailed = await this.scoreModel.exists({ subjectCode, idStudent: userId, status: 'Rớt' });
     let score;

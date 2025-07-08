@@ -36,11 +36,6 @@ const AdminSidebar = () => {
                     label: <Link href={'/dashboard/subject-managerment'}>Quản lý môn học</Link>,
                     icon: <AppstoreOutlined />,
                 },
-                {
-                    key: 'report',
-                    label: <Link href={'/dashboard/report'}>Thông báo lỗi</Link>,
-                    icon: <FaCircleExclamation />,
-                },
             ],
         },
     ];

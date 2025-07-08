@@ -18,6 +18,7 @@ interface Profile {
     earnedCredits?: number;
     cumulativePoint?: number;
     academicYear?: number;
+    role?: string;
 }
 
 const DashboardPage = () => {
@@ -115,10 +116,13 @@ const DashboardPage = () => {
                         <StatsCard value={profile?.cumulativePoint !== undefined ? profile.cumulativePoint.toFixed(2) : '--'} label="GPA" bgColor="bg-blue-100" />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Upload buttons chỉ hiện với user thường */}
+                    {profile?.role !== 'ADMIN' && (
+                      <div className="grid grid-cols-2 gap-4">
                         <UploadButtons label="Tải lên thời khóa biểu" icon="📅" />
                         <UploadButtons label="Tải lên bảng điểm sinh viên" icon="🆔" />
-                    </div>
+                      </div>
+                    )}
                 </div>
 
                 <div className="col-span-1 flex flex-col space-y-4">
