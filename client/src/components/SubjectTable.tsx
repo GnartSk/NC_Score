@@ -1,7 +1,7 @@
 'use client';
 import { Table, Tag, Spin, message, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { convertScore10to4 } from '@/utils/scoreConvert';
 import { getCourseSelection } from '@/utils/courseUtils';
 import { isGroupSubject } from '@/utils/groupSubjectMap';
@@ -212,8 +212,8 @@ const CATEGORY_OPTIONS = [
   { value: 'Môn lý luận chính trị và pháp luật', label: 'Môn lý luận chính trị và pháp luật' },
   { value: 'Toán - Tin học - Khoa học tự nhiên', label: 'Toán - Tin học - Khoa học tự nhiên' },
   { value: 'Ngoại ngữ', label: 'Ngoại ngữ' },
-  { value: 'Cơ sở ngành', label: 'Cơ sở ngành' },
-  { value: 'Chuyên ngành', label: 'Chuyên ngành' },
+  { value: 'Nhóm các môn học cơ sở ngành', label: 'Nhóm các môn học cơ sở ngành' },
+  { value: 'Nhóm các môn học chuyên ngành', label: 'Nhóm các môn học chuyên ngành' },
   { value: 'Môn học khác', label: 'Môn học khác' },
 ];
 
@@ -242,6 +242,24 @@ async function fetchUserMajor(): Promise<string | null> {
   }
 }
 
+// Thêm hàm lấy CTĐT từ backend
+async function fetchTrainingProgram(major: string, course: string) {
+  try {
+    console.log('[CTĐT] Fetching training program for major:', major, 'course:', course);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/training-program?major=${major}&course=${course}`);
+    if (!res.ok) {
+      console.warn('[CTĐT] Failed to fetch training program for major:', major, 'course:', course, 'Status:', res.status);
+      return null;
+    }
+    const data = await res.json();
+    console.log('[CTĐT] Subjects fetched:', Array.isArray(data.data?.subjects) ? data.data.subjects.length : 0);
+    return data.data?.subjects || [];
+  } catch (err) {
+    console.error('[CTĐT] Error fetching training program:', err);
+    return null;
+  }
+}
+
 export default function SubjectTable({ 
   title, 
   category,
@@ -261,6 +279,8 @@ export default function SubjectTable({
   const [selectedCategory, setSelectedCategory] = useState(category);
   const [currentSubjectObjects, setCurrentSubjectObjects] = useState<{ code: string, name: string }[]>([]);
   const [major, setMajor] = useState<string | null>(null);
+  const [course, setCourse] = useState<string | null>(null);
+  const [trainingProgram, setTrainingProgram] = useState<any[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -284,7 +304,34 @@ export default function SubjectTable({
     }
     // Lấy ngành học từ API
     fetchUserMajor().then(setMajor);
+    // Lấy khóa học từ localStorage (giả sử lưu trong courseSelection)
+    const courseSelection = getCourseSelection();
+    setCourse(courseSelection?.course || null);
   }, []);
+
+  // Lấy CTĐT khi có major và course
+  useEffect(() => {
+    if (major && course) {
+      console.log('[CTĐT] useEffect: major =', major, ', course =', course);
+      fetchTrainingProgram(major, course).then((subjects) => {
+        setTrainingProgram(subjects || []);
+      });
+    } else {
+      console.warn('[CTĐT] useEffect: Missing major or course. major =', major, ', course =', course);
+    }
+  }, [major, course]);
+
+  // Hàm lấy category từ CTĐT
+  function getCategoryFromTrainingProgram(code: string) {
+    const found = trainingProgram.find(subj => subj.code === code);
+    return found ? found.category : 'Môn học khác';
+  }
+
+  // Lấy các category từ CTĐT
+  const CATEGORY_OPTIONS = useMemo(() => {
+    const cats = Array.from(new Set(trainingProgram.map(subj => subj.category)));
+    return cats.map(cat => ({ value: cat, label: cat }));
+  }, [trainingProgram]);
 
   const columns: ColumnsType<Subject> = [
     {
@@ -404,6 +451,13 @@ export default function SubjectTable({
         );
       },
     },
+    {
+      title: 'NHÓM MÔN',
+      dataIndex: 'category',
+      key: 'category',
+      align: 'center',
+      render: (_, record) => getCategoryFromTrainingProgram(record.code)
+    },
   ];
 
   useEffect(() => {
@@ -420,7 +474,6 @@ export default function SubjectTable({
         const scores = res.data?.scores || [];
         // Map lại các trường cho columns
         let allSubjects = (scores as any[]).map((subj: any) => {
-          // Nếu status là 'Miễn' từ database, ưu tiên lấy luôn
           if (subj.status === 'Miễn') {
             return {
               ...subj,
@@ -454,11 +507,8 @@ export default function SubjectTable({
             status,
           };
         });
-        if (category !== 'Tất cả') {
-          allSubjects = allSubjects.filter((subj: any) => getCategoryFromCode(subj.code) === category);
-        }
+        // KHÔNG filter theo category ở đây nữa
         setData(allSubjects);
-        // Tính tổng số tín chỉ đã học được (các môn có status 'Hoàn thành')
         if (onCreditsChange) {
           const earnedCredits = allSubjects
             .filter((item: any) => item.status === 'Hoàn thành' || item.status === 'Miễn')
@@ -468,15 +518,14 @@ export default function SubjectTable({
       })
       .catch(() => setData([]))
       .finally(() => setLoading(false));
-  }, [category, onCreditsChange]);
+  }, [category, onCreditsChange, trainingProgram]);
 
   // Lấy danh sách môn đang học từ ICS
   const currentSubjects = typeof window !== 'undefined' ? getCurrentSubjectObjects() : [];
   // Gộp các môn ICS vào data bảng điểm nếu chưa có
-  // Đảm bảo chỉ hiển thị 1 bản ghi duy nhất cho mỗi mã môn: ưu tiên Hoàn thành > Đang học > Rớt
   const mergedData = [...data, ...currentSubjects
     .filter(subj => {
-      const subjCategory = getCategoryFromCode(subj.code);
+      const subjCategory = getCategoryFromTrainingProgram(subj.code);
       return (category === 'Tất cả' || subjCategory === category) && !data.some(item => item.code === subj.code);
     })
     .map(subj => ({
@@ -490,7 +539,7 @@ export default function SubjectTable({
       ck: '',
       total: '',
       status: 'Đang học',
-      category: getCategoryFromCode(subj.code),
+      category: getCategoryFromTrainingProgram(subj.code),
     }))
   ];
 
@@ -557,14 +606,14 @@ export default function SubjectTable({
         .reduce((sum, item) => sum + (Number(item.credits) || 0), 0)
     : 0;
 
-  // Lấy tổng số tín chỉ của category
+  // Lấy tổng số tín chỉ của category từ CTĐT
   const getTotalCredits = (category: string) => {
     switch(category) {
       case 'Môn lý luận chính trị và pháp luật': return 13;
       case 'Toán - Tin học - Khoa học tự nhiên': return 22;
       case 'Ngoại ngữ': return 12;
-      case 'Cơ sở ngành': return 49;
-      case 'Chuyên ngành': return 12;
+      case 'Nhóm các môn học cơ sở ngành': return 49;
+      case 'Nhóm các môn học chuyên ngành': return 12;
       case 'Môn học khác': return 8;
       default: return 0;
     }
@@ -587,7 +636,7 @@ export default function SubjectTable({
       </div>
       <Table
         columns={columns}
-        dataSource={category === 'Tất cả' ? filteredData : filteredData.filter(item => getCategoryFromCode(item.code) === category)}
+        dataSource={category === 'Tất cả' ? filteredData : filteredData.filter(item => getCategoryFromTrainingProgram(item.code) === category)}
         loading={loading}
         pagination={false}
         scroll={{ x: 1000 }}

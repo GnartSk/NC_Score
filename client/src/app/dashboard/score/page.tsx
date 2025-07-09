@@ -15,8 +15,8 @@ const CATEGORY_OPTIONS = [
   { value: 'Môn lý luận chính trị và pháp luật', label: 'Môn lý luận chính trị và pháp luật', totalCredits: 13 },
   { value: 'Toán - Tin học - Khoa học tự nhiên', label: 'Toán - Tin học - Khoa học tự nhiên', totalCredits: 22 },
   { value: 'Ngoại ngữ', label: 'Ngoại ngữ', totalCredits: 12 },
-  { value: 'Cơ sở ngành', label: 'Cơ sở ngành', totalCredits: 49 },
-  { value: 'Chuyên ngành', label: 'Chuyên ngành', totalCredits: 12 },
+  { value: 'Nhóm các môn học c ơ sở ngành', label: 'Nhóm các môn học cơ sở ngành', totalCredits: 49 },
+  { value: 'Nhóm các môn học chuyên ngành', label: 'Nhóm các môn học chuyên ngành', totalCredits: 12 },
   { value: 'Môn học khác', label: 'Môn học khác', totalCredits: 6 },
 ];
 

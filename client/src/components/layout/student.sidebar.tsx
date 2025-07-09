@@ -78,7 +78,7 @@ const StudentSideBar = () => {
                 },
                 {
                     key: 'ctdt',
-                    label: 'CTĐT',
+                    label: <Link href="/dashboard/training-program-student">CTĐT</Link>,
                     icon: <FontAwesomeIcon icon={faGraduationCap} />,
                 },
                 {

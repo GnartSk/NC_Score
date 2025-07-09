@@ -165,8 +165,8 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       'Toán - Tin học - Khoa học tự nhiên': [],
       'Môn lý luận chính trị và pháp luật': [],
       'Ngoại ngữ': [],
-      'Cơ sở ngành': [],
-      'Chuyên ngành': [],
+      'Nhóm các môn học cơ sở ngành': [],
+      'Nhóm các môn học chuyên ngành': [],
       'Môn học khác': []
     };
 
@@ -189,10 +189,10 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
               const code = subject.subjectCode || '';
               
               // Ưu tiên kiểm tra theo ngành
-              if (isGroupSubject('Cơ sở ngành', major, code)) {
-                category = 'Cơ sở ngành';
-              } else if (isGroupSubject('Chuyên ngành', major, code)) {
-                category = 'Chuyên ngành';
+              if (isGroupSubject('Nhóm các môn học cơ sở ngành', major, code)) {
+                category = 'Nhóm các môn học cơ sở ngành';
+              } else if (isGroupSubject('Nhóm các môn học chuyên ngành', major, code)) {
+                category = 'Nhóm các môn học chuyên ngành';
               } else if (code.startsWith('SS') && code !== 'SS004') {
                 category = 'Môn lý luận chính trị và pháp luật';
               } else if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') {

@@ -1,6 +1,6 @@
 // Mapping nhóm môn -> ngành -> danh sách mã môn học
 export const groupSubjectMap: Record<string, Record<string, string[]>> = {
-  "Cơ sở ngành": {
+  "Nhóm các môn học cơ sở ngành": {
     "Chung": [
       "IT002", "IT003", "IT004", "IT005", "IT006", "IT007", "NT106", "NT101", "NT132" // các môn mà mọi ngành đều học
     ],
@@ -12,7 +12,7 @@ export const groupSubjectMap: Record<string, Record<string, string[]>> = {
     ],
     // Thêm ngành mới ở đây
   },
-  "Chuyên ngành": {
+  "Nhóm các môn học chuyên ngành": {
     "An toàn thông tin": [
       "NT204", "NT330", "NT207", "NT137", "NT213", "NT334", "NT535", "NT211", "NT212", "NT534", "NT133", "NT523", "NT205"
     ],

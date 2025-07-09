@@ -98,10 +98,10 @@ const UploadIcsButton = () => {
             if (subj.TK === 'Miễn' || subj.status === 'Miễn') {
               status = 'Miễn';
             }
-            if (isGroupSubject('Cơ sở ngành', major || '', code)) {
-              category = 'Cơ sở ngành';
-            } else if (isGroupSubject('Chuyên ngành', major || '', code)) {
-              category = 'Chuyên ngành';
+            if (isGroupSubject('Nhóm các môn học cơ sở ngành', major || '', code)) {
+              category = 'Nhóm các môn học cơ sở ngành';
+            } else if (isGroupSubject('Nhóm các môn học chuyên ngành', major || '', code)) {
+              category = 'Nhóm các môn học chuyên ngành';
             } else if (code.startsWith('SS')) {
               category = 'Môn lý luận chính trị';
             } else if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') {
