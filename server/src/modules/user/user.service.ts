@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 import { PaginationDto } from './dto/pagination.dto';
+import { CourseSelectionDto } from './dto/course-selection.dto';
 
 @Injectable()
 export class UserService {
@@ -54,8 +55,8 @@ export class UserService {
     const { page = 1, limit = 10 } = paginationDto;
     const skip = (page - 1) * limit;
 
-    const users = await this.userModel.find().skip(skip).limit(limit);
-    const total = await this.userModel.countDocuments();
+    const users = await this.userModel.find({ role: 'USER' }).skip(skip).limit(limit);
+    const total = await this.userModel.countDocuments({ role: 'USER' });
 
     return {
       users,
@@ -65,7 +66,30 @@ export class UserService {
   }
 
   async findOne(_id: string) {
-    return await this.userModel.findOne({ _id });
+    const user = await this.userModel.findOne({ _id });
+    if (!user) return null;
+    return {
+      _id: user._id,
+      gmail: user.gmail,
+      username: user.username,
+      fullName: user.fullName,
+      avatar: user.avatar,
+      role: user.role,
+      codeId: user.codeId,
+      codeExpired: user.codeExpired,
+      birth: user.birth,
+      gender: user.gender,
+      studentId: user.studentId,
+      isActive: user.isActive,
+      academicYear: user.academicYear,
+      specialized: user.specialized,
+      cumulativeCredit: user.cumulativeCredit,
+      cumulativeScore: user.cumulativeScore,
+      course: user.course,
+      major: user.major,
+      earnedCredits: user.earnedCredits,
+      cumulativePoint: user.cumulativePoint,
+    };
   }
 
   async findByGmail(gmail: string) {
@@ -164,5 +188,38 @@ export class UserService {
     await user.save();
 
     return true;
+  }
+
+  async getCourseSelection(userId: string) {
+    const user = await this.userModel.findById(userId);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!user.course || !user.major) {
+      throw new NotFoundException('Course selection not found');
+    }
+    return {
+      course: user.course,
+      major: user.major
+    };
+  }
+
+  async setCourseSelection(userId: string, courseSelectionDto: CourseSelectionDto) {
+    const user = await this.userModel.findById(userId);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.course = courseSelectionDto.course;
+    user.major = courseSelectionDto.major;
+    
+    await user.save();
+    
+    return {
+      course: user.course,
+      major: user.major
+    };
   }
 }

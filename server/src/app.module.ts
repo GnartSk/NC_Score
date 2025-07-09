@@ -12,16 +12,19 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { UserModule } from '@/modules/user/user.module';
 import { AuthModule } from '@/auth/auth.module';
 import { SubjectModule } from '@/modules/subject/subject.module';
+import { IcsModule } from './modules/ics/ics.module';
 
 import { ScoreModule } from './modules/score/score.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { ReaderModule } from './modules/reader/reader.module';
+import { TrainingProgramModule } from './modules/training-program/training-program.module';
 
 @Module({
   imports: [
     UserModule,
     AuthModule,
+    IcsModule,
     SubjectModule,
     ConfigModule.forRoot({
       isGlobal: true,
@@ -79,6 +82,7 @@ import { ReaderModule } from './modules/reader/reader.module';
     ScoreModule,
     CloudinaryModule,
     ReaderModule,
+    TrainingProgramModule,
   ],
   controllers: [AppController],
   providers: [

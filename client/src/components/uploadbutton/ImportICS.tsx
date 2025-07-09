@@ -1,57 +1,77 @@
-"use client";
+// components/uploadbutton/ImportICS.tsx
+'use client';
+import { Button, message } from 'antd';
+import { useState } from 'react';
+import { parseICSContent } from '@/utils/icsHelper';
 
-import { useState } from "react";
-import { Upload, CalendarCheck } from "lucide-react";
-import BigCalendar from "../calendar/BigCalender";
-
-export default function ImportICS() {
-    const [file, setFile] = useState<File | null>(null);
-    const [events, setEvents] = useState([]);
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setFile(e.target.files[0]);
-        }
-    };
-
-    const uploadICS = async () => {
-        if (!file) return alert("Vui lòng chọn file!");
-
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const res = await fetch("/api/import-ics", { method: "POST", body: formData });
-        const data = await res.json();
-
-        // Chuyển đổi định dạng sự kiện
-        const formattedEvents = data.events.map((event: any) => ({
-            title: event.summary,
-            start: new Date(event.start),
-            end: new Date(event.end),
-        }));
-
-        setEvents(formattedEvents);
-        alert("Import file ICS thành công!");
-    };
-
-    return (
-        <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center space-y-4 border border-gray-300">
-            <label className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600 transition">
-                <Upload className="w-5 h-5 mr-2" />
-                <span>{file ? file.name : "Chọn file ICS"}</span>
-                <input type="file" accept=".ics" className="hidden" onChange={handleFileChange} />
-            </label>
-
-            <button
-                onClick={uploadICS}
-                disabled={!file}
-                className={`w-full px-4 py-2 rounded-md text-white ${file ? "bg-green-500 hover:bg-green-600" : "bg-gray-300 cursor-not-allowed"}`}
-            >
-                Import ICS
-            </button>
-
-            {/* Hiển thị lịch với dữ liệu đã import */}
-            {/* <BigCalendar importedEvents={events} /> */}
-        </div>
-    );
+interface Event {
+  title: string;
+  start: Date;
+  end: Date;
+  desc?: string;
+  location?: string;
+  allDay?: boolean;
 }
+
+interface ImportICSProps {
+  onImport: (events: Event[]) => void;
+}
+
+const ImportICS = ({ onImport }: ImportICSProps) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setLoading(true);
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const data = e.target?.result as string;
+        const calendarEvents = parseICSContent(data);
+        
+        if (calendarEvents.length) {
+          onImport(calendarEvents);
+          message.success(`Đã import ${calendarEvents.length} sự kiện thành công`);
+        } else {
+          message.warning('Không tìm thấy sự kiện nào trong file ICS');
+        }
+      } catch (error) {
+        console.error('Error parsing ICS file:', error);
+        message.error('Không thể đọc file ICS. Vui lòng kiểm tra định dạng file.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    reader.onerror = () => {
+      message.error('Lỗi khi đọc file');
+      setLoading(false);
+    };
+    
+    reader.readAsText(file);
+  };
+
+  return (
+    <div>
+      <input
+        type="file"
+        accept=".ics"
+        onChange={handleFileUpload}
+        id="ics-upload"
+        hidden
+      />
+      <Button
+        onClick={() => document.getElementById('ics-upload')?.click()}
+        loading={loading}
+        className="bg-gray-100 hover:bg-gray-200 text-gray-800"
+      >
+        Import ICS
+      </Button>
+    </div>
+  );
+};
+
+export default ImportICS;

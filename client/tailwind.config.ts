@@ -15,4 +15,12 @@ export default {
         },
     },
     plugins: [],
+    safelist: [
+        'group-hover:opacity-100',
+        'opacity-0',
+        'transition-opacity',
+        'duration-300',
+    ],
 } satisfies Config;
+
+

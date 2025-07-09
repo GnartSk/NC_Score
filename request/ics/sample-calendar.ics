@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//NC_Score//Calendar//VN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+SUMMARY:Sample Event 1
+DTSTART:20250501T100000Z
+DTEND:20250501T120000Z
+DESCRIPTION:This is a sample event for testing ICS import
+LOCATION:Test Location
+UID:sample-event-1@ncscore.com
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Sample Event 2
+DTSTART:20250502T140000Z
+DTEND:20250502T160000Z
+DESCRIPTION:This is another sample event for testing
+LOCATION:Another Location
+UID:sample-event-2@ncscore.com
+END:VEVENT
+END:VCALENDAR 

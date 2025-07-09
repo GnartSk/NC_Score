@@ -50,5 +50,17 @@ export class User {
 
   @Prop()
   cumulativeScore: string;
+
+  @Prop()
+  course: string; // K17, K18, K19
+
+  @Prop()
+  major: string; // An toàn thông tin, Mạng máy tính & Truyền thông dữ liệu
+
+  @Prop({ default: 0 })
+  earnedCredits: number;
+
+  @Prop({ default: 0 })
+  cumulativePoint: number; // GPA
 }
 export const UserSchema = SchemaFactory.createForClass(User);

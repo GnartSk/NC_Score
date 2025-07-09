@@ -1,0 +1,20 @@
+meta {
+  name: "Get All ICS Events"
+  type: http
+  seq: 2
+}
+
+get {
+  url: "{{baseUrl}}/ics/events"
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjIyNTIxNTExQGdtLnVpdC5lZHUudm4iLCJzdWIiOiI2ODE1YjEwMTNiNjllODUzYTBiNmRiYWEiLCJpYXQiOjE3NTE2MzkzNjAsImV4cCI6MTgzODAzOTM2MH0.ZPHVcrp9SwVGSMqfb0nIgYE4AXlfiF-HXvAlVpINYNc
+}
+
+docs {
+  title: "Get All ICS Events"
+  description: "Retrieve all calendar events stored in the system"
+}
