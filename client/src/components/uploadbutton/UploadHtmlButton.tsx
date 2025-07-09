@@ -61,6 +61,17 @@ function normalizeMajor(major: string) {
   return major;
 }
 
+function getMajorFromLocalStorage() {
+  try {
+    const profile = localStorage.getItem('profile');
+    if (profile) {
+      const parsed = JSON.parse(profile);
+      if (parsed.major) return parsed.major;
+    }
+  } catch {}
+  return null;
+}
+
 const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   const [loading, setLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -71,10 +82,15 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   const [major, setMajor] = useState<string>('');
 
   useEffect(() => {
-    // Lấy ngành học từ localStorage (chỉ chạy ở client)
+    // Ưu tiên lấy ngành từ localStorage profile
     if (typeof window !== 'undefined') {
-      const courseSelection = getCourseSelection();
-      setMajor(normalizeMajor(courseSelection?.major || ''));
+      const localMajor = getMajorFromLocalStorage();
+      if (localMajor) {
+        setMajor(normalizeMajor(localMajor));
+      } else {
+        const courseSelection = getCourseSelection();
+        setMajor(normalizeMajor(courseSelection?.major || ''));
+      }
     }
   }, []);
 
@@ -348,6 +364,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       setConfirmLoading(false);
     }
   };
+
 
   const handleCancelModal = () => {
     setModalVisible(false);

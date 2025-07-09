@@ -83,6 +83,7 @@ const DashboardPage = () => {
 
             const data = await response.json();
             setProfile(data.data);
+            localStorage.setItem('profile', JSON.stringify(data.data));
         } catch (error) {
             console.error('Fetch error:', error);
         } finally {
