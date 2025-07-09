@@ -49,8 +49,8 @@ This is the source code for an application to view and interact with education s
 
 This repository includes both **frontend** and **backend** projects. Please refer to each part for specific setup instructions.
 
-- [`/PDF_Viewer`](./client/README.md) — NextJS-based web application
-- [`/PDF_Viewer_Backend`](./server/README.md) — NestJS-based API server
+- [`/Frontend`](./client/README.md) — NextJS-based web application
+- [`/Backend`](./server/README.md) — NestJS-based API server
 
 ✅ **Be sure to follow the README in each folder to correctly set up the `.env` configuration files.**
 
