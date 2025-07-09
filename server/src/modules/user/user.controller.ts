@@ -16,6 +16,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
+import { CourseSelectionDto } from './dto/course-selection.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 
@@ -39,6 +40,16 @@ export class UserController {
   @Get('profile')
   async getProfile(@Request() req) {
     return this.userService.findOne(req.user._id);
+  }
+
+  @Get('course-selection')
+  async getCourseSelection(@Request() req) {
+    return this.userService.getCourseSelection(req.user._id);
+  }
+
+  @Post('course-selection')
+  async setCourseSelection(@Request() req, @Body() courseSelectionDto: CourseSelectionDto) {
+    return this.userService.setCourseSelection(req.user._id, courseSelectionDto);
   }
 
   @Get(':id')

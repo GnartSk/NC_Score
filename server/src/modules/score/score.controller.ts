@@ -29,6 +29,11 @@ export class ScoreController {
     return this.scoreService.findAllOfUser(req.user._id);
   }
 
+  @Get('user/:userId')
+  findAllScoreOfUser(@Param('userId') userId: string) {
+    return this.scoreService.findAllOfUser(userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.scoreService.findOne(id);
@@ -47,8 +52,9 @@ export class ScoreController {
   //Hàm chưa xài được
   @Post('allScore')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
-  uploadAllScore(@Request() req, @Body(new ValidationPipe({ transform: true })) body: StudentGradesDTO) {
-    console.log(body);
-    return this.scoreService.uploadAllScore();
+  async uploadAllScore(@Request() req, @Body(new ValidationPipe({ transform: true })) body: any) {
+    // Lấy currentSubjects từ body nếu client gửi lên, hoặc [] nếu không có
+    const currentSubjects = body.currentSubjects || [];
+    return this.scoreService.uploadAllScore(req.user._id, body, currentSubjects);
   }
 }

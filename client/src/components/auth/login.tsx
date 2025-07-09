@@ -45,7 +45,7 @@ export default function LoginPage() {
                 <div className="rounded-2xl shadow-2xl h-[520px] flex max-w-3xl ">
                     <div className="md:w-4/5 p-6">
                         <div className="py-8">
-                            <img className="px-24" src="/LogoUIT.svg" alt="logoUIT" />
+                            <img className="w-16 md:w-30 mx-auto" src="/LogoUIT.svg" alt="logoUIT" />
                             <h2 className="text-2xl mt-2 font-bold text-black mb-2">Đăng nhập</h2>
                         </div>
                         <div>

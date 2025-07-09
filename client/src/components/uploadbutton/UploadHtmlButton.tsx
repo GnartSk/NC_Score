@@ -1,9 +1,11 @@
 'use client';
 import { Button, Upload, message, Modal, Table, Tabs, Space } from 'antd';
 import { UploadOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import { getCookie } from 'cookies-next';
+import { isGroupSubject } from '@/utils/groupSubjectMap';
+import { getCourseSelection } from '@/utils/courseUtils';
 
 interface Subject {
   id: number;
@@ -35,12 +37,46 @@ const getCookieValue = (name: string): string | null => {
   }
 };
 
+// Hàm lấy ngành học từ API
+async function fetchUserMajor(): Promise<string | null> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
+    if (!token) return null;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.data?.major || null;
+  } catch {
+    return null;
+  }
+}
+
+// Hàm chuẩn hóa tên ngành về đúng key trong groupSubjectMap
+function normalizeMajor(major: string) {
+  if (!major) return '';
+  if (major.toLowerCase().includes('an toàn thông tin')) return 'An toàn thông tin';
+  if (major.toLowerCase().includes('mạng máy tính')) return 'Mạng máy tính & Truyền thông dữ liệu';
+  return major;
+}
+
 const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   const [loading, setLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [parsedData, setParsedData] = useState<{[key: string]: Subject[]}>({});
   const [activeTab, setActiveTab] = useState('political');
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [major, setMajor] = useState<string>('');
+
+  useEffect(() => {
+    // Lấy ngành học từ localStorage (chỉ chạy ở client)
+    if (typeof window !== 'undefined') {
+      const courseSelection = getCourseSelection();
+      setMajor(normalizeMajor(courseSelection?.major || ''));
+    }
+  }, []);
 
   // Cấu hình cột cho bảng xác nhận
   const columns: ColumnsType<Subject> = [
@@ -70,31 +106,51 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       title: 'QT',
       dataIndex: 'qt',
       key: 'qt',
-      render: val => val || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'TH',
       dataIndex: 'th',
       key: 'th',
-      render: val => val || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'GK',
       dataIndex: 'gk',
       key: 'gk',
-      render: val => val || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'CK',
       dataIndex: 'ck',
       key: 'ck',
-      render: val => val || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'TK',
       dataIndex: 'total',
       key: 'total',
-      render: val => val?.toFixed(1) || '-',
+      render: val => {
+        if (val === 'Miễn') return 'Miễn';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val || '-';
+      },
     },
     {
       title: 'TT',
@@ -106,16 +162,17 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
   // Hàm xử lý dữ liệu từ API để phân loại theo category
   const processApiData = (apiData: any) => {
     const categorizedData: { [key: string]: any[] } = {
-      'Toán - Tin học': [],
-      'Môn lý luận chính trị': [],
+      'Toán - Tin học - Khoa học tự nhiên': [],
+      'Môn lý luận chính trị và pháp luật': [],
       'Ngoại ngữ': [],
-      'Đại cương': [],
       'Cơ sở ngành': [],
       'Chuyên ngành': [],
-      'Tự chọn': []
+      'Môn học khác': []
     };
 
     const semesterData: { [key: string]: any[] } = {};
+
+    // Dùng biến major từ state (đã lấy ở useEffect)
 
     // Xử lý dữ liệu theo mẫu API trả về
     try {
@@ -128,40 +185,20 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
           if (semesterInfo && Array.isArray(semesterInfo.subjects)) {
             semesterInfo.subjects.forEach((subject: any, index: number) => {
               // Xác định category dựa vào mã môn học
-              let category = 'Tự chọn'; // Default category
+              let category = 'Môn học khác'; // Default category
               const code = subject.subjectCode || '';
               
-              console.log(`Processing subject: ${code} - ${subject.subjectName}`);
-              
-              // Môn lý luận chính trị
-              if (code.startsWith('SS')) {
-                category = 'Môn lý luận chính trị';
-              } 
-              // Toán - Tin học - Khoa học tự nhiên (thuộc đại cương)
-              else if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') {
-                category = 'Toán - Tin học';
-              }
-              // Ngoại ngữ (thuộc đại cương)
-              else if (code.startsWith('EN')) {
-                category = 'Ngoại ngữ';
-              }
-              // Cơ sở ngành
-              else if ((code.startsWith('IT') && code !== 'IT001') || 
-                      code === 'NT0' || code === 'NT1' || 
-                      code.startsWith('NT0') || code.startsWith('NT1')) {
+              // Ưu tiên kiểm tra theo ngành
+              if (isGroupSubject('Cơ sở ngành', major, code)) {
                 category = 'Cơ sở ngành';
-              }
-              // Chuyên ngành - tất cả mã NT khác 
-              else if (code.startsWith('NT') && 
-                      !code.startsWith('NT0') && 
-                      !code.startsWith('NT1') && !code.startsWith('NT2')) {
+              } else if (isGroupSubject('Chuyên ngành', major, code)) {
                 category = 'Chuyên ngành';
-              }
-              else if (code === 'NT209') {
-                category = 'Chuyên ngành';
-              }
-              else if (code.startsWith('NT2')) {
-                category = 'Tự chọn';
+              } else if (code.startsWith('SS') && code !== 'SS004') {
+                category = 'Môn lý luận chính trị và pháp luật';
+              } else if (code.startsWith('MA') || code.startsWith('PH') || code === 'IT001') {
+                category = 'Toán - Tin học - Khoa học tự nhiên';
+              } else if (code.startsWith('EN')) {
+                category = 'Ngoại ngữ';
               }
               
               console.log(`Categorized as: ${category}`);
@@ -189,7 +226,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
                 th: subject.TH ? parseFloat(subject.TH) : undefined,
                 gk: subject.GK ? parseFloat(subject.GK) : undefined,
                 ck: subject.CK ? parseFloat(subject.CK) : undefined,
-                total: subject.TK ? parseFloat(subject.TK) : undefined,
+                total: subject.TK ? (subject.TK === 'Miễn' ? 'Miễn' : parseFloat(subject.TK)) : undefined,
                 status: status,
                 category: category,
                 semester: semester
@@ -226,7 +263,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
     };
   };
 
-  // Bước 1: Xử lý file HTML và hiển thị dữ liệu để xác nhận
+  // Xử lý file HTML và hiển thị dữ liệu để xác nhận
   const handleUpload = async (file: File) => {
     setLoading(true);
     
@@ -262,7 +299,9 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
         throw new Error('Không tìm thấy dữ liệu từ file HTML');
       }
       
-      // Xử lý và phân loại dữ liệu
+      // Lưu dữ liệu server gốc để xác nhận lưu
+      (window as any)._lastServerScoreData = result.data;
+      // Xử lý và phân loại dữ liệu chỉ để hiển thị modal
       const processedData = processApiData(result);
       
       // Lưu dữ liệu để hiển thị trong modal (chỉ show categories)
@@ -282,24 +321,26 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
     }
   };
 
-  // Bước 2: Gửi dữ liệu đã xác nhận lên server
+  // Gửi dữ liệu đã xác nhận lên server
   const handleConfirmUpload = async () => {
     setConfirmLoading(true);
     
     try {
-      // Lấy processedData đã lưu tạm ở window
-      const processedData = (window as any)._lastProcessedScoreData;
+      // Lấy dữ liệu server gốc đã lưu tạm ở window
+      const serverData = (window as any)._lastServerScoreData;
       
-      // Lưu dữ liệu vào localStorage
-      localStorage.setItem('html_score_data', JSON.stringify(processedData));
+      // Lưu dữ liệu vào localStorage đúng định dạng server
+      localStorage.setItem('html_score_data', JSON.stringify(serverData));
       
       // Gọi callback khi upload thành công
       if (onUploadSuccess) {
-        onUploadSuccess(processedData);
+        onUploadSuccess(serverData);
       }
       
       message.success('Đã lưu điểm thành công!');
       setModalVisible(false);
+      setRefreshKey(prev => prev + 1);
+      uploadAllScoreToServer();
     } catch (error) {
       console.error('Error saving score data:', error);
       message.error('Có lỗi xảy ra khi lưu điểm!');
@@ -333,6 +374,48 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       math: 'Toán - Tin học'
     };
     return `${titles[category] || category} (${count})`;
+  };
+
+  // Hàm gọi API lưu điểm lên server
+  const uploadAllScoreToServer = async () => {
+    const htmlScoreData = localStorage.getItem('html_score_data');
+    // Lấy token từ cookie hoặc localStorage
+    const token = getCookie('NCToken') || localStorage.getItem('NCToken');
+    if (!token || token === 'null') {
+      message.error('Bạn cần đăng nhập lại để sử dụng tính năng này!');
+      return;
+    }
+    try {
+      // Lọc lại dữ liệu semesters nếu cần (giữ nguyên logic cũ)
+      const rawData = htmlScoreData ? JSON.parse(htmlScoreData) : {};
+      const rawSemesters = rawData.semesters || {};
+      const cumulativePoint = rawData.cumulativePoint;
+      const semesters: Record<string, any> = {};
+      Object.entries(rawSemesters).forEach(([key, value]) => {
+        if (value && Array.isArray((value as any).subjects)) {
+          semesters[key] = { subjects: (value as any).subjects };
+        }
+      });
+      // Gửi cả cumulativePoint lên backend
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/allScore`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          semesters,
+          cumulativePoint,
+        }),
+      });
+      if (res.ok) {
+        message.success('Đã lưu điểm lên hệ thống!');
+      } else {
+        message.error('Lưu điểm lên hệ thống thất bại!');
+      }
+    } catch (e) {
+      message.error('Lỗi khi lưu điểm lên hệ thống!');
+    }
   };
 
   return (

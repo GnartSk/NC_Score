@@ -8,23 +8,53 @@ import {
     ProfileOutlined,
 
 } from '@ant-design/icons';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StudentContext } from "@/lib/student.context";
 import type { MenuProps } from 'antd';
 import Link from 'next/link'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGraduationCap } from "@fortawesome/free-solid-svg-icons/faGraduationCap";
+import { getCourseSelection, getCourseDisplayName, getMajorDisplayName } from '@/utils/courseUtils';
+import Image from 'next/image';
 
 type MenuItem = Required<MenuProps>['items'][number];
+
+// Hàm lấy thông tin user từ API
+async function fetchUserProfile() {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
+    if (!token) return null;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.data || null;
+  } catch {
+    return null;
+  }
+}
+
 const StudentSideBar = () => {
     const { Sider } = Layout;
     const { collapseMenu } = useContext(StudentContext)!;
+    const [userProfile, setUserProfile] = useState<any>(null);
+
+    useEffect(() => {
+      fetchUserProfile().then(setUserProfile);
+    }, []);
 
     const items: MenuItem[] = [
 
         {
             key: 'grp',
-            label: 'NC Score',
+            label: (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 64 }}>
+                    <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image src="/LogoUIT.svg" alt="Logo UIT" width={200} height={32} priority />
+                    </Link>
+                </div>
+            ),
             type: 'group',
             children: [
                 {
@@ -67,7 +97,15 @@ const StudentSideBar = () => {
         <Sider
             collapsed={collapseMenu}
         >
-
+            {userProfile && !collapseMenu && (
+                <div className="p-4 bg-blue-50 border-b border-blue-200">
+                    <div className="text-xs text-blue-600 font-medium mb-1">Thông tin học tập</div>
+                    <div className="text-xs text-blue-800">
+                        <div>{getCourseDisplayName(userProfile.course)}</div>
+                        <div>{getMajorDisplayName(userProfile.major)}</div>
+                    </div>
+                </div>
+            )}
             <Menu
                 mode="inline"
                 defaultSelectedKeys={['dashboard']}

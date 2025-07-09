@@ -23,6 +23,20 @@ export async function middleware(req: NextRequest) {
         const adminRoutes = ['/dashboard/student-score', '/dashboard/subject-managerment', '/dashboard/report'];
         const userRouter = ['/dashboard/user'];
 
+        // Kiểm tra nếu user đang truy cập dashboard và chưa chọn khóa học/ngành học
+        if (req.nextUrl.pathname === '/dashboard') {
+            // Kiểm tra xem user đã chọn khóa học và ngành học chưa
+            const courseSelectionRes = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/course-selection`, {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            // Nếu chưa có thông tin khóa học hoặc API trả về lỗi, redirect đến trang chọn khóa học
+            if (!courseSelectionRes.ok || courseSelectionRes.status === 404) {
+                return NextResponse.redirect(new URL('/course-selection', req.url));
+            }
+        }
+
         if (adminRoutes.includes(req.nextUrl.pathname) && role !== 'ADMIN') {
             return NextResponse.redirect(new URL('/dashboard', req.url));
         }

@@ -6,26 +6,32 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import React from "react";
 
-const data = [
-  {
-    name: "Total",
-    count: 130,
-    fill: "white",
-  },
-  {
-    name: "Tín chỉ còn lại",
-    count: 39,
-    fill: "#FAE27C",
-  },
-  {
-    name: "Tín chỉ hoàn thành",
-    count: 91,
-    fill: "#C3EBFA",
-  },
-];
+interface CountChartProps {
+  total: number;
+  earned: number;
+  remaining: number;
+}
 
-const CountChart = () => {
+const CountChart = ({ total, earned, remaining }: CountChartProps) => {
+  const data = [
+    {
+      name: "Total",
+      count: total,
+      fill: "white",
+    },
+    {
+      name: "Tín chỉ còn lại",
+      count: remaining,
+      fill: "#FAE27C",
+    },
+    {
+      name: "Tín chỉ hoàn thành",
+      count: earned,
+      fill: "#C3EBFA",
+    },
+  ];
   return (
     <div className="bg-white rounded-xl w-full h-full p-4">
       {/* TITLE */}
@@ -59,12 +65,12 @@ const CountChart = () => {
       <div className="flex justify-center gap-16">
         <div className="flex flex-col gap-1">
           <div className="w-5 h-5 bg-lamaSky rounded-full" />
-          <h1 className="font-bold">91</h1>
+          <h1 className="font-bold">{earned}</h1>
           <h2 className="text-xs text-gray-300">Số tín chỉ hoàn thành</h2>
         </div>
         <div className="flex flex-col gap-1">
           <div className="w-5 h-5 bg-lamaYellow rounded-full" />
-          <h1 className="font-bold">39</h1>
+          <h1 className="font-bold">{remaining}</h1>
           <h2 className="text-xs text-gray-300">Số tín chỉ còn lại</h2>
         </div>
       </div>

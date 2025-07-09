@@ -7,6 +7,7 @@ import { StudentContext } from '@/lib/student.context';
 import type { MenuProps } from 'antd';
 import Link from 'next/link';
 import { FaCircleExclamation, FaPeopleGroup } from 'react-icons/fa6';
+import Image from 'next/image';
 
 type MenuItem = Required<MenuProps>['items'][number];
 const AdminSidebar = () => {
@@ -16,7 +17,13 @@ const AdminSidebar = () => {
     const items: MenuItem[] = [
         {
             key: 'grp',
-            label: 'NC Score',
+            label: (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 64 }}>
+                    <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image src="/LogoUIT.svg" alt="Logo UIT" width={200} height={32} priority />
+                    </Link>
+                </div>
+            ),
             type: 'group',
             children: [
                 {
@@ -30,9 +37,9 @@ const AdminSidebar = () => {
                     icon: <AppstoreOutlined />,
                 },
                 {
-                    key: 'report',
-                    label: <Link href={'/dashboard/report'}>Thông báo lỗi</Link>,
-                    icon: <FaCircleExclamation />,
+                    key: 'training-program',
+                    label: <Link href={'/dashboard/training-program'}>Quản lý CTĐT</Link>,
+                    icon: <AppstoreOutlined />,
                 },
             ],
         },

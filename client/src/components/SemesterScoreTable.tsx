@@ -18,11 +18,43 @@ interface Subject {
   semester: string;
 }
 
-export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?: '10' | '4' }) {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<{[key: string]: Subject[]}>({});
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    const part = parts.pop();
+    return part ? part.split(';').shift() : null;
+  }
+  return null;
+}
 
-  const columns: ColumnsType<Subject> = [
+// Hàm so sánh học kỳ dạng "Học kỳ X - Năm học YYYY-YYYY" hoặc "Học kỳ X YYYY-YYYY"
+function compareSemester(a: string, b: string): number {
+  const parse = (s: string) => {
+    // Chỉ bắt định dạng 'Học kỳ X - Năm học YYYY-YYYY'
+    const match = s.match(/Học kỳ\s*(\d)[\s-]*Năm học\s*(\d{4})[- ]?(\d{4})?/);
+    if (!match) return null;
+    const hk = parseInt(match[1]);
+    const y1 = parseInt(match[2]);
+    const y2 = parseInt(match[3] || match[2]);
+    return { hk, y1, y2 };
+  };
+  const sa = parse(a);
+  const sb = parse(b);
+  if (!sa || !sb) return 0;
+  // So sánh năm học mới nhất trước
+  if (sa.y2 !== sb.y2) return sa.y2 - sb.y2;
+  if (sa.y1 !== sb.y1) return sa.y1 - sb.y1;
+  // Nếu cùng năm, học kỳ 2 trước học kỳ 1
+  if (sa.hk !== sb.hk) return sa.hk - sb.hk;
+  return 0;
+}
+
+export default function SemesterScoreTable({ scoreScale = '10', userId }: { scoreScale?: '10' | '4'; userId?: string }) {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<{[key: string]: any[]}>({});
+
+  const columns: ColumnsType<any> = [
     {
       title: 'STT',
       dataIndex: 'id',
@@ -33,26 +65,26 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'MÃ MÔN',
-      dataIndex: 'code',
-      key: 'code',
+      dataIndex: 'subjectCode',
+      key: 'subjectCode',
       align: 'center',
     },
     {
       title: 'TÊN MÔN',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'subjectName',
+      key: 'subjectName',
       width: 250,
     },
     {
       title: 'TC',
-      dataIndex: 'credits',
-      key: 'credits',
+      dataIndex: 'credit',
+      key: 'credit',
       align: 'center',
     },
     {
       title: 'QT',
-      dataIndex: 'qt',
-      key: 'qt',
+      dataIndex: 'QT',
+      key: 'QT',
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
@@ -63,8 +95,8 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'TH',
-      dataIndex: 'th',
-      key: 'th',
+      dataIndex: 'TH',
+      key: 'TH',
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
@@ -75,8 +107,8 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'GK',
-      dataIndex: 'gk',
-      key: 'gk',
+      dataIndex: 'GK',
+      key: 'GK',
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
@@ -87,8 +119,8 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'CK',
-      dataIndex: 'ck',
-      key: 'ck',
+      dataIndex: 'CK',
+      key: 'CK',
       align: 'center',
       render: (value) => {
         if (value === undefined || value === null || value === '') return '-';
@@ -99,11 +131,10 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
     },
     {
       title: 'TỔNG KẾT',
-      dataIndex: 'total',
-      key: 'total',
+      dataIndex: 'TK',
+      key: 'TK',
       align: 'center',
       render: (value) => {
-        
         if (value === undefined || value === null || value === '') return '-';
         const score = typeof value === 'string' ? parseFloat(value) : value;
         if (isNaN(score)) return '-';
@@ -115,129 +146,87 @@ export default function SemesterScoreTable({ scoreScale = '10' }: { scoreScale?:
       dataIndex: 'status',
       key: 'status',
       align: 'center',
-      render: (status) => (
-        <Tag 
-          color={
-            status === 'Hoàn thành' ? 'green' :
-            status === 'Rớt' ? 'red' :
-            status === 'Miễn' ? 'blue' :
-            status === 'Hoãn thi' ? 'orange' :
-            status === 'Đang học' ? 'gold' : 'default'
-          }
-          className="rounded-full px-3"
-        >
-          {status}
-        </Tag>
-      ),
+      render: (status) => {
+        return (
+          <Tag 
+            color={
+              status === 'Hoàn thành' ? 'green' :
+              status === 'Rớt' ? 'red' :
+              status === 'Miễn' ? 'blue' :
+              status === 'Hoãn thi' ? 'orange' :
+              status === 'Đang học' ? 'gold' : 'default'
+            }
+            className="rounded-full px-3"
+          >
+            {status}
+          </Tag>
+        );
+      },
     },
   ];
 
   useEffect(() => {
     setLoading(true);
-    const scoreData = localStorage.getItem('html_score_data');
-    let parsedData: any = undefined;
-    let semestersData: any = {};
-    if (scoreData) {
-      try {
-        parsedData = JSON.parse(scoreData);
-        if (parsedData && parsedData.semesters) {
-          semestersData = { ...parsedData.semesters };
-        }
-      } catch (error) {
-        console.error('Error parsing score data:', error);
-      }
+    let url = '';
+    let headers: any = {};
+    if (userId) {
+      url = `${process.env.NEXT_PUBLIC_BackendURL}/score/user/${userId}`;
+      const token = getCookie('NCToken');
+      headers = { Authorization: `Bearer ${token}` };
+    } else {
+      url = `${process.env.NEXT_PUBLIC_BackendURL}/score/profile`;
+      const userToken = getCookie('NCToken');
+      headers = { Authorization: `Bearer ${userToken}` };
     }
-    // Thêm các môn ICS (đang học) vào học kỳ mới nhất
-    const icsRaw = localStorage.getItem('current_subject_codes');
-    if (icsRaw) {
-      try {
-        const icsSubjects = JSON.parse(icsRaw);
-        if (Array.isArray(icsSubjects) && icsSubjects.length > 0) {
-          let semesters = semestersData ? Object.keys(semestersData) : [];
-          // Sắp xếp học kỳ theo năm và số học kỳ
-          semesters.sort((a, b) => {
-            const regex = /Học kỳ (\d+) - Năm học (\d{4})-(\d{4})/;
-            const matchA = a.match(regex);
-            const matchB = b.match(regex);
-            if (matchA && matchB) {
-              const [ , hkA, yA ] = matchA;
-              const [ , hkB, yB ] = matchB;
-              // So sánh năm học trước
-              if (yA !== yB) return Number(yB) - Number(yA);
-              // Nếu năm học giống nhau, so sánh số học kỳ
-              return Number(hkB) - Number(hkA);
-            }
-            // Nếu không match, giữ nguyên thứ tự cũ
-            return 0;
+    fetch(url, {
+      method: 'GET',
+      headers,
+    })
+      .then(res => res.json())
+      .then(res => {
+        const scores = res.data?.scores || [];
+        const semestersData: Record<string, any[]> = {};
+        (scores as any[]).forEach((score: any) => {
+          const semester = score.semester || 'Chưa rõ học kỳ';
+          if (!semestersData[semester]) semestersData[semester] = [];
+          semestersData[semester].push({
+            ...score,
+            code: score.subjectCode,
+            name: score.subjectName,
+            credits: score.credit,
+            qt: score.QT,
+            th: score.TH,
+            gk: score.GK,
+            ck: score.CK,
+            total: score.TK,
+            status: score.status,
           });
-          let latestSemester = semesters.length > 0 ? semesters[0] : undefined;
-          if (!latestSemester) {
-            latestSemester = 'Học kỳ mới nhất';
-            semestersData[latestSemester] = [];
-          }
-          const currentSubjects = semestersData[latestSemester] ? semestersData[latestSemester].map((s: any) => s.subjectCode || s.code) : [];
-          const icsToAdd = icsSubjects.filter((ics: any) => !currentSubjects.includes(ics.code));
-          if (icsToAdd.length > 0) {
-            const newSubjects = icsToAdd.map((ics: any, idx: number) => ({
-              id: `ics-${ics.code}`,
-              code: ics.code,
-              name: ics.name,
-              credits: '',
-              qt: '',
-              th: '',
-              gk: '',
-              ck: '',
-              total: '',
-              status: 'Đang học',
-              semester: latestSemester,
-            }));
-            semestersData[latestSemester] = [...(semestersData[latestSemester] || []), ...newSubjects];
-          }
-          // Giữ lại 1 bản ghi duy nhất cho mỗi mã môn trong học kỳ mới nhất, ưu tiên Hoàn thành > Đang học > Rớt
-          type StatusType = 'Hoàn thành' | 'Đang học' | 'Rớt';
-          const priority: Record<StatusType, number> = { 'Hoàn thành': 3, 'Đang học': 2, 'Rớt': 1 };
-          if (semestersData[latestSemester]) {
-            const merged = semestersData[latestSemester];
-            semestersData[latestSemester] = Object.values(
-              merged.reduce((acc: any, item: any) => {
-                const code = item.code;
-                if (!acc[code]) {
-                  acc[code] = item;
-                } else {
-                  const s1 = (item.status as StatusType);
-                  const s2 = (acc[code].status as StatusType);
-                  if ((priority[s1] || 0) > (priority[s2] || 0)) {
-                    acc[code] = item;
-                  }
-                }
-                return acc;
-              }, {} as Record<string, any>)
-            );
-          }
-        }
-      } catch (e) { /* ignore */ }
-    }
-    setData(semestersData);
-    setLoading(false);
-  }, []);
+        });
+        setData(semestersData);
+      })
+      .catch(() => setData({}))
+      .finally(() => setLoading(false));
+  }, [userId, scoreScale]);
 
   return (
     <div className="space-y-8">
-      {Object.entries(data).map(([semester, subjects]) => (
-        <div key={semester} className="p-4 bg-white rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">{semester}</h2>
-          <Table
-            columns={columns}
-            dataSource={subjects}
-            loading={loading}
-            pagination={false}
-            scroll={{ x: 1000 }}
-            rowKey={(record) => `${semester}-${record.code}-${record.id || Math.random().toString(36).substring(2, 9)}`}
-            className="antd-custom-table"
-            rowClassName={(record) => record.status === 'Rớt' ? 'bg-red-100' : ''}
-          />
-        </div>
-      ))}
+      {Object.entries(data)
+        .sort(([a], [b]) => compareSemester(b, a))
+        .map(([semester, subjects]) => (
+          <div key={semester} className="p-4 bg-white rounded-lg shadow-sm">
+            <h2 className="text-lg font-semibold mb-4">{semester}</h2>
+            <Table
+              columns={columns}
+              dataSource={subjects}
+              loading={loading}
+              pagination={false}
+              scroll={{ x: 1000 }}
+              rowKey={(record) => `${semester}-${record.code}-${record.id || Math.random().toString(36).substring(2, 9)}`}
+              className="antd-custom-table"
+              rowClassName={(record) => record.status === 'Rớt' ? 'bg-red-100' : ''}
+            />
+          </div>
+        ))}
       {Object.keys(data).length === 0 && !loading && (
         <div className="text-center text-gray-500 py-8">
           Chưa có dữ liệu điểm học kỳ. Vui lòng tải lên file điểm để xem.
