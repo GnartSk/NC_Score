@@ -1,38 +1,42 @@
-## Getting Started
+# 🌐 Frontend - NC Score Application
 
-### Môi trường chạy dự án: Node.js v20.14.0
+This is the frontend for the **NC SCore**, built with **NextJS**.
 
-https://nodejs.org/download/release/v20.14.0/
+---
 
-===
+## ⚙️ Getting Started
 
-Các bước cài đặt: (chế độ development)
+### 1️⃣ Install Dependencies
 
-1. clone code
-2. cài đặt thư viện: npm i
-3. Update file .env.development (nếu cần thiết)
-4. Chạy dự án: npm run dev
+```bash
+npm install
+# or
+yarn install
+```
 
-===
+### 2️⃣ Start Development Server
 
 ```bash
 npm run dev
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+By default, the app will be available at:
+👉 http://localhost:3000
 
-===
+### 📦 Environment Variables
 
-Cách chạy tại chế độ production:
+This project uses environment variables stored in a .env file.
 
-1. clone code
-2. cài đặt thư viện: npm i
-3. Update file .env.production (nếu cần thiết)
-4. Build dự án: npm run build
-5. Chạy dự án: npm run preview
+A template is provided:
+📄 [`./.env.example`](./.env.example)
+Then update the values accordingly.
+
+### 🧾 Environment Variables Description
+
+
+| Variable Name                                            | Description                                                                                                                            |
+| :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXTAUTH_URL`                                       | Based on the port number you define (Default is usually http://localhost:3000)                                                         |
+| `NEXT_PUBLIC_BackendURL`                                       | Based on the port number you define with /api after (Default is usually http://localhost:8081/api)                                     |
