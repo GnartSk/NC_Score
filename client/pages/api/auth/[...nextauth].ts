@@ -13,7 +13,7 @@ export default NextAuth({
       async authorize(credentials) {
         try {
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BackendURL}/dashboard`,
+            `${process.env.BackendURL}/dashboard`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

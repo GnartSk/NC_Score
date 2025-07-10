@@ -53,7 +53,7 @@ const TrainingProgramPage = () => {
     setLoading(true);
     try {
       const token = getCookie('NCToken');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/training-program`, {
+      const res = await fetch(`${process.env.BackendURL}/training-program`, {
         credentials: 'include',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -98,7 +98,7 @@ const TrainingProgramPage = () => {
     formData.append("course", course);
     const token = getCookie('NCToken');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/training-program/upload`, {
+      const res = await fetch(`${process.env.BackendURL}/training-program/upload`, {
         method: "POST",
         body: formData,
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -124,7 +124,7 @@ const TrainingProgramPage = () => {
     if (!confirm('Bạn có chắc muốn xóa?')) return;
     try {
       const token = getCookie('NCToken');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/training-program/${id}`, { method: 'DELETE', credentials: 'include', headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      const res = await fetch(`${process.env.BackendURL}/training-program/${id}`, { method: 'DELETE', credentials: 'include', headers: token ? { Authorization: `Bearer ${token}` } : {} });
       if (res.ok) {
         fetchPrograms();
         showToast('success', 'Xóa thành công!');
@@ -149,7 +149,7 @@ const TrainingProgramPage = () => {
     setEditLoading(true);
     try {
       const token = getCookie('NCToken');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/training-program/${editing._id}`, {
+      const res = await fetch(`${process.env.BackendURL}/training-program/${editing._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ major: editMajor, majorCode: editMajorCode, course: editCourse }),

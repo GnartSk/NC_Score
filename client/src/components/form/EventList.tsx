@@ -28,7 +28,7 @@ const EventList: React.FC<EventListProps> = ({ newEvent }) => {
     setError(null);
 
     try {
-      const response = await axios.get<EventData[]>(`${process.env.NEXT_PUBLIC_BackendURL}/events`);
+      const response = await axios.get<EventData[]>(`${process.env.BackendURL}/events`);
       setEvents(response.data);
     } catch (err) {
       setError("Không thể tải danh sách lịch học.");

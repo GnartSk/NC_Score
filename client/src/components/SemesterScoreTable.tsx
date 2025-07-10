@@ -170,11 +170,11 @@ export default function SemesterScoreTable({ scoreScale = '10', userId }: { scor
     let url = '';
     let headers: any = {};
     if (userId) {
-      url = `${process.env.NEXT_PUBLIC_BackendURL}/score/user/${userId}`;
+      url = `${process.env.BackendURL}/score/user/${userId}`;
       const token = getCookie('NCToken');
       headers = { Authorization: `Bearer ${token}` };
     } else {
-      url = `${process.env.NEXT_PUBLIC_BackendURL}/score/profile`;
+      url = `${process.env.BackendURL}/score/profile`;
       const userToken = getCookie('NCToken');
       headers = { Authorization: `Bearer ${userToken}` };
     }

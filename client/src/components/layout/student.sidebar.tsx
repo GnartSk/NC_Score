@@ -24,7 +24,7 @@ async function fetchUserProfile() {
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
     if (!token) return null;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+    const res = await fetch(`${process.env.BackendURL}/user/profile`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) return null;

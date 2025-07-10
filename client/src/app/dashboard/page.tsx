@@ -74,7 +74,7 @@ const DashboardPage = () => {
     const getProfile = useCallback(async (userToken: string) => {
         setLoading(true);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+            const response = await fetch(`${process.env.BackendURL}/user/profile`, {
                 method: 'GET',
                 headers: { Authorization: `Bearer ${userToken}` },
             });

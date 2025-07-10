@@ -58,7 +58,7 @@ async function fetchAllScoresFromAPI() {
     console.log('No token found');
     return [];
   }
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/profile`, {
+  const res = await fetch(`${process.env.BackendURL}/score/profile`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   console.log('API status:', res.status);
@@ -96,7 +96,7 @@ export default function SubjectsPage() {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
         if (token) {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+          const res = await fetch(`${process.env.BackendURL}/user/profile`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           if (res.ok) {

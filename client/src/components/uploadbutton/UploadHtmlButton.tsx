@@ -42,7 +42,7 @@ async function fetchUserMajor(): Promise<string | null> {
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
     if (!token) return null;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+    const res = await fetch(`${process.env.BackendURL}/user/profile`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) return null;
@@ -297,7 +297,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/reader/html`, {
+      const response = await fetch(`${process.env.BackendURL}/reader/html`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -414,7 +414,7 @@ const UploadHtmlButton = ({ onUploadSuccess }: UploadHtmlButtonProps) => {
         }
       });
       // Gửi cả cumulativePoint lên backend
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/allScore`, {
+      const res = await fetch(`${process.env.BackendURL}/score/allScore`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

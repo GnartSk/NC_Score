@@ -56,7 +56,7 @@ const CourseSelectionPage = () => {
             
             // Gửi lên server để lưu vào database
             if (token) {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/course-selection`, {
+                const response = await fetch(`${process.env.BackendURL}/user/course-selection`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

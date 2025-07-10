@@ -30,7 +30,7 @@ async function fetchUserMajor(): Promise<string | null> {
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
     if (!token) return null;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+    const res = await fetch(`${process.env.BackendURL}/user/profile`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) return null;
@@ -154,7 +154,7 @@ const UploadIcsButton = () => {
 
     try {
       const token = getCookie('NCToken');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/ics/extract-class-codes`, {
+      const response = await fetch(`${process.env.BackendURL}/ics/extract-class-codes`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -336,7 +336,7 @@ const UploadIcsButton = () => {
       return;
     }
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/allScore`, {
+      const res = await fetch(`${process.env.BackendURL}/score/allScore`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

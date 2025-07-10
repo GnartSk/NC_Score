@@ -231,7 +231,7 @@ async function fetchUserMajor(): Promise<string | null> {
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
     if (!token) return null;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+    const res = await fetch(`${process.env.BackendURL}/user/profile`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) return null;
@@ -409,7 +409,7 @@ export default function SubjectTable({
   useEffect(() => {
     setLoading(true);
     const userToken = getCookie('NCToken');
-    fetch(`${process.env.NEXT_PUBLIC_BackendURL}/score/profile`, {
+    fetch(`${process.env.BackendURL}/score/profile`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${userToken}`,

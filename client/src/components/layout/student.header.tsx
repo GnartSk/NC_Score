@@ -33,7 +33,7 @@ const StudentHeader = (props: any) => {
                 const token = getCookie('NCToken') as string | undefined;
                 if (!token) return;
 
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+                const response = await fetch(`${process.env.BackendURL}/user/profile`, {
                     method: 'GET',
                     headers: { Authorization: `Bearer ${token}` },
                 });

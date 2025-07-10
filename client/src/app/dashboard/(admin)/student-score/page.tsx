@@ -78,7 +78,7 @@ const StudentScore = () => {
           setLoading(false);
           return;
         }
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user`, {
+        const res = await fetch(`${process.env.BackendURL}/user`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
