@@ -8,6 +8,7 @@ import CalendarWidget from '@/components/calendar/CalendarWidget';
 import Loading from '@/components/loading/Loading';
 import { Card, List, Avatar, Spin, Input, Select, Row, Col, Empty, Tag } from 'antd';
 import { SearchOutlined, UserOutlined, BookOutlined, CrownOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 interface Profile {
     fullName: string;
@@ -50,6 +51,7 @@ const DashboardPage = () => {
     const [selectedCourse, setSelectedCourse] = useState<string>('all');
 
     const { Search } = Input;
+    const router = useRouter();
 
     const majors = useMemo(() => {
         const uniqueMajors = [...new Set(users.map(user => user.major).filter(Boolean))];
@@ -174,6 +176,16 @@ const DashboardPage = () => {
     }, [token, getProfile]);
 
     console.log('Profile', profile);
+
+    // Điều hướng nếu thiếu ngành hoặc khóa học (với user thường)
+    useEffect(() => {
+        if (
+            profile &&
+            (!profile.major || !profile.course)
+        ) {
+            router.push('/course-selection');
+        }
+    }, [profile, router]);
 
     if (loading) {
         return <Loading />;
