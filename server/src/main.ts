@@ -26,7 +26,9 @@ async function bootstrap() {
 
   // Bật CORS
   app.enableCors({
-    origin: 'http://localhost:3000', // Cho phép frontend Next.js truy cập
+    origin: process.env.NODE_ENV === 'production' 
+      ? ['https://your-vercel-domain.vercel.app', 'https://your-vercel-domain.vercel.app'] 
+      : 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,

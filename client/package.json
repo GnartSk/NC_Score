@@ -9,7 +9,10 @@
         "dev": "next dev --turbopack",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "update-urls:dev": "node ../update-urls.js development",
+        "update-urls:prod": "node ../update-urls.js production",
+        "deploy:prepare": "npm run update-urls:prod && npm run build"
     },
     "dependencies": {
         "@ant-design/icons": "5.6.0",

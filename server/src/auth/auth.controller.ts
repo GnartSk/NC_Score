@@ -70,9 +70,14 @@ export class AuthController {
     console.log(req);
     if (!req.user) {
       console.log('Google authentication failed, redirecting to login...');
-      return res.redirect('http://localhost:3000/auth/login');
+      return res.redirect(process.env.NODE_ENV === 'production' 
+      ? 'https://your-vercel-domain.vercel.app/auth/login'
+      : 'http://localhost:3000/auth/login');
     }
-    console.log(`Redirecting to: http://localhost:3000/auth?token=${req.user.access_token}`);
-    res.redirect(`http://localhost:3000/auth?token=${req.user.access_token}`);
+    const redirectUrl = process.env.NODE_ENV === 'production'
+      ? `https://your-vercel-domain.vercel.app/auth?token=${req.user.access_token}`
+      : `http://localhost:3000/auth?token=${req.user.access_token}`;
+    console.log(`Redirecting to: ${redirectUrl}`);
+    res.redirect(redirectUrl);
   }
 }

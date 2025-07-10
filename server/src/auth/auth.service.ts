@@ -78,7 +78,9 @@ export class AuthService {
         template: 'forgot_password',
         context: {
           name: user.fullName,
-          resetLink: `http://localhost:3000/reset-password?token=${token}`,
+          resetLink: process.env.NODE_ENV === 'production' 
+        ? `https://your-vercel-domain.vercel.app/reset-password?token=${token}`
+        : `http://localhost:3000/reset-password?token=${token}`,
         },
       });
 

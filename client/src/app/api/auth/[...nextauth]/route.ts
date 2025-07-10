@@ -14,7 +14,7 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const res = await fetch("http://localhost:3000/dashboard?token=${req.user.access_token}", {
+          const res = await fetch(`${process.env.NODE_ENV === 'production' ? 'https://your-render-domain.onrender.com' : 'http://localhost:3000'}/dashboard?token=${req.user.access_token}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

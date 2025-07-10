@@ -93,7 +93,7 @@ export default function LoginPage() {
                                     type="button"
                                     className="flex items-center justify-center w-full max-w-xs border border-gray-300 rounded-lg shadow-md py-2 px-4 bg-white hover:bg-gray-100 transition-all duration-300 mt-1"
                                     onClick={() =>
-                                        (window.location.href = 'http://localhost:8081/api/auth/google/login')
+                                        (window.location.href = `${process.env.NODE_ENV === 'production' ? 'https://your-render-domain.onrender.com' : 'http://localhost:3000'}/api/auth/google/login`)
                                     }
                                 >
                                     <FcGoogle className="text-2xl mr-2" />
