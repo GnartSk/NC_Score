@@ -1,5 +1,3 @@
-
-
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
@@ -14,13 +12,14 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const res = await fetch(`${process.env.NODE_ENV === 'production' ? 'https://your-render-domain.onrender.com' : 'http://localhost:3000'}/dashboard?token=${req.user.access_token}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: credentials?.email,
-            })
-          });
+          const res = await fetch(
+            `${process.env.NODE_ENV === 'production' ? 'https://nc-score.onrender.com' : 'http://localhost:3000'}/dashboard`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: credentials?.email }),
+            }
+          );
 
           if (!res.ok) {
             throw new Error("Invalid credentials");
@@ -45,8 +44,8 @@ const handler = NextAuth({
       return token;
     },
     async session({ session, token }) {
-    session.user.email = token.email || ""; 
-    session.user.name = token.name; 
+      session.user.email = token.email || "";
+      session.user.name = token.name;
       return session;
     }
   },
