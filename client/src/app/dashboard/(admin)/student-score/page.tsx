@@ -94,7 +94,7 @@ const StudentScore = () => {
 
   useEffect(() => {
     // Nếu có query id thì chọn user đó
-    const id = searchParams.get('id');
+    const id = searchParams?.get('id');
     if (id) {
       setScoreUserId(id);
       const found = users.find(u => u._id === id);
