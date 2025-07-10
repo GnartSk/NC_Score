@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './Interceptor/response.interceptor';
 import { useContainer } from 'class-validator';
+import { getFrontendUri } from './helpers/util';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,8 +26,16 @@ async function bootstrap() {
   app.setGlobalPrefix('api', { exclude: [''] });
 
   // Bật CORS
+  const allowedOrigins = [
+    getFrontendUri(),
+    'https://nc-score-project.vercel.app',
+    'https://nc-score-project.vercel.app/',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ].filter(Boolean); // Loại bỏ các giá trị undefined/null
+
   app.enableCors({
-    origin: process.env.FRONTEND_URI,
+    origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
