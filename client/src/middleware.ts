@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
     }
 
     try {
-        const res = await fetch(`${process.env.BackendURL}/user/profile`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
         // Kiểm tra nếu user đang truy cập dashboard và chưa chọn khóa học/ngành học
         if (req.nextUrl.pathname === '/dashboard') {
             // Kiểm tra xem user đã chọn khóa học và ngành học chưa
-            const courseSelectionRes = await fetch(`${process.env.BackendURL}/user/course-selection`, {
+            const courseSelectionRes = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/course-selection`, {
                 method: 'GET',
                 headers: { Authorization: `Bearer ${token}` },
             });

@@ -99,7 +99,7 @@ const SubjectManagement = () => {
     const getSubject = async () => {
         try {
             const res = await fetch(
-                `${process.env.BackendURL}/subject?page=${page + 1}&limit=${subjectsPerPage}`,
+                `${process.env.NEXT_PUBLIC_BackendURL}/subject?page=${page + 1}&limit=${subjectsPerPage}`,
                 {
                     method: 'GET',
                     headers: {
@@ -134,7 +134,7 @@ const SubjectManagement = () => {
 
     const onSubmit = async (data: FormData) => {
         try {
-            const res = await fetch(`${process.env.BackendURL}/subject`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/subject`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ const SubjectManagement = () => {
         // console.log(deleteSubjectCode);
 
         try {
-            const res = await fetch(`${process.env.BackendURL}/subject/${deleteSubjectCode}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/subject/${deleteSubjectCode}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`,

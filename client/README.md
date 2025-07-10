@@ -35,8 +35,7 @@ Then update the values accordingly.
 
 ### 🧾 Environment Variables Description
 
-
-| Variable Name                                            | Description                                                                                                                            |
-| :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXTAUTH_URL`                                       | Based on the port number you define (Default is usually http://localhost:3000)                                                         |
-| `NEXT_PUBLIC_BackendURL`                                       | Based on the port number you define with /api after (Default is usually http://localhost:8081/api)                                     |
+| Variable Name            | Description                                                                                        |
+| :----------------------- | :------------------------------------------------------------------------------------------------- |
+| `NEXTAUTH_URL`           | Based on the port number you define (Default is usually http://localhost:3000)                     |
+| `NEXT_PUBLIC_BackendURL` | Based on the port number you define with /api after (Default is usually http://localhost:8081/api) |

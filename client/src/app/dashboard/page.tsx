@@ -30,10 +30,10 @@ const DashboardPage = () => {
 
     // Hàm lấy tổng tín chỉ ngành
     function getTotalCreditsByMajor(major: string | undefined) {
-      if (!major) return 130;
-      if (major.toLowerCase().includes('mạng máy tính & truyền thông dữ liệu')) return 130;
-      if (major.toLowerCase().includes('an toàn thông tin')) return 129;
-      return 130;
+        if (!major) return 130;
+        if (major.toLowerCase().includes('mạng máy tính & truyền thông dữ liệu')) return 130;
+        if (major.toLowerCase().includes('an toàn thông tin')) return 129;
+        return 130;
     }
 
     // Hàm tính học kỳ hiện tại
@@ -47,7 +47,7 @@ const DashboardPage = () => {
         let semester;
         if (currentMonth >= 9 && currentMonth <= 12) {
             // Kỳ 1: tháng 9-12
-            semester = yearsPassed * 2 +1 ;
+            semester = yearsPassed * 2 + 1;
         } else if (currentMonth >= 1 && currentMonth <= 8) {
             // Kỳ 2: tháng 1-8
             semester = yearsPassed * 2;
@@ -74,7 +74,7 @@ const DashboardPage = () => {
     const getProfile = useCallback(async (userToken: string) => {
         setLoading(true);
         try {
-            const response = await fetch(`${process.env.BackendURL}/user/profile`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
                 method: 'GET',
                 headers: { Authorization: `Bearer ${userToken}` },
             });
@@ -111,18 +111,26 @@ const DashboardPage = () => {
                     </div>
 
                     <div className="bg-white p-6 rounded-lg shadow-md flex justify-around">
-                        <StatsCard value={getCurrentSemester(profile?.academicYear)} label="Kì học" bgColor="bg-blue-100" />
+                        <StatsCard
+                            value={getCurrentSemester(profile?.academicYear)}
+                            label="Kì học"
+                            bgColor="bg-blue-100"
+                        />
                         <StatsCard value={remainingCredits} label="Số tín chỉ còn lại" bgColor="bg-orange-300" />
                         <StatsCard value={earnedCredits} label="Số tín chỉ hoàn thành" bgColor="bg-teal-300" />
-                        <StatsCard value={profile?.cumulativePoint !== undefined ? profile.cumulativePoint.toFixed(2) : '--'} label="GPA" bgColor="bg-blue-100" />
+                        <StatsCard
+                            value={profile?.cumulativePoint !== undefined ? profile.cumulativePoint.toFixed(2) : '--'}
+                            label="GPA"
+                            bgColor="bg-blue-100"
+                        />
                     </div>
 
                     {/* Upload buttons chỉ hiện với user thường */}
                     {profile?.role !== 'ADMIN' && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <UploadButtons label="Tải lên thời khóa biểu" icon="📅" />
-                        <UploadButtons label="Tải lên bảng điểm sinh viên" icon="🆔" />
-                      </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <UploadButtons label="Tải lên thời khóa biểu" icon="📅" />
+                            <UploadButtons label="Tải lên bảng điểm sinh viên" icon="🆔" />
+                        </div>
                     )}
                 </div>
 

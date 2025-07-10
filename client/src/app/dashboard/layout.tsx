@@ -21,7 +21,7 @@ const StudentLayout = async ({
         const token = cookieStore.get('NCToken')?.value;
         if (token) {
             try {
-                const res = await fetch(`${process.env.BackendURL}/user/profile`, {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
                     headers: { Authorization: `Bearer ${token}` },
                     cache: 'no-store',
                 });
@@ -37,9 +37,9 @@ const StudentLayout = async ({
 
     const isUser = role === 'USER';
 
-    if (!role) {
-        return <div>Không xác định được quyền truy cập. Vui lòng đăng nhập lại.</div>;
-    }
+    // if (!role) {
+    //     return <div>Không xác định được quyền truy cập. Vui lòng đăng nhập lại.</div>;
+    // }
 
     return (
         <StudentContextProvider>
