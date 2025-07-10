@@ -28,7 +28,7 @@ const EventList: React.FC<EventListProps> = ({ newEvent }) => {
     setError(null);
 
     try {
-      const response = await axios.get<EventData[]>(`${process.env.NODE_ENV === 'production' ? 'https://your-render-domain.onrender.com' : 'http://localhost:3000'}/events`);
+      const response = await axios.get<EventData[]>(`${process.env.NEXT_PUBLIC_BackendURL}/events`);
       setEvents(response.data);
     } catch (err) {
       setError("Không thể tải danh sách lịch học.");

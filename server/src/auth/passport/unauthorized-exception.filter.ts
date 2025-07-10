@@ -9,8 +9,6 @@ export class UnauthorizedRedirectFilter implements ExceptionFilter {
 
     console.log('Unauthorized access detected. Redirecting to login page.');
 
-    response.redirect(process.env.NODE_ENV === 'production'
-      ? 'https://your-vercel-domain.vercel.app/auth/login'
-      : 'http://localhost:3000/auth/login');
+    response.redirect(`${process.env.FRONTEND_URI}/auth/login`);
   }
 }

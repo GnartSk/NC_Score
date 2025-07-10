@@ -13,7 +13,7 @@ export default NextAuth({
       async authorize(credentials) {
         try {
           const res = await fetch(
-            `${process.env.NODE_ENV === 'production' ? 'https://nc-score.onrender.com' : 'http://localhost:3000'}/dashboard`,
+            `${process.env.NEXT_PUBLIC_BackendURL}/dashboard`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
