@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 
-const handler = NextAuth({
+export default NextAuth({
   providers: [
     Google,
     Credentials({
@@ -36,14 +36,14 @@ const handler = NextAuth({
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: any, user: any }) {
       if (user) {
         token.email = user.email;
         token.name = user.name;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any, token: any }) {
       session.user.email = token.email || "";
       session.user.name = token.name;
       return session;
@@ -53,6 +53,4 @@ const handler = NextAuth({
     signIn: "/auth/login"
   },
   secret: process.env.AUTH_SECRET
-});
-
-export { handler as GET, handler as POST };
+}); 
