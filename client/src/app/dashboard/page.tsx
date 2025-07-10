@@ -94,7 +94,7 @@ const DashboardPage = () => {
         let semester;
         if (currentMonth >= 9 && currentMonth <= 12) {
             // Kỳ 1: tháng 9-12
-            semester = yearsPassed * 2 +1 ;
+            semester = yearsPassed * 2 + 1;
         } else if (currentMonth >= 1 && currentMonth <= 8) {
             // Kỳ 2: tháng 1-8
             semester = yearsPassed * 2;
@@ -328,10 +328,10 @@ const DashboardPage = () => {
 
                     {/* Upload buttons chỉ hiện với user thường */}
                     {profile?.role !== 'ADMIN' && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <UploadButtons label="Tải lên thời khóa biểu" icon="📅" />
-                        <UploadButtons label="Tải lên bảng điểm sinh viên" icon="🆔" />
-                      </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <UploadButtons label="Tải lên thời khóa biểu" icon="📅" />
+                            <UploadButtons label="Tải lên bảng điểm sinh viên" icon="🆔" />
+                        </div>
                     )}
                 </div>
 

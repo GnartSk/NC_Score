@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Home() {
+    console.log('NEXT_PUBLIC_BackendURL hihi = ', process.env.NEXT_PUBLIC_BackendURL);
+
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-pink-100 via-40% to-fuchsia-100 text-blue-900">
             {/* Header */}
@@ -75,7 +77,9 @@ export default function Home() {
                 <h2 className="text-3xl font-bold text-fuchsia-700">Chúng tôi muốn gì khi tạo ra NC Score?</h2>
                 <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-6 bg-white rounded-lg shadow-md">
-                        <p className="italic text-gray-700">"NC Score sẽ giúp các sinh viên biết sắp xếp học phần cho bản thân!"</p>
+                        <p className="italic text-gray-700">
+                            "NC Score sẽ giúp các sinh viên biết sắp xếp học phần cho bản thân!"
+                        </p>
                         <span className="block mt-4 font-semibold text-fuchsia-700">- Lê Hoàng Vũ</span>
                     </div>
                     <div className="p-6 bg-white rounded-lg shadow-md">

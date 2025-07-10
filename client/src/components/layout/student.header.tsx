@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { StudentContext } from '@/lib/student.context';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Layout } from 'antd';
@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from 'react';
 import { DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
-import { signOut } from "next-auth/react";
+import { signOut } from 'next-auth/react';
 import { getCookie, deleteCookie } from 'cookies-next';
 import { getCourseSelection, getCourseDisplayName, getMajorDisplayName } from '@/utils/courseUtils';
 
@@ -61,10 +61,7 @@ const StudentHeader = (props: any) => {
             localStorage.removeItem('NCToken');
             deleteCookie('NCToken');
             await signOut({ redirect: false }).catch((error: any) => {
-                if (
-                    typeof error?.message === 'string' &&
-                    error.message.includes('Unexpected end of JSON input')
-                ) {
+                if (typeof error?.message === 'string' && error.message.includes('Unexpected end of JSON input')) {
                     // Bỏ qua lỗi này
                     return;
                 }
@@ -79,11 +76,7 @@ const StudentHeader = (props: any) => {
     const items: MenuProps['items'] = [
         {
             key: '1',
-            label: (
-                <span>
-                    Settings
-                </span>
-            ),
+            label: <span>Settings</span>,
         },
         {
             key: '4',
@@ -93,7 +86,7 @@ const StudentHeader = (props: any) => {
     ];
 
     // Ưu tiên hiển thị tên từ profile, nếu không có thì dùng từ session, hoặc giá trị mặc định
-    const displayName = profile?.fullName || session?.user?.name || "Người dùng";
+    const displayName = profile?.fullName || session?.user?.name || 'Người dùng';
     const courseSelection = getCourseSelection();
 
     return (
@@ -101,22 +94,22 @@ const StudentHeader = (props: any) => {
             <Header
                 style={{
                     padding: 0,
-                    display: "flex",
-                    background: "#ffffff",
-                    justifyContent: "space-between",
-                    alignItems: "center"
-                }} >
-
+                    display: 'flex',
+                    background: '#ffffff',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}
+            >
                 <div className="flex items-center">
                     <Button
                         type="text"
                         icon={collapseMenu ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                         onClick={() => setCollapseMenu(!collapseMenu)}
                         style={{
-                             fontSize: '16px',
-                             width: 64,
-                             height: 64,
-                         }}
+                            fontSize: '16px',
+                            width: 64,
+                            height: 64,
+                        }}
                     />
                     {courseSelection && (
                         <div className="ml-4 text-sm text-gray-600">
@@ -126,9 +119,10 @@ const StudentHeader = (props: any) => {
                         </div>
                     )}
                 </div>
-                <Dropdown menu={{ items }} >
-                    <a onClick={(e) => e.preventDefault()}
-                        style={{ color: "unset", lineHeight: "0 !important", marginRight: 20 }}
+                <Dropdown menu={{ items }}>
+                    <a
+                        onClick={(e) => e.preventDefault()}
+                        style={{ color: 'unset', lineHeight: '0 !important', marginRight: 20 }}
                     >
                         <Space>
                             Xin chào {displayName}
@@ -138,7 +132,7 @@ const StudentHeader = (props: any) => {
                 </Dropdown>
             </Header>
         </>
-    )
-}
+    );
+};
 
 export default StudentHeader;

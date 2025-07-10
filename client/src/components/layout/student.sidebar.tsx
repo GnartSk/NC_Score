@@ -1,19 +1,13 @@
-'use client'
-import Layout from "antd/es/layout";
-import Menu from "antd/es/menu";
-import {
-    AppstoreOutlined,
-    GlobalOutlined,
-    PartitionOutlined,
-    ProfileOutlined,
-
-} from '@ant-design/icons';
+'use client';
+import Layout from 'antd/es/layout';
+import Menu from 'antd/es/menu';
+import { AppstoreOutlined, GlobalOutlined, PartitionOutlined, ProfileOutlined } from '@ant-design/icons';
 import React, { useContext, useEffect, useState } from 'react';
-import { StudentContext } from "@/lib/student.context";
+import { StudentContext } from '@/lib/student.context';
 import type { MenuProps } from 'antd';
-import Link from 'next/link'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGraduationCap } from "@fortawesome/free-solid-svg-icons/faGraduationCap";
+import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGraduationCap } from '@fortawesome/free-solid-svg-icons/faGraduationCap';
 import { getCourseSelection, getCourseDisplayName, getMajorDisplayName } from '@/utils/courseUtils';
 import Image from 'next/image';
 
@@ -21,18 +15,18 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 // Hàm lấy thông tin user từ API
 async function fetchUserProfile() {
-  try {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
-    if (!token) return null;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.data || null;
-  } catch {
-    return null;
-  }
+    try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('NCToken') : null;
+        if (!token) return null;
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/profile`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.data || null;
+    } catch {
+        return null;
+    }
 }
 
 const StudentSideBar = () => {
@@ -41,11 +35,10 @@ const StudentSideBar = () => {
     const [userProfile, setUserProfile] = useState<any>(null);
 
     useEffect(() => {
-      fetchUserProfile().then(setUserProfile);
+        fetchUserProfile().then(setUserProfile);
     }, []);
 
     const items: MenuItem[] = [
-
         {
             key: 'grp',
             label: (
@@ -58,13 +51,13 @@ const StudentSideBar = () => {
             type: 'group',
             children: [
                 {
-                    key: "current-score",
-                    label: <Link href={"/dashboard/score"}>Điểm hiện tại</Link>,
+                    key: 'current-score',
+                    label: <Link href={'/dashboard/score'}>Điểm hiện tại</Link>,
                     icon: <AppstoreOutlined />,
                 },
                 {
-                    key: "users",
-                    label: <Link href={"/dashboard/calender"}>Lịch</Link>,
+                    key: 'users',
+                    label: <Link href={'/dashboard/calender'}>Lịch</Link>,
                     icon: <ProfileOutlined />,
                 },
                 {
@@ -72,8 +65,8 @@ const StudentSideBar = () => {
                     label: 'Lộ trình',
                     icon: <PartitionOutlined />,
                     children: [
-                      { key: 'subject-suggestions', label: 'Đề xuất môn học' },
-                      { key: 'schedule', label: 'Xếp TKB' },
+                        { key: 'subject-suggestions', label: 'Đề xuất môn học' },
+                        { key: 'schedule', label: 'Xếp TKB' },
                     ],
                 },
                 {
@@ -94,9 +87,7 @@ const StudentSideBar = () => {
     ];
 
     return (
-        <Sider
-            collapsed={collapseMenu}
-        >
+        <Sider collapsed={collapseMenu}>
             {userProfile && !collapseMenu && (
                 <div className="p-4 bg-blue-50 border-b border-blue-200">
                     <div className="text-xs text-blue-600 font-medium mb-1">Thông tin học tập</div>
@@ -106,14 +97,9 @@ const StudentSideBar = () => {
                     </div>
                 </div>
             )}
-            <Menu
-                mode="inline"
-                defaultSelectedKeys={['dashboard']}
-                items={items}
-                style={{ height: '100vh' }}
-            />
+            <Menu mode="inline" defaultSelectedKeys={['dashboard']} items={items} style={{ height: '100vh' }} />
         </Sider>
-    )
-}
+    );
+};
 
 export default StudentSideBar;

@@ -4,8 +4,6 @@ import { Model } from 'mongoose';
 import { TrainingProgram, Subject } from './schemas/training-program.schema';
 import { UploadTrainingProgramDto } from './dto/upload-training-program.dto';
 import * as XLSX from 'xlsx';
-import { Types } from 'mongoose';
-
 @Injectable()
 export class TrainingProgramService {
   constructor(

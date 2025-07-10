@@ -1,38 +1,46 @@
-## Getting Started
+# 🌐 Backend - NC Score Application
 
-### Môi trường chạy dự án: Node.js v20.14.0
+This is the backend for the **NC Score**, built with **NestJS**.
 
-https://nodejs.org/download/release/v20.14.0/
+---
 
-===
+## ⚙️ Getting Started
 
-Các bước cài đặt: (chế độ development)
+### 1️⃣ Install Dependencies
 
-1. clone code
-2. cài đặt thư viện: npm i
-3. Update file .env.development (nếu cần thiết)
-4. Chạy dự án: npm run dev
+```bash
+npm install
+# or
+yarn install
+```
 
-===
+### 2️⃣ Start Development Server
 
 ```bash
 npm run dev
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+By default, the app will be available at:
+👉 http://localhost:8081
 
-===
+### 📦 Environment Variables
 
-Cách chạy tại chế độ production:
+This project uses environment variables stored in a .env file.
 
-1. clone code
-2. cài đặt thư viện: npm i
-3. Update file .env.production (nếu cần thiết)
-4. Build dự án: npm run build
-5. Chạy dự án: npm run preview
+A template is provided:
+📄 [`./.env.example`](./.env.example)
+Then update the values accordingly.
+
+### 🧾 Environment Variables Description
+
+| Variable Name                                                               | Description                                                                                                                                                                                              |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MONGODB_URI`                                                               | MongoDB connection string. See [MongoDB Atlas Guide](https://www.mongodb.com/docs/atlas/tutorial/connect-to-your-cluster/)                                                                               |
+| `PORT`                                                                      | Server port (default: `8081`)                                                                                                                                                                            |
+| `JWT_SECRET`                                                                | Secret key for signing JWT tokens                                                                                                                                                                        |
+| `JWT_ACCESS_TOKEN_EXPIRED`                                                  | JWT access token expiry time, e.g., `30m`                                                                                                                                                                |
+| `MAIL_USER`, `MAIL_PASSWORD`                                                | Gmail account and app password. See [Google Support](https://support.google.com/accounts/answer/185833?hl=vi) and [Google Security](https://myaccount.google.com/security)                               |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_SECRET`, `GOOGLE_CALLBACK_URL`                  | Google OAuth2 credentials. Follow [Google OAuth Guide](https://developers.google.com/identity/protocols/oauth2/web-server) and create credentials at [Google Console](https://console.cloud.google.com/) |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`      | Cloudinary credentials. See [Cloudinary Docs](https://cloudinary.com/documentation/finding_your_credentials_tutorial?utm_source=chatgpt.com)                                                             |

@@ -22,6 +22,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 import { UseFilters } from '@nestjs/common';
 import { UnauthorizedRedirectFilter } from './passport/unauthorized-exception.filter';
+import { getFrontendUri } from '@/helpers/util';
 
 @Controller('auth')
 export class AuthController {
@@ -70,9 +71,10 @@ export class AuthController {
     console.log(req);
     if (!req.user) {
       console.log('Google authentication failed, redirecting to login...');
-      return res.redirect('http://localhost:3000/auth/login');
+      return res.redirect(`${getFrontendUri()}/auth/login`);
     }
-    console.log(`Redirecting to: http://localhost:3000/auth?token=${req.user.access_token}`);
-    res.redirect(`http://localhost:3000/auth?token=${req.user.access_token}`);
+    const redirectUrl = `${getFrontendUri()}/auth?token=${req.user.access_token}`;
+    console.log(`Redirecting to: ${redirectUrl}`);
+    res.redirect(redirectUrl);
   }
 }

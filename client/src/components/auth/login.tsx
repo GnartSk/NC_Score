@@ -39,6 +39,8 @@ export default function LoginPage() {
         }
     };
 
+    console.log('NEXT_PUBLIC_BackendURL hihi = ', process.env.NEXT_PUBLIC_BackendURL);
+
     return (
         <div className="flex bg-[#F0F7FF] flex-col items-center justify-center flex-1 h-screen px-20 text-center">
             <main className="flex flex-col items-center w-screen flex-1 px-20 text-center mt-9 min-w-[764px]">
@@ -93,7 +95,7 @@ export default function LoginPage() {
                                     type="button"
                                     className="flex items-center justify-center w-full max-w-xs border border-gray-300 rounded-lg shadow-md py-2 px-4 bg-white hover:bg-gray-100 transition-all duration-300 mt-1"
                                     onClick={() =>
-                                        (window.location.href = 'http://localhost:8081/api/auth/google/login')
+                                        (window.location.href = `${process.env.NEXT_PUBLIC_BackendURL}/auth/google/login`)
                                     }
                                 >
                                     <FcGoogle className="text-2xl mr-2" />

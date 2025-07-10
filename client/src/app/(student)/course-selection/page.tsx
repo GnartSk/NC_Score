@@ -7,7 +7,7 @@ import { CourseSelection, setCourseSelection, getCourseDisplayName, getMajorDisp
 const CourseSelectionPage = () => {
     const [selection, setSelection] = useState<CourseSelection>({
         course: '',
-        major: ''
+        major: '',
     });
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -16,12 +16,12 @@ const CourseSelectionPage = () => {
     const courses = [
         { id: 'K17', name: getCourseDisplayName('K17') },
         { id: 'K18', name: getCourseDisplayName('K18') },
-        { id: 'K19', name: getCourseDisplayName('K19') }
+        { id: 'K19', name: getCourseDisplayName('K19') },
     ];
 
     const majors = [
         { id: 'ATTT', name: getMajorDisplayName('An toàn thông tin') },
-        { id: 'MMT', name: getMajorDisplayName('Mạng máy tính & Truyền thông dữ liệu') }
+        { id: 'MMT', name: getMajorDisplayName('Mạng máy tính & Truyền thông dữ liệu') },
     ];
 
     useEffect(() => {
@@ -37,7 +37,7 @@ const CourseSelectionPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!selection.course || !selection.major) {
             alert('Vui lòng chọn đầy đủ khóa học và ngành học!');
             return;
@@ -46,23 +46,23 @@ const CourseSelectionPage = () => {
         setLoading(true);
         try {
             // Lấy tên ngành đúng với DTO
-            const selectedMajor = majors.find(m => m.id === selection.major)?.name || selection.major;
+            const selectedMajor = majors.find((m) => m.id === selection.major)?.name || selection.major;
             const payload = {
                 course: selection.course,
-                major: selectedMajor
+                major: selectedMajor,
             };
             // Lưu lựa chọn vào localStorage
             setCourseSelection(payload);
-            
+
             // Gửi lên server để lưu vào database
             if (token) {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_BackendURL}/user/course-selection`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
+                        Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
                 });
 
                 if (!response.ok) {
@@ -81,11 +81,11 @@ const CourseSelectionPage = () => {
     };
 
     const handleCourseChange = (courseId: string) => {
-        setSelection(prev => ({ ...prev, course: courseId }));
+        setSelection((prev) => ({ ...prev, course: courseId }));
     };
 
     const handleMajorChange = (majorId: string) => {
-        setSelection(prev => ({ ...prev, major: majorId }));
+        setSelection((prev) => ({ ...prev, major: majorId }));
     };
 
     if (!token) {
@@ -99,15 +99,15 @@ const CourseSelectionPage = () => {
                     <div className="md:w-4/5 p-6">
                         <div className="py-6">
                             <img className="px-36" src="/LogoUIT.svg" alt="logoUIT" />
-                            <p className="font-bold text-gray-600 mt-2">Vui lòng chọn khóa học và ngành học của bạn để tiếp tục</p>
+                            <p className="font-bold text-gray-600 mt-2">
+                                Vui lòng chọn khóa học và ngành học của bạn để tiếp tục
+                            </p>
                         </div>
-                        
+
                         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                             {/* Khóa học */}
                             <div className="text-left">
-                                <label className="block text-sm font-medium text-gray-700 mb-3">
-                                    Khóa học *
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-3">Khóa học *</label>
                                 <div className="grid grid-cols-1 gap-3">
                                     {courses.map((course) => (
                                         <label
@@ -134,9 +134,7 @@ const CourseSelectionPage = () => {
 
                             {/* Ngành học */}
                             <div className="text-left">
-                                <label className="block text-sm font-medium text-gray-700 mb-3">
-                                    Ngành học *
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-3">Ngành học *</label>
                                 <div className="grid grid-cols-1 gap-3">
                                     {majors.map((major) => (
                                         <label
@@ -175,7 +173,7 @@ const CourseSelectionPage = () => {
                         <h2 className="text-3xl absolute ml-24 mt-9 text-white font-bold mb-2">
                             Chọn thông tin học tập
                         </h2>
-                        
+
                         <img className="object-cover" src="/BackgroundLogin.svg" alt="#" />
                     </div>
                 </div>
@@ -184,4 +182,4 @@ const CourseSelectionPage = () => {
     );
 };
 
-export default CourseSelectionPage; 
+export default CourseSelectionPage;

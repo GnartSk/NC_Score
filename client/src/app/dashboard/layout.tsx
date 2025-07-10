@@ -37,9 +37,9 @@ const StudentLayout = async ({
 
     const isUser = role === 'USER';
 
-    if (!role) {
-        return <div>Không xác định được quyền truy cập. Vui lòng đăng nhập lại.</div>;
-    }
+    // if (!role) {
+    //     return <div>Không xác định được quyền truy cập. Vui lòng đăng nhập lại.</div>;
+    // }
 
     return (
         <StudentContextProvider>

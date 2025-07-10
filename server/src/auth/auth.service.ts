@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '@/modules/user/user.service';
-import { comparePasswordHelper } from '@/helpers/util';
+import { comparePasswordHelper, getFrontendUri } from '@/helpers/util';
 import { JwtService } from '@nestjs/jwt';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { User } from '@/modules/user/schemas/user.schema';
@@ -78,7 +78,7 @@ export class AuthService {
         template: 'forgot_password',
         context: {
           name: user.fullName,
-          resetLink: `http://localhost:3000/reset-password?token=${token}`,
+          resetLink: `${getFrontendUri()}/reset-password?token=${token}`,
         },
       });
 
