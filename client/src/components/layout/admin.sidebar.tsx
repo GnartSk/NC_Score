@@ -26,11 +26,11 @@ const AdminSidebar = () => {
             ),
             type: 'group',
             children: [
-                {
-                    key: 'student-score',
-                    label: <Link href={'/dashboard/student-score'}>Điểm sinh viên</Link>,
-                    icon: <FaPeopleGroup />,
-                },
+                // {
+                //     key: 'student-score',
+                //     label: <Link href={'/dashboard/student-score'}>Điểm sinh viên</Link>,
+                //     icon: <FaPeopleGroup />,
+                // },
                 {
                     key: 'subject-managerment',
                     label: <Link href={'/dashboard/subject-managerment'}>Quản lý môn học</Link>,
